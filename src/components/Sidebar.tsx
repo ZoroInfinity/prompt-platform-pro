@@ -1,19 +1,31 @@
 
 import { useState } from "react";
 import { ChevronDown, ChevronRight, PenTool, BarChart3, User, Edit3, Briefcase, FileText } from "lucide-react";
+import { ChatMode } from "@/pages/Index";
 
-const Sidebar = () => {
-  const [isContentHubExpanded, setIsContentHubExpanded] = useState(false);
+interface SidebarProps {
+  currentMode: ChatMode;
+  onModeChange: (mode: ChatMode) => void;
+}
+
+const Sidebar = ({ currentMode, onModeChange }: SidebarProps) => {
+  const [isContentHubExpanded, setIsContentHubExpanded] = useState(true);
+
+  const contentCreationItems = [
+    { id: "quick-post" as ChatMode, label: "Quick Post", icon: Edit3 },
+    { id: "business-writing" as ChatMode, label: "Business Writing", icon: Briefcase },
+    { id: "content-writing" as ChatMode, label: "Content Writing", icon: FileText },
+  ];
 
   return (
     <div className="w-64 bg-card border-r border-border h-screen flex flex-col">
       {/* Header */}
-      <div className="p-4 border-b border-border">
+      <div className="p-6 border-b border-border">
         <h1 className="text-xl font-semibold text-foreground">GenAI Studio</h1>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2">
+      <nav className="flex-1 p-4 space-y-1">
         {/* Content Creation Hub */}
         <div>
           <button
@@ -33,18 +45,20 @@ const Sidebar = () => {
 
           {isContentHubExpanded && (
             <div className="ml-8 mt-2 space-y-1">
-              <button className="w-full flex items-center space-x-3 p-2 rounded-md hover:bg-accent transition-colors text-muted-foreground hover:text-foreground">
-                <Edit3 className="w-4 h-4" />
-                <span>Quick Post</span>
-              </button>
-              <button className="w-full flex items-center space-x-3 p-2 rounded-md hover:bg-accent transition-colors text-muted-foreground hover:text-foreground">
-                <Briefcase className="w-4 h-4" />
-                <span>Business Writing</span>
-              </button>
-              <button className="w-full flex items-center space-x-3 p-2 rounded-md hover:bg-accent transition-colors text-muted-foreground hover:text-foreground">
-                <FileText className="w-4 h-4" />
-                <span>Content Writing</span>
-              </button>
+              {contentCreationItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => onModeChange(item.id)}
+                  className={`w-full flex items-center space-x-3 p-2 rounded-md transition-colors ${
+                    currentMode === item.id
+                      ? "bg-sky-50 text-sky-700 border border-sky-200"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                  }`}
+                >
+                  <item.icon className="w-4 h-4" />
+                  <span>{item.label}</span>
+                </button>
+              ))}
             </div>
           )}
         </div>

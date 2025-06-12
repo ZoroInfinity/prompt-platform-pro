@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Edit, Image, MoreHorizontal } from "lucide-react";
+import { Edit, Image, MoreHorizontal, Copy, Share } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -37,20 +37,20 @@ const ContentCard = ({ content, onEdit }: ContentCardProps) => {
   };
 
   return (
-    <div className="bg-card border border-border rounded-lg shadow-sm hover:shadow-md transition-shadow">
+    <div className="bg-card border border-border rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden">
       {/* Header */}
-      <div className="p-4 border-b border-border flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <div className={`w-3 h-3 rounded ${content.color}`} />
-          <span className="font-medium text-foreground">{content.platform}</span>
+      <div className="p-4 border-b border-border flex items-center justify-between bg-gray-50/50">
+        <div className="flex items-center space-x-3">
+          <div className={`w-4 h-4 rounded-full ${content.color}`} />
+          <span className="font-medium text-foreground text-sm">{content.platform}</span>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" className="rounded-full">
               <MoreHorizontal className="w-4 h-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
+          <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => setIsEditing(true)}>
               <Edit className="w-4 h-4 mr-2" />
               Edit Text
@@ -59,12 +59,20 @@ const ContentCard = ({ content, onEdit }: ContentCardProps) => {
               <Image className="w-4 h-4 mr-2" />
               Change Image
             </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Copy className="w-4 h-4 mr-2" />
+              Copy Text
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Share className="w-4 h-4 mr-2" />
+              Share
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
 
       {/* Image */}
-      <div className="aspect-video bg-muted">
+      <div className="aspect-video bg-muted relative overflow-hidden">
         <img
           src={content.image}
           alt="Content visual"
@@ -75,35 +83,39 @@ const ContentCard = ({ content, onEdit }: ContentCardProps) => {
       {/* Content */}
       <div className="p-4">
         {isEditing ? (
-          <div className="space-y-3">
+          <div className="space-y-4">
             <Textarea
               value={editText}
               onChange={(e) => setEditText(e.target.value)}
-              className="min-h-24 resize-none"
+              className="min-h-24 resize-none border-border"
             />
             <div className="flex space-x-2">
-              <Button onClick={handleSave} size="sm" className="bg-sky-500 hover:bg-sky-600">
-                Save
+              <Button onClick={handleSave} size="sm" className="bg-sky-500 hover:bg-sky-600 rounded-lg">
+                Save Changes
               </Button>
-              <Button onClick={handleCancel} variant="outline" size="sm">
+              <Button onClick={handleCancel} variant="outline" size="sm" className="rounded-lg">
                 Cancel
               </Button>
             </div>
           </div>
         ) : (
-          <div className="space-y-3">
-            <p className="text-sm text-foreground whitespace-pre-wrap">{content.content}</p>
+          <div className="space-y-4">
+            <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">{content.content}</p>
             <div className="flex space-x-2">
               <Button
                 onClick={() => setIsEditing(true)}
                 variant="outline"
                 size="sm"
-                className="flex items-center space-x-1"
+                className="flex items-center space-x-1 rounded-lg hover:bg-sky-50 hover:border-sky-200"
               >
                 <Edit className="w-3 h-3" />
                 <span>Edit Text</span>
               </Button>
-              <Button variant="outline" size="sm" className="flex items-center space-x-1">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex items-center space-x-1 rounded-lg hover:bg-sky-50 hover:border-sky-200"
+              >
                 <Image className="w-3 h-3" />
                 <span>Change Image</span>
               </Button>
