@@ -1,47 +1,79 @@
 
-import { useState } from "react";
-import Sidebar from "@/components/Sidebar";
-import ChatInterface from "@/components/ChatInterface";
-import ContextualPanel from "@/components/ContextualPanel";
-
-export type ChatMode = "general" | "quick-post" | "business-writing" | "content-writing";
+import { useState } from "react"
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { AppSidebar } from "@/components/AppSidebar"
+import { ThemeProvider } from "@/components/ThemeProvider"
+import { ThemeToggle } from "@/components/ThemeToggle"
+import { UserProfile } from "@/components/UserProfile"
+import { ChatInterface } from "@/components/ChatInterface"
+import { ContentCreationMode } from "@/components/ContentCreationMode"
+import { BrandPersonaMode } from "@/components/BrandPersonaMode"
+import { ImageFineTuningMode } from "@/components/ImageFineTuningMode"
 
 const Index = () => {
-  const [generatedContent, setGeneratedContent] = useState<any[]>([]);
-  const [showContextualPanel, setShowContextualPanel] = useState(false);
-  const [currentMode, setCurrentMode] = useState<ChatMode>("general");
+  const [activeMode, setActiveMode] = useState<string>("quick-post")
 
-  const handleContentGenerated = (content: any[]) => {
-    setGeneratedContent(content);
-    setShowContextualPanel(true);
-  };
+  const renderActiveMode = () => {
+    switch (activeMode) {
+      case "quick-post":
+      case "business-writing": // Keep business writing in the same interface
+        return <ChatInterface onModeActivation={setActiveMode} activeMode={activeMode} />
+      case "content-creation":
+        return <ContentCreationMode />
+      case "brand-persona":
+        return <BrandPersonaMode />
+      case "image-finetuning":
+        return <ImageFineTuningMode />
+      default:
+        return <ChatInterface onModeActivation={setActiveMode} activeMode={activeMode} />
+    }
+  }
 
-  const handleModeChange = (mode: ChatMode) => {
-    setCurrentMode(mode);
-    // Clear previous content when switching modes
-    setGeneratedContent([]);
-    setShowContextualPanel(false);
-  };
+  // Function to reset to home state
+  const handleHomeClick = () => {
+    setActiveMode("quick-post")
+  }
 
   return (
-    <div className="min-h-screen bg-background flex w-full">
-      <Sidebar currentMode={currentMode} onModeChange={handleModeChange} />
-      
-      <div className="flex-1 flex">
-        <ChatInterface 
-          currentMode={currentMode}
-          onModeChange={handleModeChange}
-          onContentGenerated={handleContentGenerated}
-          generatedContent={generatedContent}
-          setGeneratedContent={setGeneratedContent}
-        />
-        
-        {showContextualPanel && (
-          <ContextualPanel onClose={() => setShowContextualPanel(false)} />
-        )}
-      </div>
-    </div>
-  );
-};
+    <ThemeProvider>
+      <div className="min-h-screen gradient-bg">
+        <SidebarProvider>
+          <div className="flex min-h-screen w-full">
+            <AppSidebar 
+              activeMode={activeMode} 
+              onModeChange={setActiveMode}
+              onHomeClick={handleHomeClick}
+            />
+            
+            <main className="flex-1 flex flex-col">
+              <header className="glass-card border-b backdrop-blur-xl bg-white/25 dark:bg-slate-900/30 sticky top-0 z-50">
+                <div className="flex items-center justify-between px-6 py-4">
+                  <div className="flex items-center gap-4">
+                    <SidebarTrigger className="glass-card hover:bg-white/30 dark:hover:bg-slate-800/30" />
+                    <h1 className="text-2xl font-bold text-foreground">AutoText AI</h1>
+                  </div>
+                  
+                  <div className="flex items-center gap-4">
+                    <ThemeToggle />
+                    <UserProfile />
+                  </div>
+                </div>
+              </header>
 
-export default Index;
+              <div className="flex-1 flex flex-col items-center justify-center p-6">
+                <div className="w-full max-w-4xl mx-auto">
+                  <div className="text-center mb-8">
+                    <h2 className="text-3xl font-bold text-foreground mb-2">Your Creative Assistant Awaits</h2>
+                  </div>
+                  {renderActiveMode()}
+                </div>
+              </div>
+            </main>
+          </div>
+        </SidebarProvider>
+      </div>
+    </ThemeProvider>
+  )
+}
+
+export default Index

@@ -1,130 +1,117 @@
 
-import { useState } from "react";
-import { Edit, Image, MoreHorizontal, Copy, Share } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { useState } from "react"
+import { Instagram, Linkedin, X, Edit, Palette, Calendar, Send } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 interface ContentCardProps {
-  content: {
-    id: number;
-    platform: string;
-    platformId: string;
-    color: string;
-    content: string;
-    image: string;
-  };
-  onEdit: (id: number, newText: string) => void;
+  content: string
+  defaultPlatform?: string
 }
 
-const ContentCard = ({ content, onEdit }: ContentCardProps) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editText, setEditText] = useState(content.content);
+export function ContentCard({ content, defaultPlatform = "instagram" }: ContentCardProps) {
+  const [selectedPlatform, setSelectedPlatform] = useState(defaultPlatform)
 
-  const handleSave = () => {
-    onEdit(content.id, editText);
-    setIsEditing(false);
-  };
+  const platformIcons = {
+    instagram: Instagram,
+    linkedin: Linkedin,
+    x: X,
+  }
 
-  const handleCancel = () => {
-    setEditText(content.content);
-    setIsEditing(false);
-  };
+  const platformColors = {
+    instagram: "bg-gradient-to-r from-purple-500 to-pink-500",
+    linkedin: "bg-blue-600",
+    x: "bg-gray-900 dark:bg-gray-100",
+  }
+
+  const PlatformIcon = platformIcons[selectedPlatform as keyof typeof platformIcons]
 
   return (
-    <div className="bg-card border border-border rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden">
-      {/* Header */}
-      <div className="p-4 border-b border-border flex items-center justify-between bg-gray-50/50">
-        <div className="flex items-center space-x-3">
-          <div className={`w-4 h-4 rounded-full ${content.color}`} />
-          <span className="font-medium text-foreground text-sm">{content.platform}</span>
+    <Card className="glass-card animate-fade-in hover:shadow-2xl transition-all duration-300 group">
+      <CardContent className="pt-6">
+        <div className="flex items-center justify-between mb-4">
+          <Select value={selectedPlatform} onValueChange={setSelectedPlatform}>
+            <SelectTrigger className="w-40 glass border-0 hover:bg-white/30 dark:hover:bg-slate-800/30">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="glass-card backdrop-blur-xl bg-white/90 dark:bg-slate-900/90">
+              <SelectItem value="instagram">
+                <div className="flex items-center">
+                  <Instagram className="mr-2 h-4 w-4" />
+                  Instagram
+                </div>
+              </SelectItem>
+              <SelectItem value="linkedin">
+                <div className="flex items-center">
+                  <Linkedin className="mr-2 h-4 w-4" />
+                  LinkedIn
+                </div>
+              </SelectItem>
+              <SelectItem value="x">
+                <div className="flex items-center">
+                  <X className="mr-2 h-4 w-4" />
+                  X (Twitter)
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+          
+          <Badge 
+            className={`text-white border-0 ${platformColors[selectedPlatform as keyof typeof platformColors]}`}
+          >
+            <PlatformIcon className="mr-1 h-3 w-3" />
+            {selectedPlatform.charAt(0).toUpperCase() + selectedPlatform.slice(1)}
+          </Badge>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="rounded-full">
-              <MoreHorizontal className="w-4 h-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => setIsEditing(true)}>
-              <Edit className="w-4 h-4 mr-2" />
-              Edit Text
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Image className="w-4 h-4 mr-2" />
-              Change Image
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Copy className="w-4 h-4 mr-2" />
-              Copy Text
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Share className="w-4 h-4 mr-2" />
-              Share
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
 
-      {/* Image */}
-      <div className="aspect-video bg-muted relative overflow-hidden">
-        <img
-          src={content.image}
-          alt="Content visual"
-          className="w-full h-full object-cover"
-        />
-      </div>
+        <div className="bg-white/50 dark:bg-slate-800/50 rounded-lg p-4 border border-white/20 dark:border-slate-700/20">
+          <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+            {content}
+          </p>
+        </div>
+      </CardContent>
 
-      {/* Content */}
-      <div className="p-4">
-        {isEditing ? (
-          <div className="space-y-4">
-            <Textarea
-              value={editText}
-              onChange={(e) => setEditText(e.target.value)}
-              className="min-h-24 resize-none border-border"
-            />
-            <div className="flex space-x-2">
-              <Button onClick={handleSave} size="sm" className="bg-sky-500 hover:bg-sky-600 rounded-lg">
-                Save Changes
-              </Button>
-              <Button onClick={handleCancel} variant="outline" size="sm" className="rounded-lg">
-                Cancel
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">{content.content}</p>
-            <div className="flex space-x-2">
-              <Button
-                onClick={() => setIsEditing(true)}
-                variant="outline"
-                size="sm"
-                className="flex items-center space-x-1 rounded-lg hover:bg-sky-50 hover:border-sky-200"
-              >
-                <Edit className="w-3 h-3" />
-                <span>Edit Text</span>
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="flex items-center space-x-1 rounded-lg hover:bg-sky-50 hover:border-sky-200"
-              >
-                <Image className="w-3 h-3" />
-                <span>Change Image</span>
-              </Button>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-export default ContentCard;
+      <CardFooter className="flex gap-2 pt-0">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="glass border-0 hover:bg-white/30 dark:hover:bg-slate-800/30 transition-all duration-200"
+        >
+          <Edit className="mr-1 h-3 w-3" />
+          Edit
+        </Button>
+        <Button 
+          variant="outline" 
+          size="sm"
+          className="glass border-0 hover:bg-white/30 dark:hover:bg-slate-800/30 transition-all duration-200"
+        >
+          <Palette className="mr-1 h-3 w-3" />
+          Customize
+        </Button>
+        <Button 
+          variant="outline" 
+          size="sm"
+          className="glass border-0 hover:bg-white/30 dark:hover:bg-slate-800/30 transition-all duration-200"
+        >
+          <Calendar className="mr-1 h-3 w-3" />
+          Schedule
+        </Button>
+        <Button 
+          size="sm"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200 group-hover:animate-glow"
+        >
+          <Send className="mr-1 h-3 w-3" />
+          Post Now
+        </Button>
+      </CardFooter>
+    </Card>
+  )
+}
