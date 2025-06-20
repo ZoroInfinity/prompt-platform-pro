@@ -16,7 +16,7 @@ const Index = () => {
   const renderActiveMode = () => {
     switch (activeMode) {
       case "quick-post":
-      case "business-writing": // Keep business writing in the same interface
+      case "business-writing":
         return <ChatInterface onModeActivation={setActiveMode} activeMode={activeMode} />
       case "content-creation":
         return <ContentCreationMode />
@@ -29,7 +29,6 @@ const Index = () => {
     }
   }
 
-  // Function to reset to home state
   const handleHomeClick = () => {
     setActiveMode("quick-post")
   }
@@ -60,11 +59,8 @@ const Index = () => {
                 </div>
               </header>
 
-              <div className="flex-1 flex flex-col items-center justify-center p-6">
-                <div className="w-full max-w-4xl mx-auto">
-                  <div className="text-center mb-8">
-                    <h2 className="text-3xl font-bold text-foreground mb-2">Your Creative Assistant Awaits</h2>
-                  </div>
+              <div className="flex-1 flex flex-col p-4">
+                <div className="w-full mx-auto">
                   {renderActiveMode()}
                 </div>
               </div>

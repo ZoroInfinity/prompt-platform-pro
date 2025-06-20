@@ -1,16 +1,18 @@
 import { useState } from "react"
-import { Send, Sparkles, Image as ImageIcon, Brain, FileText, Edit, X, MessageSquare, Square } from "lucide-react"
+import { Send, Sparkles, Image as ImageIcon, Brain, FileText, Edit, X, MessageSquare, Square, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ContentPreviewCard } from "@/components/ContentPreviewCard"
 import { EditorTray } from "@/components/EditorTray"
 import { MediaSearchSidebar } from "@/components/MediaSearchSidebar"
 import { FeatureTray } from "@/components/FeatureTray"
 import { PostPreviewModal } from "@/components/PostPreviewModal"
 import { BusinessContentCard } from "@/components/BusinessContentCard"
+import { Instagram, Linkedin, Twitter } from "lucide-react"
 
 interface GeneratedContent {
   platform: string
@@ -37,6 +39,7 @@ export function ChatInterface({ onModeActivation, activeMode = "quick-post" }: C
   const [businessContents, setBusinessContents] = useState<BusinessContent[]>([])
   const [hasGenerated, setHasGenerated] = useState(false)
   const [sharedImage, setSharedImage] = useState<string | null>(null)
+  const [selectedModel, setSelectedModel] = useState("default")
   const [editorTray, setEditorTray] = useState<{isOpen: boolean, platform: string, content: string, outputId: string}>({
     isOpen: false,
     platform: "",
@@ -83,6 +86,19 @@ export function ChatInterface({ onModeActivation, activeMode = "quick-post" }: C
     { id: "business-writing", label: "Business Writing", icon: FileText, tooltip: "Create professional business content" },
     { id: "content-creation", label: "Content Creation", icon: Edit, tooltip: "Advanced content creation tools" }
   ]
+
+  const modelOptions = [
+    { value: "default", label: "Default" },
+    { value: "witty", label: "Witty" },
+    { value: "formal", label: "Formal" },
+    { value: "experimental", label: "Experimental" }
+  ]
+
+  const platformIcons = {
+    instagram: Instagram,
+    linkedin: Linkedin,
+    twitter: Twitter
+  }
 
   const sampleImages = [
     "photo-1488590528505-98d2b5aba04b",
@@ -263,7 +279,6 @@ What's one insight that changed your perspective recently? 🤔
       setTimeout(() => {
         const newBusinessContents: BusinessContent[] = []
         
-        // Generate 2 versions for business writing
         for (let i = 0; i < 2; i++) {
           newBusinessContents.push({
             content: generateBusinessContent(input, documentType),
@@ -277,20 +292,11 @@ What's one insight that changed your perspective recently? 🤔
         setIsGenerating(false)
       }, 800)
     } else {
-      // Quick Post logic
       const platformsToUse = activeMode === "quick-post" 
         ? featureConfigs["quick-post"].platforms || ["linkedin"]
         : ["linkedin"]
       
       if (activeMode === "quick-post" && featureConfigs["quick-post"].autoImage) {
-        const sampleImages = [
-          "photo-1488590528505-98d2b5aba04b",
-          "photo-1461749280684-dccba630e2f6", 
-          "photo-1581091226825-a6a2a5aee158",
-          "photo-1486312338219-ce68d2c6f44d",
-          "photo-1518770660439-4636190af475",
-          "photo-1649972904349-6e44c42644a7"
-        ]
         const imageId = sampleImages[Math.floor(Math.random() * sampleImages.length)]
         setSharedImage(imageId)
       }
@@ -321,7 +327,6 @@ What's one insight that changed your perspective recently? 🤔
   }
 
   const handleModeChange = (modeId: string) => {
-    // Clear previous content when switching modes
     if (modeId !== activeMode) {
       setGeneratedContents([])
       setBusinessContents([])
@@ -437,8 +442,8 @@ What's one insight that changed your perspective recently? 🤔
   }
 
   return (
-    <div className="w-full max-w-[1800px] mx-auto px-2">
-      {/* Main Chat Interface */}
+    <div className="w-full max-w-none mx-auto px-2">
+      {/* Chat Interface - Always at top */}
       <div className="glass-card p-6 mb-6">
         <div className="space-y-4">
           <div className="flex gap-3">
@@ -455,26 +460,35 @@ What's one insight that changed your perspective recently? 🤔
                   handleGenerate()
                 }
               }}
-              className="glass border-0 bg-white/50 dark:bg-slate-800/50 placeholder:text-muted-foreground/70 text-base py-3 min-h-[80px] max-h-[120px] resize-none"
-              rows={3}
+              className="glass border-0 bg-white/50 dark:bg-slate-800/50 placeholder:text-muted-foreground/70 text-base py-3 resize-none flex-1"
+              rows={hasGenerated ? 1 : 2}
             />
-            <Button 
-              onClick={isGenerating ? handleStopGeneration : handleGenerate}
-              disabled={!isGenerating && !input.trim()}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200 px-6 py-3 self-start"
-            >
-              {isGenerating ? (
-                <>
-                  <Square className="h-4 w-4 mr-2" />
-                  Stop
-                </>
-              ) : (
-                <>
-                  <Send className="h-4 w-4 mr-2" />
-                  Generate
-                </>
-              )}
-            </Button>
+            <div className="flex items-end gap-2">
+              <Select value={selectedModel} onValueChange={setSelectedModel}>
+                <SelectTrigger className="glass border-0 w-32 h-10">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="glass-card">
+                  {modelOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button 
+                onClick={isGenerating ? handleStopGeneration : handleGenerate}
+                disabled={!isGenerating && !input.trim()}
+                size="icon"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200 h-10 w-10"
+              >
+                {isGenerating ? (
+                  <Square className="h-4 w-4" />
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
           </div>
 
           {/* Mode Selection Icons */}
@@ -533,17 +547,21 @@ What's one insight that changed your perspective recently? 🤔
 
       {/* Quick Post Content Layout */}
       {activeMode === "quick-post" && generatedContents.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-8">
           {/* Content Area - 3/5 width */}
           <div className="lg:col-span-3">
             <div className="glass-card p-6">
               <Tabs defaultValue={selectedPlatforms[0]} className="w-full">
                 <TabsList className="grid w-full mb-6" style={{gridTemplateColumns: `repeat(${selectedPlatforms.length}, 1fr)`}}>
-                  {selectedPlatforms.map(platform => (
-                    <TabsTrigger key={platform} value={platform} className="capitalize">
-                      {platform}
-                    </TabsTrigger>
-                  ))}
+                  {selectedPlatforms.map(platform => {
+                    const IconComponent = platformIcons[platform as keyof typeof platformIcons]
+                    return (
+                      <TabsTrigger key={platform} value={platform} className="capitalize flex items-center gap-2">
+                        {IconComponent && <IconComponent className="h-4 w-4" />}
+                        {platform}
+                      </TabsTrigger>
+                    )
+                  })}
                 </TabsList>
                 
                 {selectedPlatforms.map(platform => {
@@ -589,20 +607,20 @@ What's one insight that changed your perspective recently? 🤔
             </div>
           </div>
 
-          {/* Enhanced Image Section - 2/5 width */}
+          {/* Enhanced Image Section - 2/5 width, matching content height */}
           <div className="lg:col-span-2">
-            <div className="glass-card p-6 sticky top-24">
+            <div className="glass-card p-6 h-[500px] flex flex-col">
               <h3 className="text-xl font-semibold mb-6">Shared Image</h3>
               {sharedImage ? (
-                <div className="space-y-4">
-                  <div className="relative rounded-xl overflow-hidden bg-muted/20 shadow-lg aspect-square max-h-[300px]">
+                <div className="flex flex-col flex-1">
+                  <div className="relative rounded-xl overflow-hidden bg-muted/20 shadow-lg aspect-square flex-1 max-h-[340px]">
                     <img 
                       src={`https://images.unsplash.com/${sharedImage}?w=600&h=600&fit=crop`}
                       alt="Shared content image" 
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <div className="grid grid-cols-1 gap-3">
+                  <div className="grid grid-cols-1 gap-3 mt-4">
                     <Button
                       variant="outline"
                       className="glass border-0 hover:bg-white/30 dark:hover:bg-slate-800/30"
@@ -622,7 +640,7 @@ What's one insight that changed your perspective recently? 🤔
                   </div>
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center py-16 border-2 border-dashed border-muted-foreground/20 rounded-xl aspect-square max-h-[300px]">
+                <div className="flex flex-col items-center justify-center flex-1 border-2 border-dashed border-muted-foreground/20 rounded-xl aspect-square max-h-[340px]">
                   <ImageIcon className="h-12 w-12 text-muted-foreground/40 mb-4" />
                   <p className="text-muted-foreground mb-4">No image selected</p>
                   <Button
