@@ -1,4 +1,3 @@
-
 import { useState } from "react"
 import { Send, Sparkles, Image as ImageIcon, Brain, FileText, Edit, X, MessageSquare, Square, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -443,231 +442,240 @@ What's one insight that changed your perspective recently? 🤔
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4">
-      {/* Show heading only after generation */}
-      {hasGenerated && (
-        <div className="mb-4">
-          <h1 className="text-lg font-medium text-foreground">AutoText AI</h1>
-        </div>
-      )}
+    <div className="w-full">
+      {/* Chat Interface - Landing State (Centered) or Post-Generation (Top Fixed) */}
+      <div className={`${hasGenerated ? 'sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-white/20 dark:border-slate-700/20' : 'min-h-[70vh] flex items-center justify-center'}`}>
+        <div className={`w-full max-w-4xl mx-auto px-6 py-6 ${hasGenerated ? '' : 'glass-card rounded-xl shadow-2xl'}`}>
+          {/* Landing Heading - Show only before generation */}
+          {!hasGenerated && (
+            <div className="text-center mb-8">
+              <h1 className="text-2xl font-semibold text-foreground mb-2">
+                Let's create something amazing!
+              </h1>
+            </div>
+          )}
 
-      {/* Chat Interface - Centered when no content, at top after generation */}
-      <div className={`glass-card p-6 mb-6 ${!hasGenerated ? 'min-h-[60vh] flex items-center justify-center' : ''}`}>
-        <div className={`space-y-4 ${!hasGenerated ? 'w-full max-w-2xl' : 'w-full'}`}>
-          <div className="flex gap-3">
-            <Textarea
-              placeholder={activeMode === "business-writing" 
-                ? "Describe the business document you need..." 
-                : "What would you like to create today?"
-              }
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault()
-                  handleGenerate()
+          <div className="space-y-4">
+            <div className="flex gap-3">
+              <Textarea
+                placeholder={activeMode === "business-writing" 
+                  ? "Describe the business document you need..." 
+                  : "What would you like to create today?"
                 }
-              }}
-              className="glass border-0 bg-white/50 dark:bg-slate-800/50 placeholder:text-muted-foreground/70 text-base py-3 resize-none flex-1"
-              rows={hasGenerated ? 1 : 2}
-            />
-          </div>
-
-          {/* UI Controls Row */}
-          <div className="flex items-center justify-between">
-            {/* Left-aligned: Feature Icons */}
-            <div className="flex gap-2">
-              <TooltipProvider>
-                {modes.map((mode) => {
-                  const Icon = mode.icon
-                  const isActive = activeMode === mode.id
-                  return (
-                    <Tooltip key={mode.id}>
-                      <TooltipTrigger asChild>
-                        <div className="relative">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleModeChange(mode.id)}
-                            onMouseEnter={(e) => handleFeatureIconHover(mode.id, e)}
-                            onContextMenu={(e) => handleFeatureIconRightClick(mode.id, e)}
-                            className={`glass border-0 p-3 rounded-full hover:bg-white/30 dark:hover:bg-slate-800/30 transition-all duration-200 ${
-                              isActive 
-                                ? "bg-primary/20 ring-2 ring-primary/50 shadow-lg" 
-                                : ""
-                            }`}
-                          >
-                            <Icon className={`h-4 w-4 ${isActive ? "text-primary" : "text-muted-foreground"}`} />
-                          </Button>
-                          {getFeatureBadge(mode.id)}
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{mode.tooltip}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  )
-                })}
-              </TooltipProvider>
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault()
+                    handleGenerate()
+                  }
+                }}
+                className="glass border-0 bg-white/50 dark:bg-slate-800/50 placeholder:text-muted-foreground/70 text-base py-3 resize-none flex-1"
+                rows={hasGenerated ? 1 : 2}
+              />
             </div>
 
-            {/* Right-aligned: Model Dropdown + Generate Button */}
-            <div className="flex items-center gap-2">
-              <Select value={selectedModel} onValueChange={setSelectedModel}>
-                <SelectTrigger className="glass border-0 w-32 h-10">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="glass-card">
-                  {modelOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button 
-                onClick={isGenerating ? handleStopGeneration : handleGenerate}
-                disabled={!isGenerating && !input.trim()}
-                size="icon"
-                className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200 h-10 w-10"
-              >
-                {isGenerating ? (
-                  <Square className="h-4 w-4" />
-                ) : (
-                  <Send className="h-4 w-4" />
-                )}
-              </Button>
+            {/* UI Controls Row */}
+            <div className="flex items-center justify-between">
+              {/* Left-aligned: Feature Icons */}
+              <div className="flex gap-2">
+                <TooltipProvider>
+                  {modes.map((mode) => {
+                    const Icon = mode.icon
+                    const isActive = activeMode === mode.id
+                    return (
+                      <Tooltip key={mode.id}>
+                        <TooltipTrigger asChild>
+                          <div className="relative">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleModeChange(mode.id)}
+                              onMouseEnter={(e) => handleFeatureIconHover(mode.id, e)}
+                              onContextMenu={(e) => handleFeatureIconRightClick(mode.id, e)}
+                              className={`glass border-0 p-3 rounded-full hover:bg-white/30 dark:hover:bg-slate-800/30 transition-all duration-200 ${
+                                isActive 
+                                  ? "bg-primary/20 ring-2 ring-primary/50 shadow-lg" 
+                                  : ""
+                              }`}
+                            >
+                              <Icon className={`h-4 w-4 ${isActive ? "text-primary" : "text-muted-foreground"}`} />
+                            </Button>
+                            {getFeatureBadge(mode.id)}
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{mode.tooltip}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    )
+                  })}
+                </TooltipProvider>
+              </div>
+
+              {/* Right-aligned: Model Dropdown + Generate Button */}
+              <div className="flex items-center gap-2">
+                <Select value={selectedModel} onValueChange={setSelectedModel}>
+                  <SelectTrigger className="glass border-0 w-32 h-10">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="glass-card">
+                    {modelOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button 
+                  onClick={isGenerating ? handleStopGeneration : handleGenerate}
+                  disabled={!isGenerating && !input.trim()}
+                  size="icon"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200 h-10 w-10"
+                >
+                  {isGenerating ? (
+                    <Square className="h-4 w-4" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Business Writing Content */}
-      {activeMode === "business-writing" && businessContents.length > 0 && (
-        <div className="space-y-8 mb-8">
-          {businessContents.map((content, index) => (
-            <BusinessContentCard
-              key={content.outputId}
-              content={content.content}
-              documentType={content.documentType}
-              versionLabel={`Version ${index + 1}`}
-              onContentChange={(newContent) => handleBusinessContentChange(content.outputId, newContent)}
-              showCitations={featureConfigs["business-writing"].showCitations}
-            />
-          ))}
-        </div>
-      )}
+      {/* Content Area - Only show after generation */}
+      {hasGenerated && (
+        <div className="w-full max-w-6xl mx-auto px-6 py-8">
+          {/* Business Writing Content */}
+          {activeMode === "business-writing" && businessContents.length > 0 && (
+            <div className="space-y-8">
+              {businessContents.map((content, index) => (
+                <BusinessContentCard
+                  key={content.outputId}
+                  content={content.content}
+                  documentType={content.documentType}
+                  versionLabel={`Version ${index + 1}`}
+                  onContentChange={(newContent) => handleBusinessContentChange(content.outputId, newContent)}
+                  showCitations={featureConfigs["business-writing"].showCitations}
+                />
+              ))}
+            </div>
+          )}
 
-      {/* Quick Post Content Layout - 2 Column */}
-      {activeMode === "quick-post" && generatedContents.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-8">
-          {/* Content Area - 3/5 width */}
-          <div className="lg:col-span-3">
-            <div className="glass-card p-6">
-              <Tabs defaultValue={selectedPlatforms[0]} className="w-full">
-                <TabsList className="grid w-full mb-6" style={{gridTemplateColumns: `repeat(${selectedPlatforms.length}, 1fr)`}}>
-                  {selectedPlatforms.map(platform => {
-                    const IconComponent = platformIcons[platform as keyof typeof platformIcons]
-                    return (
-                      <TabsTrigger key={platform} value={platform} className="capitalize flex items-center gap-2">
-                        {IconComponent && <IconComponent className="h-4 w-4" />}
-                        {platform}
-                      </TabsTrigger>
-                    )
-                  })}
-                </TabsList>
-                
-                {selectedPlatforms.map(platform => {
-                  const platformContents = getContentForPlatform(platform)
-                  if (platformContents.length === 0) return null
-                  
-                  return (
-                    <TabsContent key={platform} value={platform}>
-                      <div className="relative">
-                        <Carousel 
-                          className="w-full" 
-                          opts={{
-                            align: "start",
-                            loop: false,
-                          }}
-                        >
-                          <CarouselContent className="-ml-2 md:-ml-4">
-                            {platformContents.map((content, index) => (
-                              <CarouselItem key={content.outputId} className="pl-2 md:pl-4 basis-full">
-                                <div className="h-[500px]">
-                                  <ContentPreviewCard
-                                    platform={content.platform}
-                                    content={content.content}
-                                    image={null}
-                                    onEdit={() => handleEditContent(content.platform, content.outputId)}
-                                    onContentChange={(newContent) => handleContentChange(content.platform, content.outputId, newContent)}
-                                    onPostNow={() => handlePostNow(content.platform, content.content)}
-                                    versionLabel={`Version ${index + 1}`}
-                                    isCompact={false}
-                                  />
-                                </div>
-                              </CarouselItem>
-                            ))}
-                          </CarouselContent>
-                          <CarouselPrevious className="glass border-0" />
-                          <CarouselNext className="glass border-0" />
-                        </Carousel>
+          {/* Quick Post Content Layout - 2 Column */}
+          {activeMode === "quick-post" && generatedContents.length > 0 && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Content Area - 2/3 width */}
+              <div className="lg:col-span-2">
+                <div className="glass-card p-6 h-full">
+                  <Tabs defaultValue={selectedPlatforms[0]} className="w-full">
+                    <TabsList className="grid w-full mb-6" style={{gridTemplateColumns: `repeat(${selectedPlatforms.length}, 1fr)`}}>
+                      {selectedPlatforms.map(platform => {
+                        const IconComponent = platformIcons[platform as keyof typeof platformIcons]
+                        return (
+                          <TabsTrigger key={platform} value={platform} className="capitalize flex items-center gap-2">
+                            {IconComponent && <IconComponent className="h-4 w-4" />}
+                            {platform}
+                          </TabsTrigger>
+                        )
+                      })}
+                    </TabsList>
+                    
+                    {selectedPlatforms.map(platform => {
+                      const platformContents = getContentForPlatform(platform)
+                      if (platformContents.length === 0) return null
+                      
+                      return (
+                        <TabsContent key={platform} value={platform}>
+                          <div className="relative">
+                            <Carousel 
+                              className="w-full" 
+                              opts={{
+                                align: "start",
+                                loop: false,
+                              }}
+                            >
+                              <CarouselContent className="-ml-2 md:-ml-4">
+                                {platformContents.map((content, index) => (
+                                  <CarouselItem key={content.outputId} className="pl-2 md:pl-4 basis-full">
+                                    <div className="h-[500px]">
+                                      <ContentPreviewCard
+                                        platform={content.platform}
+                                        content={content.content}
+                                        image={null}
+                                        onEdit={() => handleEditContent(content.platform, content.outputId)}
+                                        onContentChange={(newContent) => handleContentChange(content.platform, content.outputId, newContent)}
+                                        onPostNow={() => handlePostNow(content.platform, content.content)}
+                                        versionLabel={`Version ${index + 1}`}
+                                        isCompact={false}
+                                      />
+                                    </div>
+                                  </CarouselItem>
+                                ))}
+                              </CarouselContent>
+                              <CarouselPrevious className="glass border-0" />
+                              <CarouselNext className="glass border-0" />
+                            </Carousel>
+                          </div>
+                        </TabsContent>
+                      )
+                    })}
+                  </Tabs>
+                </div>
+              </div>
+
+              {/* Image Section - 1/3 width, matching content height */}
+              <div className="lg:col-span-1">
+                <div className="glass-card p-6 h-[620px] flex flex-col">
+                  <h3 className="text-xl font-semibold mb-6">Shared Image</h3>
+                  {sharedImage ? (
+                    <div className="flex flex-col flex-1">
+                      <div className="relative rounded-xl overflow-hidden bg-muted/20 shadow-lg aspect-square flex-1 max-h-[400px]">
+                        <img 
+                          src={`https://images.unsplash.com/${sharedImage}?w=600&h=600&fit=crop`}
+                          alt="Shared content image" 
+                          className="w-full h-full object-cover"
+                        />
                       </div>
-                    </TabsContent>
-                  )
-                })}
-              </Tabs>
-            </div>
-          </div>
-
-          {/* Image Section - 2/5 width, matching content height */}
-          <div className="lg:col-span-2">
-            <div className="glass-card p-6 h-[620px] flex flex-col">
-              <h3 className="text-xl font-semibold mb-6">Shared Image</h3>
-              {sharedImage ? (
-                <div className="flex flex-col flex-1">
-                  <div className="relative rounded-xl overflow-hidden bg-muted/20 shadow-lg aspect-square flex-1 max-h-[400px]">
-                    <img 
-                      src={`https://images.unsplash.com/${sharedImage}?w=600&h=600&fit=crop`}
-                      alt="Shared content image" 
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-3 mt-4 items-center">
-                    <Button
-                      variant="outline"
-                      className="glass border-0 hover:bg-white/30 dark:hover:bg-slate-800/30 w-full"
-                      onClick={() => setIsMediaSearchOpen(true)}
-                    >
-                      <ImageIcon className="h-4 w-4 mr-2" />
-                      Edit Image
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="glass border-0 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 hover:text-red-700 w-full"
-                      onClick={handleRemoveSharedImage}
-                    >
-                      <X className="h-4 w-4 mr-2" />
-                      Remove Image
-                    </Button>
-                  </div>
+                      <div className="flex flex-col gap-3 mt-6">
+                        <Button
+                          variant="outline"
+                          className="glass border-0 hover:bg-white/30 dark:hover:bg-slate-800/30 w-full"
+                          onClick={() => setIsMediaSearchOpen(true)}
+                        >
+                          <ImageIcon className="h-4 w-4 mr-2" />
+                          Edit Image
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="glass border-0 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 hover:text-red-700 w-full"
+                          onClick={handleRemoveSharedImage}
+                        >
+                          <X className="h-4 w-4 mr-2" />
+                          Remove Image
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center flex-1 border-2 border-dashed border-muted-foreground/20 rounded-xl aspect-square max-h-[400px]">
+                      <ImageIcon className="h-12 w-12 text-muted-foreground/40 mb-4" />
+                      <p className="text-muted-foreground mb-4 text-center">No image selected</p>
+                      <Button
+                        variant="outline"
+                        onClick={() => setIsMediaSearchOpen(true)}
+                        className="glass border-0 hover:bg-white/30 dark:hover:bg-slate-800/30"
+                      >
+                        <ImageIcon className="h-4 w-4 mr-2" />
+                        Add Image
+                      </Button>
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center flex-1 border-2 border-dashed border-muted-foreground/20 rounded-xl aspect-square max-h-[400px]">
-                  <ImageIcon className="h-12 w-12 text-muted-foreground/40 mb-4" />
-                  <p className="text-muted-foreground mb-4 text-center">No image selected</p>
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsMediaSearchOpen(true)}
-                    className="glass border-0 hover:bg-white/30 dark:hover:bg-slate-800/30"
-                  >
-                    <ImageIcon className="h-4 w-4 mr-2" />
-                    Add Image
-                  </Button>
-                </div>
-              )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       )}
 

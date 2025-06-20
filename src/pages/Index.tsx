@@ -9,6 +9,11 @@ import { ChatInterface } from "@/components/ChatInterface"
 import { ContentCreationMode } from "@/components/ContentCreationMode"
 import { BrandPersonaMode } from "@/components/BrandPersonaMode"
 import { ImageFineTuningMode } from "@/components/ImageFineTuningMode"
+import { BrandSteeringWheel } from "@/components/BrandSteeringWheel"
+import { BrandVoice } from "@/components/BrandVoice"
+import { AssetManager } from "@/components/AssetManager"
+import { BrandMonitor } from "@/components/BrandMonitor"
+import { BrandIntegrations } from "@/components/BrandIntegrations"
 
 const Index = () => {
   const [activeMode, setActiveMode] = useState<string>("quick-post")
@@ -22,6 +27,16 @@ const Index = () => {
         return <ContentCreationMode />
       case "brand-persona":
         return <BrandPersonaMode />
+      case "brand-steering-wheel":
+        return <BrandSteeringWheel />
+      case "brand-voice":
+        return <BrandVoice />
+      case "asset-manager":
+        return <AssetManager />
+      case "brand-monitor":
+        return <BrandMonitor />
+      case "brand-integrations":
+        return <BrandIntegrations />
       case "image-finetuning":
         return <ImageFineTuningMode />
       default:
@@ -58,10 +73,8 @@ const Index = () => {
                 </div>
               </header>
 
-              <div className="flex-1 flex flex-col p-6">
-                <div className="w-full mx-auto flex-1 flex flex-col">
-                  {renderActiveMode()}
-                </div>
+              <div className="flex-1 flex flex-col">
+                {renderActiveMode()}
               </div>
             </main>
           </div>

@@ -12,7 +12,12 @@ import {
   ChevronRight,
   Settings,
   Palette,
-  Briefcase
+  Briefcase,
+  Compass,
+  Volume2,
+  Archive,
+  BarChart3,
+  Plug
 } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 import {
@@ -43,6 +48,11 @@ const contentCreationItems = [
 
 const brandManagementToolsItems = [
   { id: "brand-persona", title: "Brand Persona", icon: User },
+  { id: "brand-steering-wheel", title: "Steering Wheel", icon: Compass },
+  { id: "brand-voice", title: "Brand Voice", icon: Volume2 },
+  { id: "asset-manager", title: "Asset Manager", icon: Archive },
+  { id: "brand-monitor", title: "Brand Monitor", icon: BarChart3 },
+  { id: "brand-integrations", title: "Integrations", icon: Plug },
   { id: "image-finetuning", title: "Image Fine-Tuning", icon: Palette },
 ]
 
