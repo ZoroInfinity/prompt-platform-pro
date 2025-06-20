@@ -442,9 +442,9 @@ What's one insight that changed your perspective recently? 🤔
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full min-h-screen">
       {/* Chat Interface - Landing State (Centered) or Post-Generation (Top Fixed) */}
-      <div className={`${hasGenerated ? 'sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-white/20 dark:border-slate-700/20' : 'min-h-[70vh] flex items-center justify-center'}`}>
+      <div className={`w-full ${hasGenerated ? 'sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-white/20 dark:border-slate-700/20' : 'min-h-screen flex items-center justify-center'}`}>
         <div className={`w-full max-w-4xl mx-auto px-6 py-6 ${hasGenerated ? '' : 'glass-card rounded-xl shadow-2xl'}`}>
           {/* Landing Heading - Show only before generation */}
           {!hasGenerated && (
@@ -547,7 +547,7 @@ What's one insight that changed your perspective recently? 🤔
 
       {/* Content Area - Only show after generation */}
       {hasGenerated && (
-        <div className="w-full max-w-6xl mx-auto px-6 py-8">
+        <div className="w-full max-w-7xl mx-auto px-8 py-8">
           {/* Business Writing Content */}
           {activeMode === "business-writing" && businessContents.length > 0 && (
             <div className="space-y-8">
