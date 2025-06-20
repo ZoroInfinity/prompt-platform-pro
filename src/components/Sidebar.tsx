@@ -1,95 +1,122 @@
 
-import { useState } from "react";
-import { ChevronDown, ChevronRight, PenTool, BarChart3, User, Edit3, Briefcase, FileText } from "lucide-react";
-import { ChatMode } from "@/pages/Index";
+import { useState } from "react"
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
+import { 
+  BarChart3, 
+  User, 
+  PenTool,
+  ChevronDown,
+  ChevronRight
+} from "lucide-react"
 
 interface SidebarProps {
-  currentMode: ChatMode;
-  onModeChange: (mode: ChatMode) => void;
+  activeMode: string
+  onModeChange: (mode: string) => void
+  onHomeClick: () => void
 }
 
-const Sidebar = ({ currentMode, onModeChange }: SidebarProps) => {
-  const [isContentHubExpanded, setIsContentHubExpanded] = useState(true);
+export function Sidebar({ activeMode, onModeChange, onHomeClick }: SidebarProps) {
+  const [expandedSections, setExpandedSections] = useState<string[]>(["content"])
 
-  const contentCreationItems = [
-    { id: "quick-post" as ChatMode, label: "Quick Post", icon: Edit3 },
-    { id: "business-writing" as ChatMode, label: "Business Writing", icon: Briefcase },
-    { id: "content-writing" as ChatMode, label: "Content Writing", icon: FileText },
-  ];
+  const toggleSection = (section: string) => {
+    setExpandedSections(prev => 
+      prev.includes(section) 
+        ? prev.filter(s => s !== section)
+        : [...prev, section]
+    )
+  }
+
+  const mainSections = [
+    {
+      id: "content",
+      label: "Content Creation Hub",
+      icon: PenTool,
+      children: [
+        { id: "quick-post", label: "Quick Post" },
+        { id: "business-writing", label: "Business Writing" },
+        { id: "content-writing", label: "Content Writing" }
+      ]
+    },
+    {
+      id: "analytics",
+      label: "Analytics",
+      icon: BarChart3,
+      children: []
+    },
+    {
+      id: "account",
+      label: "Account",
+      icon: User,
+      children: []
+    }
+  ]
 
   return (
-    <div className="w-64 bg-card border-r border-border h-screen flex flex-col">
-      {/* Header */}
-      <div className="p-6 border-b border-border">
-        <h1 className="text-xl font-semibold text-foreground">GenAI Studio</h1>
+    <div className="w-64 h-full glass-card border-r flex flex-col">
+      <div className="p-6">
+        <Button
+          onClick={onHomeClick}
+          variant="ghost"
+          className="w-full justify-start text-lg font-semibold hover:bg-white/20"
+        >
+          AutoText AI
+        </Button>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-1">
-        {/* Content Creation Hub */}
-        <div>
-          <button
-            onClick={() => setIsContentHubExpanded(!isContentHubExpanded)}
-            className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-accent transition-colors text-foreground"
-          >
-            <div className="flex items-center space-x-3">
-              <PenTool className="w-5 h-5 text-sky-500" />
-              <span className="font-medium">Content Creation Hub</span>
+      <Separator className="mx-4" />
+
+      <nav className="flex-1 p-4 space-y-2">
+        {mainSections.map((section) => {
+          const Icon = section.icon
+          const isExpanded = expandedSections.includes(section.id)
+          const hasChildren = section.children.length > 0
+
+          return (
+            <div key={section.id} className="space-y-1">
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  if (hasChildren) {
+                    toggleSection(section.id)
+                  } else {
+                    onModeChange(section.id)
+                  }
+                }}
+                className={cn(
+                  "w-full justify-start gap-3 hover:bg-white/20",
+                  activeMode === section.id && "bg-white/20"
+                )}
+              >
+                <Icon className="h-4 w-4" />
+                <span className="flex-1 text-left">{section.label}</span>
+                {hasChildren && (
+                  isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />
+                )}
+              </Button>
+
+              {hasChildren && isExpanded && (
+                <div className="ml-6 space-y-1">
+                  {section.children.map((child) => (
+                    <Button
+                      key={child.id}
+                      variant="ghost"
+                      onClick={() => onModeChange(child.id)}
+                      className={cn(
+                        "w-full justify-start text-sm hover:bg-white/20",
+                        activeMode === child.id && "bg-white/20 text-primary"
+                      )}
+                    >
+                      {child.label}
+                    </Button>
+                  ))}
+                </div>
+              )}
             </div>
-            {isContentHubExpanded ? (
-              <ChevronDown className="w-4 h-4" />
-            ) : (
-              <ChevronRight className="w-4 h-4" />
-            )}
-          </button>
-
-          {isContentHubExpanded && (
-            <div className="ml-8 mt-2 space-y-1">
-              {contentCreationItems.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => onModeChange(item.id)}
-                  className={`w-full flex items-center space-x-3 p-2 rounded-md transition-colors ${
-                    currentMode === item.id
-                      ? "bg-sky-50 text-sky-700 border border-sky-200"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                  }`}
-                >
-                  <item.icon className="w-4 h-4" />
-                  <span>{item.label}</span>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Analytics */}
-        <button className="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-accent transition-colors text-foreground">
-          <BarChart3 className="w-5 h-5 text-sky-500" />
-          <span className="font-medium">Analytics</span>
-        </button>
-
-        {/* Account */}
-        <button className="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-accent transition-colors text-foreground">
-          <User className="w-5 h-5 text-sky-500" />
-          <span className="font-medium">Account</span>
-        </button>
+          )
+        })}
       </nav>
-
-      {/* Footer */}
-      <div className="p-4 border-t border-border">
-        <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-sky-500 rounded-full flex items-center justify-center">
-            <User className="w-4 h-4 text-white" />
-          </div>
-          <div>
-            <p className="text-sm font-medium text-foreground">John Doe</p>
-            <p className="text-xs text-muted-foreground">Free Plan</p>
-          </div>
-        </div>
-      </div>
     </div>
-  );
-};
-
-export default Sidebar;
+  )
+}

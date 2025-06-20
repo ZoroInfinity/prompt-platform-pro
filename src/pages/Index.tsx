@@ -49,7 +49,6 @@ const Index = () => {
                 <div className="flex items-center justify-between px-6 py-4">
                   <div className="flex items-center gap-4">
                     <SidebarTrigger className="glass-card hover:bg-white/30 dark:hover:bg-slate-800/30" />
-                    <h1 className="text-2xl font-bold text-foreground">AutoText AI</h1>
                   </div>
                   
                   <div className="flex items-center gap-4">
@@ -59,8 +58,8 @@ const Index = () => {
                 </div>
               </header>
 
-              <div className="flex-1 flex flex-col p-4">
-                <div className="w-full mx-auto">
+              <div className="flex-1 flex flex-col p-6">
+                <div className="w-full mx-auto flex-1 flex flex-col">
                   {renderActiveMode()}
                 </div>
               </div>

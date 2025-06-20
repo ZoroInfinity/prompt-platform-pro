@@ -1,3 +1,4 @@
+
 import { useState } from "react"
 import { Send, Sparkles, Image as ImageIcon, Brain, FileText, Edit, X, MessageSquare, Square, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -39,7 +40,7 @@ export function ChatInterface({ onModeActivation, activeMode = "quick-post" }: C
   const [businessContents, setBusinessContents] = useState<BusinessContent[]>([])
   const [hasGenerated, setHasGenerated] = useState(false)
   const [sharedImage, setSharedImage] = useState<string | null>(null)
-  const [selectedModel, setSelectedModel] = useState("default")
+  const [selectedModel, setSelectedModel] = useState("gpt-4")
   const [editorTray, setEditorTray] = useState<{isOpen: boolean, platform: string, content: string, outputId: string}>({
     isOpen: false,
     platform: "",
@@ -88,10 +89,10 @@ export function ChatInterface({ onModeActivation, activeMode = "quick-post" }: C
   ]
 
   const modelOptions = [
-    { value: "default", label: "Default" },
-    { value: "witty", label: "Witty" },
-    { value: "formal", label: "Formal" },
-    { value: "experimental", label: "Experimental" }
+    { value: "gpt-4", label: "GPT-4" },
+    { value: "gpt-3.5", label: "GPT-3.5" },
+    { value: "claude-3", label: "Claude 3" },
+    { value: "claude-instant", label: "Claude Instant" }
   ]
 
   const platformIcons = {
@@ -442,10 +443,17 @@ What's one insight that changed your perspective recently? 🤔
   }
 
   return (
-    <div className="w-full max-w-none mx-auto px-2">
-      {/* Chat Interface - Always at top */}
-      <div className="glass-card p-6 mb-6">
-        <div className="space-y-4">
+    <div className="w-full max-w-4xl mx-auto px-4">
+      {/* Show heading only after generation */}
+      {hasGenerated && (
+        <div className="mb-4">
+          <h1 className="text-lg font-medium text-foreground">AutoText AI</h1>
+        </div>
+      )}
+
+      {/* Chat Interface - Centered when no content, at top after generation */}
+      <div className={`glass-card p-6 mb-6 ${!hasGenerated ? 'min-h-[60vh] flex items-center justify-center' : ''}`}>
+        <div className={`space-y-4 ${!hasGenerated ? 'w-full max-w-2xl' : 'w-full'}`}>
           <div className="flex gap-3">
             <Textarea
               placeholder={activeMode === "business-writing" 
@@ -463,7 +471,48 @@ What's one insight that changed your perspective recently? 🤔
               className="glass border-0 bg-white/50 dark:bg-slate-800/50 placeholder:text-muted-foreground/70 text-base py-3 resize-none flex-1"
               rows={hasGenerated ? 1 : 2}
             />
-            <div className="flex items-end gap-2">
+          </div>
+
+          {/* UI Controls Row */}
+          <div className="flex items-center justify-between">
+            {/* Left-aligned: Feature Icons */}
+            <div className="flex gap-2">
+              <TooltipProvider>
+                {modes.map((mode) => {
+                  const Icon = mode.icon
+                  const isActive = activeMode === mode.id
+                  return (
+                    <Tooltip key={mode.id}>
+                      <TooltipTrigger asChild>
+                        <div className="relative">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleModeChange(mode.id)}
+                            onMouseEnter={(e) => handleFeatureIconHover(mode.id, e)}
+                            onContextMenu={(e) => handleFeatureIconRightClick(mode.id, e)}
+                            className={`glass border-0 p-3 rounded-full hover:bg-white/30 dark:hover:bg-slate-800/30 transition-all duration-200 ${
+                              isActive 
+                                ? "bg-primary/20 ring-2 ring-primary/50 shadow-lg" 
+                                : ""
+                            }`}
+                          >
+                            <Icon className={`h-4 w-4 ${isActive ? "text-primary" : "text-muted-foreground"}`} />
+                          </Button>
+                          {getFeatureBadge(mode.id)}
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{mode.tooltip}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )
+                })}
+              </TooltipProvider>
+            </div>
+
+            {/* Right-aligned: Model Dropdown + Generate Button */}
+            <div className="flex items-center gap-2">
               <Select value={selectedModel} onValueChange={setSelectedModel}>
                 <SelectTrigger className="glass border-0 w-32 h-10">
                   <SelectValue />
@@ -490,42 +539,6 @@ What's one insight that changed your perspective recently? 🤔
               </Button>
             </div>
           </div>
-
-          {/* Mode Selection Icons */}
-          <div className="flex gap-2">
-            <TooltipProvider>
-              {modes.map((mode) => {
-                const Icon = mode.icon
-                const isActive = activeMode === mode.id
-                return (
-                  <Tooltip key={mode.id}>
-                    <TooltipTrigger asChild>
-                      <div className="relative">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleModeChange(mode.id)}
-                          onMouseEnter={(e) => handleFeatureIconHover(mode.id, e)}
-                          onContextMenu={(e) => handleFeatureIconRightClick(mode.id, e)}
-                          className={`glass border-0 p-3 rounded-full hover:bg-white/30 dark:hover:bg-slate-800/30 transition-all duration-200 ${
-                            isActive 
-                              ? "bg-primary/20 ring-2 ring-primary/50 shadow-lg" 
-                              : ""
-                          }`}
-                        >
-                          <Icon className={`h-4 w-4 ${isActive ? "text-primary" : "text-muted-foreground"}`} />
-                        </Button>
-                        {getFeatureBadge(mode.id)}
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>{mode.tooltip}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                )
-              })}
-            </TooltipProvider>
-          </div>
         </div>
       </div>
 
@@ -545,7 +558,7 @@ What's one insight that changed your perspective recently? 🤔
         </div>
       )}
 
-      {/* Quick Post Content Layout */}
+      {/* Quick Post Content Layout - 2 Column */}
       {activeMode === "quick-post" && generatedContents.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-8">
           {/* Content Area - 3/5 width */}
@@ -607,23 +620,23 @@ What's one insight that changed your perspective recently? 🤔
             </div>
           </div>
 
-          {/* Enhanced Image Section - 2/5 width, matching content height */}
+          {/* Image Section - 2/5 width, matching content height */}
           <div className="lg:col-span-2">
-            <div className="glass-card p-6 h-[500px] flex flex-col">
+            <div className="glass-card p-6 h-[620px] flex flex-col">
               <h3 className="text-xl font-semibold mb-6">Shared Image</h3>
               {sharedImage ? (
                 <div className="flex flex-col flex-1">
-                  <div className="relative rounded-xl overflow-hidden bg-muted/20 shadow-lg aspect-square flex-1 max-h-[340px]">
+                  <div className="relative rounded-xl overflow-hidden bg-muted/20 shadow-lg aspect-square flex-1 max-h-[400px]">
                     <img 
                       src={`https://images.unsplash.com/${sharedImage}?w=600&h=600&fit=crop`}
                       alt="Shared content image" 
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <div className="grid grid-cols-1 gap-3 mt-4">
+                  <div className="flex flex-col gap-3 mt-4 items-center">
                     <Button
                       variant="outline"
-                      className="glass border-0 hover:bg-white/30 dark:hover:bg-slate-800/30"
+                      className="glass border-0 hover:bg-white/30 dark:hover:bg-slate-800/30 w-full"
                       onClick={() => setIsMediaSearchOpen(true)}
                     >
                       <ImageIcon className="h-4 w-4 mr-2" />
@@ -631,7 +644,7 @@ What's one insight that changed your perspective recently? 🤔
                     </Button>
                     <Button
                       variant="outline"
-                      className="glass border-0 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 hover:text-red-700"
+                      className="glass border-0 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 hover:text-red-700 w-full"
                       onClick={handleRemoveSharedImage}
                     >
                       <X className="h-4 w-4 mr-2" />
@@ -640,9 +653,9 @@ What's one insight that changed your perspective recently? 🤔
                   </div>
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center flex-1 border-2 border-dashed border-muted-foreground/20 rounded-xl aspect-square max-h-[340px]">
+                <div className="flex flex-col items-center justify-center flex-1 border-2 border-dashed border-muted-foreground/20 rounded-xl aspect-square max-h-[400px]">
                   <ImageIcon className="h-12 w-12 text-muted-foreground/40 mb-4" />
-                  <p className="text-muted-foreground mb-4">No image selected</p>
+                  <p className="text-muted-foreground mb-4 text-center">No image selected</p>
                   <Button
                     variant="outline"
                     onClick={() => setIsMediaSearchOpen(true)}
