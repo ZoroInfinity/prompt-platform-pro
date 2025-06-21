@@ -1,5 +1,5 @@
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { 
   Home, 
   FolderOpen, 
@@ -10,7 +10,6 @@ import {
   Edit,
   ChevronDown,
   ChevronRight,
-  Settings,
   Palette,
   Briefcase,
   Compass,
@@ -25,14 +24,15 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuButton,
   useSidebar,
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { ThemeToggle } from "@/components/ThemeToggle"
+import { UserProfile } from "@/components/UserProfile"
 
 interface AppSidebarProps {
   activeMode?: string | null
@@ -57,11 +57,34 @@ const brandManagementToolsItems = [
 ]
 
 export function AppSidebar({ activeMode, onModeChange, onHomeClick }: AppSidebarProps) {
-  const { state } = useSidebar()
-  const collapsed = state === "collapsed"
+  const { state, open, setOpen } = useSidebar()
+  const [isHovered, setIsHovered] = useState(false)
   const [contentHubOpen, setContentHubOpen] = useState(true)
   const [brandManagementToolsOpen, setBrandManagementToolsOpen] = useState(true)
   const location = useLocation()
+
+  // Auto-expand on hover with delay
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout
+
+    if (isHovered && !open) {
+      timeoutId = setTimeout(() => {
+        setOpen(true)
+      }, 300)
+    } else if (!isHovered && open) {
+      timeoutId = setTimeout(() => {
+        setOpen(false)
+      }, 500)
+    }
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
+    }
+  }, [isHovered, open, setOpen])
+
+  const collapsed = !open
 
   const getHomeButtonCls = () =>
     `flex items-center w-full px-3 py-2 rounded-lg transition-all duration-200 ${
@@ -82,10 +105,17 @@ export function AppSidebar({ activeMode, onModeChange, onHomeClick }: AppSidebar
 
   return (
     <Sidebar
-      className={`glass-card border-r ${collapsed ? "w-16" : "w-64"} transition-all duration-300`}
+      className="glass-card border-r transition-all duration-300 scrollbar-hide"
       collapsible="icon"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       <div className="p-4">
+        {/* Theme Toggle at top */}
+        <div className="flex justify-center mb-4">
+          <ThemeToggle />
+        </div>
+
         {!collapsed && (
           <div className="mb-6">
             <h2 className="text-lg font-semibold text-foreground">AutoText AI</h2>
@@ -94,7 +124,7 @@ export function AppSidebar({ activeMode, onModeChange, onHomeClick }: AppSidebar
         )}
       </div>
 
-      <SidebarContent>
+      <SidebarContent className="scrollbar-hide">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -119,18 +149,6 @@ export function AppSidebar({ activeMode, onModeChange, onHomeClick }: AppSidebar
                   >
                     <Activity className={`h-5 w-5 ${collapsed ? "" : "mr-3"}`} />
                     {!collapsed && <span>Analytics</span>}
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link
-                    to="/account"
-                    className="flex items-center w-full px-3 py-2 rounded-lg transition-all duration-200 text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-                  >
-                    <User className={`h-5 w-5 ${collapsed ? "" : "mr-3"}`} />
-                    {!collapsed && <span>Account</span>}
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -260,6 +278,13 @@ export function AppSidebar({ activeMode, onModeChange, onHomeClick }: AppSidebar
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
+      {/* User Profile at bottom */}
+      <div className="p-4">
+        <div className="flex justify-center">
+          <UserProfile />
+        </div>
+      </div>
     </Sidebar>
   )
 }

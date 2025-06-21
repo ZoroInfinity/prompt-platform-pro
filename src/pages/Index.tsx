@@ -1,10 +1,8 @@
 
 import { useState } from "react"
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { SidebarProvider } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/AppSidebar"
 import { ThemeProvider } from "@/components/ThemeProvider"
-import { ThemeToggle } from "@/components/ThemeToggle"
-import { UserProfile } from "@/components/UserProfile"
 import { ChatInterface } from "@/components/ChatInterface"
 import { ContentCreationMode } from "@/components/ContentCreationMode"
 import { BrandPersonaMode } from "@/components/BrandPersonaMode"
@@ -50,8 +48,8 @@ const Index = () => {
 
   return (
     <ThemeProvider>
-      <div className="min-h-screen gradient-bg">
-        <SidebarProvider>
+      <div className="min-h-screen gradient-bg overflow-hidden">
+        <SidebarProvider defaultOpen={false}>
           <div className="flex min-h-screen w-full">
             <AppSidebar 
               activeMode={activeMode} 
@@ -59,21 +57,8 @@ const Index = () => {
               onHomeClick={handleHomeClick}
             />
             
-            <main className="flex-1 flex flex-col">
-              <header className="glass-card border-b backdrop-blur-xl bg-white/25 dark:bg-slate-900/30 sticky top-0 z-50">
-                <div className="flex items-center justify-between px-6 py-4">
-                  <div className="flex items-center gap-4">
-                    <SidebarTrigger className="glass-card hover:bg-white/30 dark:hover:bg-slate-800/30" />
-                  </div>
-                  
-                  <div className="flex items-center gap-4">
-                    <ThemeToggle />
-                    <UserProfile />
-                  </div>
-                </div>
-              </header>
-
-              <div className="flex-1 flex flex-col">
+            <main className="flex-1 flex flex-col overflow-hidden">
+              <div className="flex-1 flex flex-col overflow-y-auto scrollbar-hide">
                 {renderActiveMode()}
               </div>
             </main>
