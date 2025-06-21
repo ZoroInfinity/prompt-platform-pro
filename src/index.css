@@ -88,10 +88,10 @@
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px rgba(75, 158, 255, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .dark .glass-card {
@@ -101,7 +101,7 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
-/* Scrollbar hiding for all browsers */
+/* Global scrollbar hiding */
 * {
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -109,4 +109,68 @@
 
 *::-webkit-scrollbar {
   display: none;
+}
+
+/* Smooth transitions for all interactive elements */
+.transition-all {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Enhanced button hover effects */
+button:hover {
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* Tab animations */
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Enhanced shadow for cards */
+.shadow-lg {
+  box-shadow: 0 8px 32px rgba(75, 158, 255, 0.12), 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+/* Primary color adjustments for better blue theme */
+.bg-primary {
+  background-color: #4B9EFF;
+}
+
+.text-primary {
+  color: #4B9EFF;
+}
+
+.border-primary {
+  border-color: #4B9EFF;
+}
+
+.hover\:bg-primary\/90:hover {
+  background-color: rgba(75, 158, 255, 0.9);
+}
+
+.hover\:bg-primary\/10:hover {
+  background-color: rgba(75, 158, 255, 0.1);
+}
+
+.hover\:bg-primary\/5:hover {
+  background-color: rgba(75, 158, 255, 0.05);
+}
+
+.focus\:ring-primary\/20:focus {
+  --tw-ring-color: rgba(75, 158, 255, 0.2);
 }

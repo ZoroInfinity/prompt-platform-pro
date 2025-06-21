@@ -1,243 +1,128 @@
 
 import { useState } from "react"
+import { X, Heart, MessageCircle, Send, Bookmark, MoreHorizontal } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Instagram, Linkedin, Twitter, MoreHorizontal, Heart, MessageCircle, Share, Send, Check, X } from "lucide-react"
 
 interface PostPreviewModalProps {
   isOpen: boolean
   onClose: () => void
-  platform: string
   content: string
-  image?: string | null
+  platform: string
 }
 
-const platformConfig = {
-  instagram: {
-    icon: Instagram,
-    color: "bg-gradient-to-r from-purple-500 to-pink-500",
-    username: "@yourhandle",
-    name: "Your Brand"
-  },
-  linkedin: {
-    icon: Linkedin,
-    color: "bg-blue-600",
-    username: "Your Name",
-    name: "Professional Title"
-  },
-  twitter: {
-    icon: Twitter,
-    color: "bg-sky-500",
-    username: "@yourhandle",
-    name: "Your Name"
-  }
-}
+export function PostPreviewModal({ isOpen, onClose, content, platform }: PostPreviewModalProps) {
+  const [isPosting, setIsPosting] = useState(false)
 
-export function PostPreviewModal({ isOpen, onClose, platform, content, image }: PostPreviewModalProps) {
-  const config = platformConfig[platform as keyof typeof platformConfig]
-  if (!config) return null
+  if (!isOpen) return null
 
-  const Icon = config.icon
-
-  const handlePostNow = () => {
-    console.log(`Posting to ${platform}:`, content)
-    onClose()
-  }
-
-  const renderInstagramPreview = () => (
-    <div className="bg-white max-w-sm mx-auto rounded-lg overflow-hidden shadow-lg">
-      {/* Header */}
-      <div className="flex items-center p-3 border-b">
-        <Avatar className="h-8 w-8 mr-3">
-          <AvatarImage src="/placeholder.svg" />
-          <AvatarFallback className={config.color}>YB</AvatarFallback>
-        </Avatar>
-        <div className="flex-1">
-          <div className="font-semibold text-sm">{config.username}</div>
-        </div>
-        <MoreHorizontal className="h-5 w-5 text-gray-600" />
-      </div>
-      
-      {/* Image */}
-      {image && (
-        <div className="aspect-square max-h-64">
-          <img 
-            src={`https://images.unsplash.com/${image}?w=320&h=320&fit=crop`}
-            alt="Post content" 
-            className="w-full h-full object-cover"
-          />
-        </div>
-      )}
-      
-      {/* Actions */}
-      <div className="p-3">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center space-x-4">
-            <Heart className="h-6 w-6" />
-            <MessageCircle className="h-6 w-6" />
-            <Send className="h-6 w-6" />
-          </div>
-        </div>
-        
-        {/* Caption */}
-        <div className="text-sm max-h-24 overflow-y-auto">
-          <span className="font-semibold mr-2">{config.username}</span>
-          <span className="whitespace-pre-wrap text-sm leading-tight">{content.length > 150 ? content.substring(0, 150) + '...' : content}</span>
-        </div>
-      </div>
-    </div>
-  )
-
-  const renderLinkedInPreview = () => (
-    <div className="bg-white max-w-lg mx-auto rounded-lg overflow-hidden shadow-lg border">
-      {/* Header */}
-      <div className="flex items-start p-4">
-        <Avatar className="h-10 w-10 mr-3">
-          <AvatarImage src="/placeholder.svg" />
-          <AvatarFallback className={config.color}>YN</AvatarFallback>
-        </Avatar>
-        <div className="flex-1">
-          <div className="font-semibold text-sm">{config.username}</div>
-          <div className="text-xs text-gray-500">{config.name}</div>
-          <div className="text-xs text-gray-500">2h • 🌍</div>
-        </div>
-        <MoreHorizontal className="h-5 w-5 text-gray-600" />
-      </div>
-      
-      {/* Content */}
-      <div className="px-4 pb-3">
-        <div className="text-sm whitespace-pre-wrap mb-3 max-h-32 overflow-y-auto leading-tight">
-          {content.length > 300 ? content.substring(0, 300) + '...' : content}
-        </div>
-        
-        {/* Image */}
-        {image && (
-          <div className="rounded-lg overflow-hidden">
-            <img 
-              src={`https://images.unsplash.com/${image}?w=420&h=240&fit=crop`}
-              alt="Post content" 
-              className="w-full h-48 object-cover"
-            />
-          </div>
-        )}
-      </div>
-      
-      {/* Actions */}
-      <div className="border-t px-4 py-2">
-        <div className="flex items-center justify-around text-gray-600">
-          <button className="flex items-center space-x-2 text-sm hover:bg-gray-50 px-2 py-1 rounded text-xs">
-            <span>👍</span>
-            <span>Like</span>
-          </button>
-          <button className="flex items-center space-x-2 text-sm hover:bg-gray-50 px-2 py-1 rounded text-xs">
-            <span>💬</span>
-            <span>Comment</span>
-          </button>
-          <button className="flex items-center space-x-2 text-sm hover:bg-gray-50 px-2 py-1 rounded text-xs">
-            <span>🔄</span>
-            <span>Repost</span>
-          </button>
-          <button className="flex items-center space-x-2 text-sm hover:bg-gray-50 px-2 py-1 rounded text-xs">
-            <span>📤</span>
-            <span>Send</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-
-  const renderTwitterPreview = () => (
-    <div className="bg-white max-w-lg mx-auto rounded-lg overflow-hidden shadow-lg border">
-      {/* Header */}
-      <div className="flex items-start p-4">
-        <Avatar className="h-10 w-10 mr-3">
-          <AvatarImage src="/placeholder.svg" />
-          <AvatarFallback className={config.color}>YN</AvatarFallback>
-        </Avatar>
-        <div className="flex-1">
-          <div className="flex items-center space-x-2">
-            <span className="font-semibold text-sm">{config.name}</span>
-            <span className="text-gray-500 text-sm">{config.username}</span>
-            <span className="text-gray-500 text-sm">• 2h</span>
-          </div>
-          
-          {/* Content */}
-          <div className="text-sm mt-2 whitespace-pre-wrap max-h-24 overflow-y-auto leading-tight">
-            {content.length > 280 ? content.substring(0, 280) + '...' : content}
-          </div>
-          
-          {/* Image */}
-          {image && (
-            <div className="rounded-2xl overflow-hidden mt-3">
-              <img 
-                src={`https://images.unsplash.com/${image}?w=420&h=240&fit=crop`}
-                alt="Post content" 
-                className="w-full h-48 object-cover"
-              />
-            </div>
-          )}
-          
-          {/* Actions */}
-          <div className="flex items-center justify-between mt-3 max-w-md text-gray-500">
-            <button className="flex items-center space-x-2 hover:text-blue-500">
-              <MessageCircle className="h-4 w-4" />
-              <span className="text-sm">24</span>
-            </button>
-            <button className="flex items-center space-x-2 hover:text-green-500">
-              <span className="text-sm">🔄 12</span>
-            </button>
-            <button className="flex items-center space-x-2 hover:text-red-500">
-              <Heart className="h-4 w-4" />
-              <span className="text-sm">156</span>
-            </button>
-            <button className="flex items-center space-x-2 hover:text-blue-500">
-              <Share className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-
-  const renderPreview = () => {
-    switch (platform) {
-      case "instagram":
-        return renderInstagramPreview()
-      case "linkedin":
-        return renderLinkedInPreview()
-      case "twitter":
-        return renderTwitterPreview()
-      default:
-        return renderLinkedInPreview()
-    }
+  const handleConfirmPost = () => {
+    setIsPosting(true)
+    // Simulate posting
+    setTimeout(() => {
+      setIsPosting(false)
+      onClose()
+      // Show success toast or notification
+    }, 2000)
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[500px] max-h-[90vh] p-4 overflow-hidden">
-        <DialogHeader className="pb-2">
-          <DialogTitle className="flex items-center gap-2 text-lg">
-            <Icon className="h-5 w-5" />
-            {platform.charAt(0).toUpperCase() + platform.slice(1)} Preview
-          </DialogTitle>
-        </DialogHeader>
-        
-        <div className="flex-1 overflow-hidden">
-          {renderPreview()}
-        </div>
-        
-        <div className="flex justify-center gap-3 pt-3 border-t mt-4">
-          <Button onClick={handlePostNow} className="bg-green-600 hover:bg-green-700 text-white">
-            <Check className="h-4 w-4 mr-2" />
-            Post Now
-          </Button>
-          <Button onClick={onClose} variant="outline">
-            <X className="h-4 w-4 mr-2" />
-            Cancel
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+      <Card className="w-full max-w-md mx-4 bg-white shadow-2xl">
+        <CardContent className="p-0">
+          {/* Header */}
+          <div className="flex items-center justify-between p-4 border-b">
+            <h3 className="font-semibold text-lg">Post Preview</h3>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+              className="h-8 w-8 p-0"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {/* Instagram Mock Post */}
+          <div className="bg-white">
+            {/* Post Header */}
+            <div className="flex items-center justify-between p-3">
+              <div className="flex items-center gap-3">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback className="bg-primary text-white text-xs">
+                    YB
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="font-semibold text-sm">your_brand</p>
+                  <p className="text-xs text-gray-500">Sponsored</p>
+                </div>
+              </div>
+              <MoreHorizontal className="h-5 w-5 text-gray-600" />
+            </div>
+
+            {/* Image Placeholder */}
+            <div className="aspect-square bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center border-y">
+              <div className="text-center text-gray-500">
+                <div className="w-16 h-16 mx-auto mb-2 bg-white/60 rounded-lg flex items-center justify-center">
+                  📸
+                </div>
+                <p className="text-sm">Your generated image</p>
+              </div>
+            </div>
+
+            {/* Post Actions */}
+            <div className="p-3">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-4">
+                  <Heart className="h-6 w-6" />
+                  <MessageCircle className="h-6 w-6" />
+                  <Send className="h-6 w-6" />
+                </div>
+                <Bookmark className="h-6 w-6" />
+              </div>
+
+              <p className="font-semibold text-sm mb-2">1,234 likes</p>
+
+              {/* Caption */}
+              <div className="text-sm">
+                <span className="font-semibold">your_brand</span>{" "}
+                <span className="whitespace-pre-wrap">{content.substring(0, 150)}...</span>
+                <button className="text-gray-500 ml-1">more</button>
+              </div>
+
+              <p className="text-xs text-gray-500 mt-2">2 HOURS AGO</p>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-3 p-4 border-t bg-gray-50">
+            <Button
+              variant="outline"
+              onClick={onClose}
+              className="flex-1"
+              disabled={isPosting}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmPost}
+              className="flex-1 bg-primary hover:bg-primary/90"
+              disabled={isPosting}
+            >
+              {isPosting ? (
+                <div className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  Posting...
+                </div>
+              ) : (
+                "Confirm Post"
+              )}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   )
 }
