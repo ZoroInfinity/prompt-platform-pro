@@ -1,12 +1,10 @@
-
 import { useState, useRef } from "react"
-import { Send, MessageSquarePlus, FileText, Palette, Wand2, Sparkles, Calendar, ChevronLeft, ChevronRight } from "lucide-react"
+import { Send, MessageSquarePlus, FileText, Palette, Wand2, Sparkles, Calendar, ChevronLeft, ChevronRight, Edit2, Upload, Layers } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ContentCard } from "@/components/ContentCard"
 import { Badge } from "@/components/ui/badge"
 import { FeatureTray } from "@/components/FeatureTray"
 import { PostPreviewModal } from "@/components/PostPreviewModal"
@@ -23,6 +21,8 @@ export function ChatInterface({ onModeActivation, activeMode }: ChatInterfacePro
   const [selectedModel, setSelectedModel] = useState("gpt-4")
   const [showImage, setShowImage] = useState(true)
   const [selectedFeature, setSelectedFeature] = useState("quick-post")
+  const [editingContent, setEditingContent] = useState({ platform: "", isEditing: false })
+  const [editableContent, setEditableContent] = useState("")
   
   // Feature tray state
   const [featureTrayOpen, setFeatureTrayOpen] = useState(false)
@@ -111,7 +111,7 @@ Don't get left behind. Start automating now!
     }, 2000)
   }
 
-  const handleFeatureClick = (feature: any, event: React.MouseEvent) => {
+  const handleFeatureHover = (feature: any, event: React.MouseEvent) => {
     setSelectedFeature(feature.mode)
     
     if (feature.mode === "quick-post" || feature.mode === "business-writing") {
@@ -125,8 +125,8 @@ Don't get left behind. Start automating now!
     }
   }
 
-  const handleRemoveImage = () => {
-    setShowImage(false)
+  const handleFeatureLeave = () => {
+    setFeatureTrayOpen(false)
   }
 
   const handleEditImage = () => {
@@ -134,15 +134,44 @@ Don't get left behind. Start automating now!
   }
 
   const handleUploadImage = () => {
-    console.log("Upload image clicked")
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = 'image/*'
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0]
+      if (file) {
+        console.log("Image uploaded:", file.name)
+      }
+    }
+    input.click()
   }
 
   const handleApplyLogo = () => {
     console.log("Apply logo clicked")
   }
 
+  const handleRemoveImage = () => {
+    setShowImage(false)
+    // Keep container visible for re-adding images
+    setTimeout(() => setShowImage(true), 100)
+  }
+
   const handlePostNow = () => {
     setShowPreviewModal(true)
+  }
+
+  const handleEditText = (platform: string) => {
+    setEditingContent({ platform, isEditing: true })
+    setEditableContent(generatedContent)
+  }
+
+  const handleSaveEdit = () => {
+    setGeneratedContent(editableContent)
+    setEditingContent({ platform: "", isEditing: false })
+  }
+
+  const handleCancelEdit = () => {
+    setEditingContent({ platform: "", isEditing: false })
   }
 
   const nextContent = () => {
@@ -163,14 +192,14 @@ Don't get left behind. Start automating now!
       <div className={`w-full transition-all duration-300 ${
         isLandingState 
           ? "flex items-center justify-center min-h-screen px-4" 
-          : "sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b py-4 px-6"
+          : "flex justify-center py-6 px-4"
       }`}>
-        <div className={`w-full transition-all duration-300 ${
-          isLandingState ? "max-w-2xl" : "max-w-4xl"
+        <div className={`transition-all duration-300 ${
+          isLandingState ? "max-w-2xl w-full" : "max-w-2xl w-full"
         }`}>
           {isLandingState && (
-            <div className="text-center mb-6">
-              <h1 className="text-2xl font-semibold text-foreground mb-2">
+            <div className="text-center mb-8">
+              <h1 className="text-3xl font-semibold text-foreground mb-2">
                 Let's create something amazing!
               </h1>
             </div>
@@ -184,9 +213,9 @@ Don't get left behind. Start automating now!
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="What would you like to create today?"
                   className={`resize-none transition-all duration-300 border-0 focus:ring-2 focus:ring-primary/20 ${
-                    isLandingState ? "min-h-[80px]" : "min-h-[50px]"
+                    isLandingState ? "min-h-[80px]" : "min-h-[40px]"
                   }`}
-                  rows={isLandingState ? 3 : 2}
+                  rows={isLandingState ? 3 : 1}
                 />
                 
                 <div className="flex items-center justify-between">
@@ -195,20 +224,24 @@ Don't get left behind. Start automating now!
                       const IconComponent = feature.icon
                       const isSelected = selectedFeature === feature.mode
                       return (
-                        <Button
+                        <div
                           key={index}
-                          variant="ghost"
-                          size="sm"
-                          type="button"
-                          className={`h-8 w-8 p-0 transition-all duration-200 ${
-                            isSelected 
-                              ? 'bg-primary/10 text-primary shadow-sm' 
-                              : 'hover:bg-primary/5 hover:text-primary'
-                          }`}
-                          onClick={(e) => handleFeatureClick(feature, e)}
+                          onMouseEnter={(e) => handleFeatureHover(feature, e)}
+                          onMouseLeave={handleFeatureLeave}
                         >
-                          <IconComponent className="h-4 w-4" />
-                        </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            type="button"
+                            className={`h-8 w-8 p-0 transition-all duration-200 ${
+                              isSelected 
+                                ? 'bg-primary/10 text-primary shadow-sm' 
+                                : 'hover:bg-primary/5 hover:text-primary'
+                            }`}
+                          >
+                            <IconComponent className="h-4 w-4" />
+                          </Button>
+                        </div>
                       )
                     })}
                   </div>
@@ -231,7 +264,7 @@ Don't get left behind. Start automating now!
                       disabled={!input.trim() || isGenerating}
                       className="h-8 w-8 p-0 bg-primary hover:bg-primary/90 shadow-md"
                     >
-                      <Send className="h-4 w-4" />
+                      <Wand2 className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
@@ -243,7 +276,7 @@ Don't get left behind. Start automating now!
 
       {/* Generated Content Section */}
       {(generatedContent || isGenerating) && (
-        <div className="px-6 py-6">
+        <div className="px-6 pb-6">
           <div className="max-w-7xl mx-auto">
             {isGenerating ? (
               <div className="flex items-center justify-center py-12">
@@ -256,9 +289,9 @@ Don't get left behind. Start automating now!
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Content Card with Platform Tabs */}
                 <div className="space-y-4">
-                  <Card className="glass-card shadow-lg">
-                    <CardContent className="p-6">
-                      <Tabs defaultValue="instagram" className="space-y-4">
+                  <Card className="glass-card shadow-lg h-[600px] flex flex-col">
+                    <CardContent className="p-6 flex-1 flex flex-col">
+                      <Tabs defaultValue="instagram" className="space-y-4 flex-1 flex flex-col">
                         <TabsList className="grid w-full grid-cols-2 bg-muted/50">
                           <TabsTrigger value="instagram" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
                             <div className="flex items-center gap-2">
@@ -274,47 +307,87 @@ Don't get left behind. Start automating now!
                           </TabsTrigger>
                         </TabsList>
                         
-                        <TabsContent value="instagram" className="space-y-4">
-                          <div className="relative">
-                            <div className="bg-white/70 rounded-lg p-4 border border-gray-100 min-h-[200px]">
-                              <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
-                                {generatedContent}
-                              </p>
-                            </div>
-                            
-                            {/* Carousel Navigation */}
-                            <div className="absolute top-2 right-2 flex gap-1">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-6 w-6 p-0 bg-white/80 hover:bg-white shadow-sm"
-                                onClick={prevContent}
-                              >
-                                <ChevronLeft className="h-3 w-3" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-6 w-6 p-0 bg-white/80 hover:bg-white shadow-sm"
-                                onClick={nextContent}
-                              >
-                                <ChevronRight className="h-3 w-3" />
-                              </Button>
-                            </div>
-                            
-                            <div className="absolute bottom-2 right-2">
-                              <Badge variant="secondary" className="text-xs">
-                                {currentContentIndex + 1} of {contentVariations.length}
-                              </Badge>
-                            </div>
+                        <TabsContent value="instagram" className="space-y-4 flex-1 flex flex-col">
+                          <div className="relative flex-1">
+                            {editingContent.isEditing && editingContent.platform === "instagram" ? (
+                              <div className="flex flex-col h-full">
+                                <Textarea
+                                  value={editableContent}
+                                  onChange={(e) => setEditableContent(e.target.value)}
+                                  className="flex-1 resize-none border border-gray-200 rounded-lg p-4"
+                                />
+                                <div className="flex gap-2 mt-3">
+                                  <Button size="sm" onClick={handleSaveEdit} className="bg-primary hover:bg-primary/90">
+                                    Save
+                                  </Button>
+                                  <Button size="sm" variant="outline" onClick={handleCancelEdit}>
+                                    Cancel
+                                  </Button>
+                                </div>
+                              </div>
+                            ) : (
+                              <>
+                                <div className="bg-white/70 rounded-lg p-4 border border-gray-100 h-full overflow-y-auto">
+                                  <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+                                    {generatedContent}
+                                  </p>
+                                </div>
+                                
+                                {/* Carousel Navigation */}
+                                <div className="absolute top-2 right-2 flex gap-1">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-6 w-6 p-0 bg-white/80 hover:bg-white shadow-sm"
+                                    onClick={prevContent}
+                                  >
+                                    <ChevronLeft className="h-3 w-3" />
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-6 w-6 p-0 bg-white/80 hover:bg-white shadow-sm"
+                                    onClick={nextContent}
+                                  >
+                                    <ChevronRight className="h-3 w-3" />
+                                  </Button>
+                                </div>
+                                
+                                <div className="absolute bottom-2 right-2">
+                                  <Badge variant="secondary" className="text-xs">
+                                    {currentContentIndex + 1} of {contentVariations.length}
+                                  </Badge>
+                                </div>
+                              </>
+                            )}
                           </div>
                         </TabsContent>
                         
-                        <TabsContent value="linkedin" className="space-y-4">
-                          <div className="bg-white/70 rounded-lg p-4 border border-gray-100 min-h-[200px]">
-                            <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
-                              {generatedContent.replace(/🚀|✨|📈|🎯|💡/g, '•')}
-                            </p>
+                        <TabsContent value="linkedin" className="space-y-4 flex-1 flex flex-col">
+                          <div className="relative flex-1">
+                            {editingContent.isEditing && editingContent.platform === "linkedin" ? (
+                              <div className="flex flex-col h-full">
+                                <Textarea
+                                  value={editableContent}
+                                  onChange={(e) => setEditableContent(e.target.value)}
+                                  className="flex-1 resize-none border border-gray-200 rounded-lg p-4"
+                                />
+                                <div className="flex gap-2 mt-3">
+                                  <Button size="sm" onClick={handleSaveEdit} className="bg-primary hover:bg-primary/90">
+                                    Save
+                                  </Button>
+                                  <Button size="sm" variant="outline" onClick={handleCancelEdit}>
+                                    Cancel
+                                  </Button>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="bg-white/70 rounded-lg p-4 border border-gray-100 h-full overflow-y-auto">
+                                <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+                                  {generatedContent.replace(/🚀|✨|📈|🎯|💡/g, '•')}
+                                </p>
+                              </div>
+                            )}
                           </div>
                         </TabsContent>
                       </Tabs>
@@ -325,7 +398,9 @@ Don't get left behind. Start automating now!
                         variant="outline" 
                         size="sm" 
                         className="flex-1 border-gray-200 hover:bg-gray-50"
+                        onClick={() => handleEditText("instagram")}
                       >
+                        <Edit2 className="mr-1 h-3 w-3" />
                         Edit Text
                       </Button>
                       <Button 
@@ -349,58 +424,59 @@ Don't get left behind. Start automating now!
                 </div>
 
                 {/* Image Card */}
-                {showImage && (
-                  <div className="space-y-4">
-                    <Card className="glass-card shadow-lg">
-                      <CardContent className="p-6">
-                        <div className="aspect-square bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg flex items-center justify-center mb-4 border border-gray-100">
-                          <div className="text-center text-muted-foreground">
-                            <Palette className="h-12 w-12 mx-auto mb-2 opacity-40" />
-                            <p className="text-sm font-medium">Generated Image</p>
-                            <p className="text-xs text-gray-400">AI-created visual content</p>
-                          </div>
+                <div className="space-y-4">
+                  <Card className="glass-card shadow-lg h-[600px] flex flex-col">
+                    <CardContent className="p-6 flex-1 flex flex-col">
+                      <div className="aspect-square bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg flex items-center justify-center border border-gray-100 flex-1 max-h-[400px]">
+                        <div className="text-center text-muted-foreground">
+                          <Palette className="h-12 w-12 mx-auto mb-2 opacity-40" />
+                          <p className="text-sm font-medium">Generated Image</p>
+                          <p className="text-xs text-gray-400">AI-created visual content</p>
                         </div>
-                      </CardContent>
-                      
-                      <CardFooter className="flex flex-col gap-3 pt-0 px-6 pb-6">
-                        <div className="flex gap-2 w-full">
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="flex-1 border-gray-200 hover:bg-gray-50"
-                            onClick={handleEditImage}
-                          >
-                            Edit Image
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="flex-1 border-gray-200 hover:bg-gray-50"
-                            onClick={handleUploadImage}
-                          >
-                            Upload Image
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="flex-1 border-gray-200 hover:bg-gray-50"
-                            onClick={handleApplyLogo}
-                          >
-                            Apply Logo
-                          </Button>
-                        </div>
+                      </div>
+                    </CardContent>
+                    
+                    <CardFooter className="flex flex-col gap-3 pt-0 px-6 pb-6">
+                      <div className="flex gap-2 w-full">
                         <Button 
-                          variant="destructive" 
+                          variant="outline" 
                           size="sm" 
-                          className="w-full"
-                          onClick={handleRemoveImage}
+                          className="flex-1 border-gray-200 hover:bg-gray-50"
+                          onClick={handleEditImage}
                         >
-                          Remove Image
+                          <Edit2 className="mr-1 h-3 w-3" />
+                          Edit Image
                         </Button>
-                      </CardFooter>
-                    </Card>
-                  </div>
-                )}
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="flex-1 border-gray-200 hover:bg-gray-50"
+                          onClick={handleUploadImage}
+                        >
+                          <Upload className="mr-1 h-3 w-3" />
+                          Upload Image
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="flex-1 border-gray-200 hover:bg-gray-50"
+                          onClick={handleApplyLogo}
+                        >
+                          <Layers className="mr-1 h-3 w-3" />
+                          Apply Logo
+                        </Button>
+                      </div>
+                      <Button 
+                        variant="destructive" 
+                        size="sm" 
+                        className="w-full"
+                        onClick={handleRemoveImage}
+                      >
+                        Remove Image
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </div>
               </div>
             )}
           </div>
