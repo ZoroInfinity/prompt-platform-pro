@@ -35,7 +35,7 @@ export function ContentCard({ content, defaultPlatform = "instagram" }: ContentC
   const PlatformIcon = platformIcons[selectedPlatform as keyof typeof platformIcons]
 
   return (
-    <Card className="glass-card animate-fade-in hover:shadow-2xl transition-all duration-300 group">
+    <Card className="glass-card animate-fade-in hover:shadow-lg transition-all duration-300 group">
       <CardContent className="pt-6">
         <div className="flex items-center justify-between mb-4">
           <Select value={selectedPlatform} onValueChange={setSelectedPlatform}>

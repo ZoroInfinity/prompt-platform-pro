@@ -63,18 +63,18 @@ export function AppSidebar({ activeMode, onModeChange, onHomeClick }: AppSidebar
   const [brandManagementToolsOpen, setBrandManagementToolsOpen] = useState(true)
   const location = useLocation()
 
-  // Auto-expand on hover with delay
+  // Auto-expand on hover with smooth transition
   useEffect(() => {
     let timeoutId: NodeJS.Timeout
 
     if (isHovered && !open) {
       timeoutId = setTimeout(() => {
         setOpen(true)
-      }, 300)
+      }, 150)
     } else if (!isHovered && open) {
       timeoutId = setTimeout(() => {
         setOpen(false)
-      }, 500)
+      }, 300)
     }
 
     return () => {
@@ -87,14 +87,14 @@ export function AppSidebar({ activeMode, onModeChange, onHomeClick }: AppSidebar
   const collapsed = !open
 
   const getHomeButtonCls = () =>
-    `flex items-center w-full px-3 py-2 rounded-lg transition-all duration-200 ${
+    `flex items-center w-full px-3 py-2 rounded-lg transition-all duration-300 ${
       activeMode === null && location.pathname === "/"
         ? "bg-primary/10 text-primary font-medium shadow-sm" 
         : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
     }`
 
   const getModeButtonCls = (modeId: string) =>
-    `w-full justify-start text-sm font-normal transition-all duration-200 ${
+    `w-full justify-start text-sm font-normal transition-all duration-300 ${
       activeMode === modeId
         ? "bg-primary/10 text-primary font-medium"
         : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
@@ -105,17 +105,12 @@ export function AppSidebar({ activeMode, onModeChange, onHomeClick }: AppSidebar
 
   return (
     <Sidebar
-      className="glass-card border-r transition-all duration-300 scrollbar-hide"
+      className="glass-card border-r transition-all duration-300 ease-in-out scrollbar-hide"
       collapsible="icon"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="p-4">
-        {/* Theme Toggle at top */}
-        <div className="flex justify-center mb-4">
-          <ThemeToggle />
-        </div>
-
         {!collapsed && (
           <div className="mb-6">
             <h2 className="text-lg font-semibold text-foreground">AutoText AI</h2>
@@ -145,7 +140,7 @@ export function AppSidebar({ activeMode, onModeChange, onHomeClick }: AppSidebar
                 <SidebarMenuButton asChild>
                   <Link
                     to="/analytics"
-                    className="flex items-center w-full px-3 py-2 rounded-lg transition-all duration-200 text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                    className="flex items-center w-full px-3 py-2 rounded-lg transition-all duration-300 text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                   >
                     <Activity className={`h-5 w-5 ${collapsed ? "" : "mr-3"}`} />
                     {!collapsed && <span>Analytics</span>}
@@ -165,7 +160,7 @@ export function AppSidebar({ activeMode, onModeChange, onHomeClick }: AppSidebar
                     <Button
                       variant="ghost"
                       onClick={() => setContentHubOpen(!contentHubOpen)}
-                      className={`w-full justify-center p-3 ${
+                      className={`w-full justify-center p-3 transition-all duration-300 ${
                         isAnyContentModeActive
                           ? "bg-primary/10 text-primary font-medium"
                           : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
@@ -182,7 +177,7 @@ export function AppSidebar({ activeMode, onModeChange, onHomeClick }: AppSidebar
                 <CollapsibleTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="w-full justify-between px-3 py-2 h-auto font-medium text-sm"
+                    className="w-full justify-between px-3 py-2 h-auto font-medium text-sm transition-all duration-300"
                   >
                     <div className="flex items-center">
                       <FolderOpen className="h-5 w-5 mr-3" />
@@ -226,7 +221,7 @@ export function AppSidebar({ activeMode, onModeChange, onHomeClick }: AppSidebar
                     <Button
                       variant="ghost"
                       onClick={() => setBrandManagementToolsOpen(!brandManagementToolsOpen)}
-                      className={`w-full justify-center p-3 ${
+                      className={`w-full justify-center p-3 transition-all duration-300 ${
                         isAnyBrandToolActive
                           ? "bg-primary/10 text-primary font-medium"
                           : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
@@ -243,7 +238,7 @@ export function AppSidebar({ activeMode, onModeChange, onHomeClick }: AppSidebar
                 <CollapsibleTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="w-full justify-between px-3 py-2 h-auto font-medium text-sm"
+                    className="w-full justify-between px-3 py-2 h-auto font-medium text-sm transition-all duration-300"
                   >
                     <div className="flex items-center">
                       <Briefcase className="h-5 w-5 mr-3" />
@@ -279,8 +274,11 @@ export function AppSidebar({ activeMode, onModeChange, onHomeClick }: AppSidebar
         </SidebarGroup>
       </SidebarContent>
 
-      {/* User Profile at bottom */}
-      <div className="p-4">
+      {/* Bottom section with Theme Toggle and User Profile */}
+      <div className="p-4 space-y-2">
+        <div className="flex justify-center">
+          <ThemeToggle />
+        </div>
         <div className="flex justify-center">
           <UserProfile />
         </div>
