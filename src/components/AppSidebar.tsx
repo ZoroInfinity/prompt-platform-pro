@@ -16,7 +16,8 @@ import {
   Volume2,
   Archive,
   BarChart3,
-  Plug
+  Plug,
+  Zap
 } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 import {
@@ -110,11 +111,21 @@ export function AppSidebar({ activeMode, onModeChange, onHomeClick }: AppSidebar
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+      {/* Top Section with Logo/Brand */}
       <div className="p-4">
-        {!collapsed && (
+        {collapsed ? (
+          <div className="flex justify-center">
+            <Zap className="h-6 w-6 text-primary" />
+          </div>
+        ) : (
           <div className="mb-6">
-            <h2 className="text-lg font-semibold text-foreground">AutoText AI</h2>
-            <p className="text-sm text-muted-foreground">AI Content Studio</p>
+            <div className="flex items-center gap-2">
+              <Zap className="h-6 w-6 text-primary" />
+              <div>
+                <h2 className="text-lg font-semibold text-foreground">AutoText AI</h2>
+                <p className="text-sm text-muted-foreground">AI Content Studio</p>
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -274,14 +285,29 @@ export function AppSidebar({ activeMode, onModeChange, onHomeClick }: AppSidebar
         </SidebarGroup>
       </SidebarContent>
 
-      {/* Bottom section with Theme Toggle and User Profile */}
-      <div className="p-4 space-y-2">
-        <div className="flex justify-center">
-          <ThemeToggle />
-        </div>
-        <div className="flex justify-center">
-          <UserProfile />
-        </div>
+      {/* Bottom section with Theme Toggle and User Profile - Always at bottom */}
+      <div className="mt-auto p-4 space-y-2">
+        {collapsed ? (
+          <>
+            <div className="flex justify-center">
+              <ThemeToggle />
+            </div>
+            <div className="flex justify-center">
+              <UserProfile />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="flex items-center gap-3 px-3 py-2">
+              <ThemeToggle />
+              <span className="text-sm text-muted-foreground">Theme</span>
+            </div>
+            <div className="flex items-center gap-3 px-3 py-2">
+              <UserProfile />
+              <span className="text-sm text-muted-foreground">Account</span>
+            </div>
+          </>
+        )}
       </div>
     </Sidebar>
   )

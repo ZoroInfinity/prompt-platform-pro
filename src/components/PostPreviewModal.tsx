@@ -29,10 +29,10 @@ export function PostPreviewModal({ isOpen, onClose, content, platform }: PostPre
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <Card className="w-full max-w-sm mx-4 bg-white shadow-2xl">
-        <CardContent className="p-0">
+      <Card className="w-full max-w-sm mx-4 bg-white shadow-2xl max-h-[90vh] flex flex-col">
+        <CardContent className="p-0 flex flex-col h-full">
           {/* Header */}
-          <div className="flex items-center justify-between p-3 border-b">
+          <div className="flex items-center justify-between p-3 border-b shrink-0">
             <h3 className="font-semibold text-base">Post Preview</h3>
             <Button
               variant="ghost"
@@ -44,10 +44,10 @@ export function PostPreviewModal({ isOpen, onClose, content, platform }: PostPre
             </Button>
           </div>
 
-          {/* Instagram Mock Post */}
-          <div className="bg-white">
+          {/* Instagram Mock Post - Scrollable content */}
+          <div className="bg-white flex-1 overflow-y-auto">
             {/* Post Header */}
-            <div className="flex items-center justify-between p-3">
+            <div className="flex items-center justify-between p-3 shrink-0">
               <div className="flex items-center gap-2">
                 <Avatar className="h-6 w-6">
                   <AvatarFallback className="bg-primary text-white text-xs">
@@ -63,7 +63,7 @@ export function PostPreviewModal({ isOpen, onClose, content, platform }: PostPre
             </div>
 
             {/* Image Placeholder */}
-            <div className="aspect-square bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center border-y">
+            <div className="aspect-square bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center border-y shrink-0">
               <div className="text-center text-gray-500">
                 <div className="w-12 h-12 mx-auto mb-1 bg-white/60 rounded-lg flex items-center justify-center">
                   📸
@@ -73,7 +73,7 @@ export function PostPreviewModal({ isOpen, onClose, content, platform }: PostPre
             </div>
 
             {/* Post Actions */}
-            <div className="p-3 space-y-2">
+            <div className="p-3 space-y-2 shrink-0">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Heart className="h-5 w-5" />
@@ -85,19 +85,19 @@ export function PostPreviewModal({ isOpen, onClose, content, platform }: PostPre
 
               <p className="font-semibold text-xs">1,234 likes</p>
 
-              {/* Caption */}
-              <div className="text-xs leading-relaxed">
+              {/* Caption - This section can scroll if content is long */}
+              <div className="text-xs leading-relaxed max-h-32 overflow-y-auto">
                 <span className="font-semibold">your_brand</span>{" "}
-                <span className="whitespace-pre-wrap">{content.substring(0, 120)}...</span>
-                <button className="text-gray-500 ml-1">more</button>
+                <span className="whitespace-pre-wrap">{content.length > 120 ? `${content.substring(0, 120)}...` : content}</span>
+                {content.length > 120 && <button className="text-gray-500 ml-1">more</button>}
               </div>
 
               <p className="text-xs text-gray-500">2 HOURS AGO</p>
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-2 p-3 border-t bg-gray-50">
+          {/* Action Buttons - Fixed at bottom */}
+          <div className="flex gap-2 p-3 border-t bg-gray-50 shrink-0">
             <Button
               variant="outline"
               size="sm"
