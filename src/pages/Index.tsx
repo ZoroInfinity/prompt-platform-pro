@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/ThemeProvider"
 import { ChatInterface } from "@/components/ChatInterface"
 import { ContentCreationMode } from "@/components/ContentCreationMode"
 import { BrandPersonaMode } from "@/components/BrandPersonaMode"
+import { BrandPersonaGenerator } from "@/components/BrandPersonaGenerator"
 import { ImageFineTuningMode } from "@/components/ImageFineTuningMode"
 import { BrandSteeringWheel } from "@/components/BrandSteeringWheel"
 import { BrandVoice } from "@/components/BrandVoice"
@@ -25,6 +26,8 @@ const Index = () => {
         return <ContentCreationMode />
       case "brand-persona":
         return <BrandPersonaMode />
+      case "brand-persona-generator":
+        return <BrandPersonaGenerator />
       case "brand-steering-wheel":
         return <BrandSteeringWheel />
       case "brand-voice":

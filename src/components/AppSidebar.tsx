@@ -17,7 +17,8 @@ import {
   Archive,
   BarChart3,
   Plug,
-  Zap
+  Zap,
+  Users
 } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 import {
@@ -48,7 +49,8 @@ const contentCreationItems = [
 ]
 
 const brandManagementToolsItems = [
-  { id: "brand-persona", title: "Brand Persona", icon: User },
+  { id: "brand-persona-generator", title: "Brand Persona", icon: Users },
+  { id: "brand-persona", title: "Brand Persona Setup", icon: User },
   { id: "brand-steering-wheel", title: "Steering Wheel", icon: Compass },
   { id: "brand-voice", title: "Brand Voice", icon: Volume2 },
   { id: "asset-manager", title: "Asset Manager", icon: Archive },
