@@ -1,3 +1,4 @@
+
 import { useState, useRef } from "react"
 import { Send, MessageSquarePlus, FileText, Palette, Wand2, Sparkles, Calendar, ChevronLeft, ChevronRight, Edit2, Upload, Layers, Instagram, Linkedin, Twitter, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -181,10 +182,14 @@ Please direct any questions or concerns to the Executive Management team. We app
       if (selectedFeature === "business-writing") {
         setGeneratedContent(businessContentSample)
       } else {
-        setGeneratedContent(contentVariations[0])
+        setGeneratedContent(contentVariations.instagram[0])
         setCurrentImageUrl("https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=400&h=400&fit=crop")
       }
-      setCurrentContentIndex(0)
+      setCurrentContentIndex({
+        instagram: 0,
+        linkedin: 0,
+        twitter: 0
+      })
       setIsGenerating(false)
     }, 2000)
   }
