@@ -1,5 +1,5 @@
 import { useState, useRef } from "react"
-import { Send, MessageSquarePlus, FileText, Palette, Wand2, Sparkles, Calendar, ChevronLeft, ChevronRight, Edit2, Upload, Layers, Instagram, Linkedin, Twitter } from "lucide-react"
+import { Send, MessageSquarePlus, FileText, Palette, Wand2, Sparkles, Calendar, ChevronLeft, ChevronRight, Edit2, Upload, Layers, Instagram, Linkedin, Twitter, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
@@ -39,14 +39,19 @@ export function ChatInterface({ onModeActivation, activeMode }: ChatInterfacePro
     contentFormat: "blog-intro"
   })
   
-  // Carousel state for content variations
-  const [currentContentIndex, setCurrentContentIndex] = useState(0)
+  // Carousel state for content variations - separate for each platform
+  const [currentContentIndex, setCurrentContentIndex] = useState({
+    instagram: 0,
+    linkedin: 0,
+    twitter: 0
+  })
   const [showPreviewModal, setShowPreviewModal] = useState(false)
   const [showImageEditTray, setShowImageEditTray] = useState(false)
   
   // Mock multiple content variations (limited to 2 per platform)
-  const contentVariations = [
-    `🚀 Ready to transform your business? Here's how automation can revolutionize your workflow:
+  const contentVariations = {
+    instagram: [
+      `🚀 Ready to transform your business? Here's how automation can revolutionize your workflow:
 
 ✨ Save 20+ hours per week
 📈 Increase productivity by 300%
@@ -56,7 +61,7 @@ export function ChatInterface({ onModeActivation, activeMode }: ChatInterfacePro
 Join thousands of entrepreneurs who've already made the switch! 
 
 #Automation #BusinessGrowth #Productivity #AI #Entrepreneur`,
-    `💼 Transform your business operations today!
+      `💼 Transform your business operations today!
 
 Automation isn't just a buzzword—it's your competitive advantage:
 
@@ -68,7 +73,36 @@ Automation isn't just a buzzword—it's your competitive advantage:
 Don't get left behind. Start automating now! 
 
 #BusinessAutomation #Productivity #Growth #Innovation`
-  ]
+    ],
+    linkedin: [
+      `Ready to transform your business? Here's how automation can revolutionize your workflow:
+
+• Save 20+ hours per week
+• Increase productivity by 300%
+• Focus on what truly matters
+• Let AI handle the repetitive tasks
+
+Join thousands of entrepreneurs who've already made the switch! 
+
+#Automation #BusinessGrowth #Productivity #AI #Entrepreneur`,
+      `Transform your business operations today!
+
+Automation isn't just a buzzword—it's your competitive advantage:
+
+• Eliminate manual processes
+• Boost team productivity
+• Focus on growth, not grunt work
+• See results in just 30 days
+
+Don't get left behind. Start automating now! 
+
+#BusinessAutomation #Productivity #Growth #Innovation`
+    ],
+    twitter: [
+      `🚀 Ready to transform your business? Automation can save you 20+ hours per week and increase productivity by 300%. Join thousands who've made the switch! #Automation #BusinessGrowth`,
+      `💼 Transform your business today! Automation = your competitive advantage. Eliminate manual processes, boost productivity, see results in 30 days. #BusinessAutomation`
+    ]
+  }
 
   const businessContentSample = `**MEMORANDUM**
 
@@ -241,16 +275,26 @@ Please direct any questions or concerns to the Executive Management team. We app
     setEditingContent({ platform: "", isEditing: false })
   }
 
-  const nextContent = () => {
-    const nextIndex = (currentContentIndex + 1) % 2 // Limited to 2 slides
-    setCurrentContentIndex(nextIndex)
-    setGeneratedContent(contentVariations[nextIndex])
+  const nextContent = (platform: string) => {
+    const nextIndex = (currentContentIndex[platform as keyof typeof currentContentIndex] + 1) % 2
+    setCurrentContentIndex(prev => ({
+      ...prev,
+      [platform]: nextIndex
+    }))
   }
 
-  const prevContent = () => {
-    const prevIndex = (currentContentIndex - 1 + 2) % 2 // Limited to 2 slides
-    setCurrentContentIndex(prevIndex)
-    setGeneratedContent(contentVariations[prevIndex])
+  const prevContent = (platform: string) => {
+    const prevIndex = (currentContentIndex[platform as keyof typeof currentContentIndex] - 1 + 2) % 2
+    setCurrentContentIndex(prev => ({
+      ...prev,
+      [platform]: prevIndex
+    }))
+  }
+
+  const getCurrentContent = (platform: string) => {
+    const variations = contentVariations[platform as keyof typeof contentVariations]
+    const index = currentContentIndex[platform as keyof typeof currentContentIndex]
+    return variations[index]
   }
 
   const isLandingState = !generatedContent && !isGenerating
@@ -367,7 +411,7 @@ Please direct any questions or concerns to the Executive Management team. We app
                 showCitations={featureConfig.showCitations}
               />
             ) : (
-              // Quick Post Content (existing grid layout)
+              // Quick Post Content (existing grid layout with fixes)
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Content Card with Platform Tabs */}
                 <div className="space-y-4">
@@ -395,10 +439,11 @@ Please direct any questions or concerns to the Executive Management team. We app
                           </TabsTrigger>
                         </TabsList>
                         
-                        <TabsContent value="instagram" className="space-y-4 flex-1 flex flex-col">
+                        {/* Instagram Tab */}
+                        <TabsContent value="instagram" className="space-y-4 flex-1 flex flex-col mt-4">
                           <div className="text-center">
                             <Badge variant="secondary" className="text-xs bg-white/90">
-                              Version {currentContentIndex + 1} of 2
+                              Version {currentContentIndex.instagram + 1} of 2
                             </Badge>
                           </div>
                           <div className="relative flex-1 flex flex-col">
@@ -407,7 +452,8 @@ Please direct any questions or concerns to the Executive Management team. We app
                                 <Textarea
                                   value={editableContent}
                                   onChange={(e) => setEditableContent(e.target.value)}
-                                  className="flex-1 resize-none border border-gray-200 rounded-lg p-4"
+                                  className="flex-1 resize-none border border-gray-200 rounded-lg p-4 text-sm leading-relaxed transition-all duration-200"
+                                  style={{ minHeight: '300px' }}
                                 />
                                 <div className="flex gap-2 mt-3">
                                   <Button size="sm" onClick={handleSaveEdit} className="bg-primary hover:bg-primary/90">
@@ -420,9 +466,9 @@ Please direct any questions or concerns to the Executive Management team. We app
                               </div>
                             ) : (
                               <>
-                                <div className="bg-white/70 rounded-lg p-6 border border-gray-100 flex-1 overflow-y-auto flex items-center justify-center">
-                                  <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap text-center">
-                                    {generatedContent}
+                                <div className="bg-white/70 rounded-lg p-6 border border-gray-100 flex-1 overflow-y-auto flex items-start justify-center" style={{ minHeight: '300px' }}>
+                                  <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap text-left w-full">
+                                    {getCurrentContent("instagram")}
                                   </p>
                                 </div>
                                 
@@ -430,7 +476,7 @@ Please direct any questions or concerns to the Executive Management team. We app
                                   variant="ghost"
                                   size="sm"
                                   className="absolute left-2 top-1/2 -translate-y-1/2 h-10 w-10 p-0 bg-white/90 hover:bg-white shadow-md rounded-full hover:scale-105 transition-all duration-200"
-                                  onClick={prevContent}
+                                  onClick={() => prevContent("instagram")}
                                 >
                                   <ChevronLeft className="h-5 w-5" />
                                 </Button>
@@ -438,7 +484,7 @@ Please direct any questions or concerns to the Executive Management team. We app
                                   variant="ghost"
                                   size="sm"
                                   className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 p-0 bg-white/90 hover:bg-white shadow-md rounded-full hover:scale-105 transition-all duration-200"
-                                  onClick={nextContent}
+                                  onClick={() => nextContent("instagram")}
                                 >
                                   <ChevronRight className="h-5 w-5" />
                                 </Button>
@@ -447,29 +493,111 @@ Please direct any questions or concerns to the Executive Management team. We app
                           </div>
                         </TabsContent>
                         
-                        <TabsContent value="linkedin" className="space-y-4 flex-1 flex flex-col">
+                        {/* LinkedIn Tab */}
+                        <TabsContent value="linkedin" className="space-y-4 flex-1 flex flex-col mt-4">
                           <div className="text-center">
                             <Badge variant="secondary" className="text-xs bg-white/90">
-                              Version 1 of 2
+                              Version {currentContentIndex.linkedin + 1} of 2
                             </Badge>
                           </div>
-                          <div className="bg-white/70 rounded-lg p-6 border border-gray-100 flex-1 overflow-y-auto flex items-center justify-center">
-                            <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap text-center">
-                              {generatedContent.replace(/🚀|✨|📈|🎯|💡|🔥/g, '•')}
-                            </p>
+                          <div className="relative flex-1 flex flex-col">
+                            {editingContent.isEditing && editingContent.platform === "linkedin" ? (
+                              <div className="flex flex-col flex-1">
+                                <Textarea
+                                  value={editableContent}
+                                  onChange={(e) => setEditableContent(e.target.value)}
+                                  className="flex-1 resize-none border border-gray-200 rounded-lg p-4 text-sm leading-relaxed transition-all duration-200"
+                                  style={{ minHeight: '300px' }}
+                                />
+                                <div className="flex gap-2 mt-3">
+                                  <Button size="sm" onClick={handleSaveEdit} className="bg-primary hover:bg-primary/90">
+                                    Save
+                                  </Button>
+                                  <Button size="sm" variant="outline" onClick={handleCancelEdit}>
+                                    Cancel
+                                  </Button>
+                                </div>
+                              </div>
+                            ) : (
+                              <>
+                                <div className="bg-white/70 rounded-lg p-6 border border-gray-100 flex-1 overflow-y-auto flex items-start justify-center" style={{ minHeight: '300px' }}>
+                                  <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap text-left w-full">
+                                    {getCurrentContent("linkedin")}
+                                  </p>
+                                </div>
+                                
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="absolute left-2 top-1/2 -translate-y-1/2 h-10 w-10 p-0 bg-white/90 hover:bg-white shadow-md rounded-full hover:scale-105 transition-all duration-200"
+                                  onClick={() => prevContent("linkedin")}
+                                >
+                                  <ChevronLeft className="h-5 w-5" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 p-0 bg-white/90 hover:bg-white shadow-md rounded-full hover:scale-105 transition-all duration-200"
+                                  onClick={() => nextContent("linkedin")}
+                                >
+                                  <ChevronRight className="h-5 w-5" />
+                                </Button>
+                              </>
+                            )}
                           </div>
                         </TabsContent>
 
-                        <TabsContent value="twitter" className="space-y-4 flex-1 flex flex-col">
+                        {/* Twitter Tab */}
+                        <TabsContent value="twitter" className="space-y-4 flex-1 flex flex-col mt-4">
                           <div className="text-center">
                             <Badge variant="secondary" className="text-xs bg-white/90">
-                              Version 1 of 2
+                              Version {currentContentIndex.twitter + 1} of 2
                             </Badge>
                           </div>
-                          <div className="bg-white/70 rounded-lg p-6 border border-gray-100 flex-1 overflow-y-auto flex items-center justify-center">
-                            <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap text-center">
-                              {generatedContent.substring(0, 280)}...
-                            </p>
+                          <div className="relative flex-1 flex flex-col">
+                            {editingContent.isEditing && editingContent.platform === "twitter" ? (
+                              <div className="flex flex-col flex-1">
+                                <Textarea
+                                  value={editableContent}
+                                  onChange={(e) => setEditableContent(e.target.value)}
+                                  className="flex-1 resize-none border border-gray-200 rounded-lg p-4 text-sm leading-relaxed transition-all duration-200"
+                                  style={{ minHeight: '300px' }}
+                                />
+                                <div className="flex gap-2 mt-3">
+                                  <Button size="sm" onClick={handleSaveEdit} className="bg-primary hover:bg-primary/90">
+                                    Save
+                                  </Button>
+                                  <Button size="sm" variant="outline" onClick={handleCancelEdit}>
+                                    Cancel
+                                  </Button>
+                                </div>
+                              </div>
+                            ) : (
+                              <>
+                                <div className="bg-white/70 rounded-lg p-6 border border-gray-100 flex-1 overflow-y-auto flex items-start justify-center" style={{ minHeight: '300px' }}>
+                                  <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap text-left w-full">
+                                    {getCurrentContent("twitter")}
+                                  </p>
+                                </div>
+                                
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="absolute left-2 top-1/2 -translate-y-1/2 h-10 w-10 p-0 bg-white/90 hover:bg-white shadow-md rounded-full hover:scale-105 transition-all duration-200"
+                                  onClick={() => prevContent("twitter")}
+                                >
+                                  <ChevronLeft className="h-5 w-5" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 p-0 bg-white/90 hover:bg-white shadow-md rounded-full hover:scale-105 transition-all duration-200"
+                                  onClick={() => nextContent("twitter")}
+                                >
+                                  <ChevronRight className="h-5 w-5" />
+                                </Button>
+                              </>
+                            )}
                           </div>
                         </TabsContent>
                       </Tabs>
@@ -505,7 +633,7 @@ Please direct any questions or concerns to the Executive Management team. We app
                   </Card>
                 </div>
 
-                {/* Image Card - Matching height */}
+                {/* Image Card - Fixed button layout */}
                 <div className="space-y-4">
                   <Card className="glass-card shadow-lg h-[600px] flex flex-col">
                     <CardContent className="p-6 flex-1 flex flex-col">
@@ -527,7 +655,8 @@ Please direct any questions or concerns to the Executive Management team. We app
                     </CardContent>
                     
                     <CardFooter className="flex flex-col gap-3 pt-0 px-6 pb-6 mt-auto">
-                      <div className="flex gap-2 w-full">
+                      {/* Single row of buttons with trash icon */}
+                      <div className="flex gap-2 w-full items-center">
                         <Button 
                           variant="outline" 
                           size="sm" 
@@ -555,15 +684,15 @@ Please direct any questions or concerns to the Executive Management team. We app
                           <Layers className="mr-1 h-3 w-3" />
                           Apply Logo
                         </Button>
+                        <Button 
+                          variant="destructive" 
+                          size="sm" 
+                          className="h-9 w-9 p-0 hover:scale-105 transition-all duration-200"
+                          onClick={handleRemoveImage}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
-                      <Button 
-                        variant="destructive" 
-                        size="sm" 
-                        className="w-full hover:scale-105 transition-all duration-200"
-                        onClick={handleRemoveImage}
-                      >
-                        Remove Image
-                      </Button>
                     </CardFooter>
                   </Card>
                 </div>
