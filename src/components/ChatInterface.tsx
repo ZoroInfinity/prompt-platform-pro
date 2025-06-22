@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react"
 import { Send, MessageSquarePlus, FileText, Palette, Wand2, Sparkles, Calendar, ChevronLeft, ChevronRight, Edit2, Upload, Layers, Instagram, Linkedin, Twitter } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -10,6 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { FeatureTray } from "@/components/FeatureTray"
 import { PostPreviewModal } from "@/components/PostPreviewModal"
 import { ImageEditTray } from "@/components/ImageEditTray"
+import { BusinessContentCard } from "@/components/BusinessContentCard"
 
 interface ChatInterfaceProps {
   onModeActivation?: (mode: string) => void
@@ -70,6 +70,46 @@ Don't get left behind. Start automating now!
 #BusinessAutomation #Productivity #Growth #Innovation`
   ]
 
+  const businessContentSample = `**MEMORANDUM**
+
+TO: All Department Heads
+FROM: Executive Management
+DATE: ${new Date().toLocaleDateString()}
+RE: Implementation of New Digital Workflow System
+
+**PURPOSE**
+This memorandum outlines the strategic implementation of our new digital workflow management system, designed to enhance operational efficiency and streamline interdepartmental communication processes.
+
+**BACKGROUND**
+Following extensive market research and internal analysis, our organization has identified significant opportunities to optimize current workflow procedures through digital transformation initiatives [1]. The proposed system addresses key operational challenges while maintaining compliance with industry standards [2].
+
+**IMPLEMENTATION STRATEGY**
+The rollout will occur in three phases:
+
+1. **Phase One (Weeks 1-2)**: Department heads receive comprehensive training on system functionality and best practices
+2. **Phase Two (Weeks 3-4)**: Pilot implementation with select teams to identify potential optimization areas
+3. **Phase Three (Weeks 5-6)**: Full organizational deployment with ongoing support and monitoring
+
+**EXPECTED OUTCOMES**
+- Reduction in processing time by approximately 40%
+- Enhanced data accuracy and reporting capabilities
+- Improved cross-departmental collaboration and communication
+- Streamlined approval processes and documentation management
+
+**NEXT STEPS**
+Department heads are requested to:
+- Attend mandatory training sessions scheduled for next week
+- Identify team members for pilot program participation
+- Provide feedback during the implementation process
+- Support their teams through the transition period
+
+Please direct any questions or concerns to the Executive Management team. We appreciate your cooperation in ensuring a smooth transition to this enhanced operational framework [3].
+
+**REFERENCES**
+[1] McKinsey Digital Transformation Report 2024
+[2] Industry Compliance Standards Documentation
+[3] Internal Process Optimization Study`
+
   const featureIcons = [
     { 
       icon: MessageSquarePlus, 
@@ -104,9 +144,13 @@ Don't get left behind. Start automating now!
     setIsGenerating(true)
     
     setTimeout(() => {
-      setGeneratedContent(contentVariations[0])
+      if (selectedFeature === "business-writing") {
+        setGeneratedContent(businessContentSample)
+      } else {
+        setGeneratedContent(contentVariations[0])
+        setCurrentImageUrl("https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=400&h=400&fit=crop")
+      }
       setCurrentContentIndex(0)
-      setCurrentImageUrl("https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=400&h=400&fit=crop")
       setIsGenerating(false)
     }, 2000)
   }
@@ -236,7 +280,10 @@ Don't get left behind. Start automating now!
                 <Textarea
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="What would you like to create today?"
+                  placeholder={selectedFeature === "business-writing" 
+                    ? "Describe the business document you need..." 
+                    : "What would you like to create today?"
+                  }
                   className={`resize-none transition-all duration-300 border-0 focus:ring-2 focus:ring-primary/20 ${
                     isLandingState ? "min-h-[80px]" : "min-h-[40px]"
                   }`}
@@ -310,7 +357,17 @@ Don't get left behind. Start automating now!
                   <p className="text-muted-foreground">Generating content...</p>
                 </div>
               </div>
+            ) : selectedFeature === "business-writing" ? (
+              // Business Writing Content
+              <BusinessContentCard
+                content={generatedContent}
+                documentType={featureConfig.businessType}
+                versionLabel="Version 1"
+                onContentChange={setGeneratedContent}
+                showCitations={featureConfig.showCitations}
+              />
             ) : (
+              // Quick Post Content (existing grid layout)
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Content Card with Platform Tabs */}
                 <div className="space-y-4">
@@ -369,7 +426,6 @@ Don't get left behind. Start automating now!
                                   </p>
                                 </div>
                                 
-                                {/* Carousel Navigation - Centered on sides */}
                                 <Button
                                   variant="ghost"
                                   size="sm"
@@ -485,19 +541,7 @@ Don't get left behind. Start automating now!
                           variant="outline" 
                           size="sm" 
                           className="flex-1 border-gray-200 hover:bg-gray-50 hover:scale-105 transition-all duration-200"
-                          onClick={() => {
-                            const input = document.createElement('input')
-                            input.type = 'file'
-                            input.accept = 'image/*'
-                            input.onchange = (e) => {
-                              const file = (e.target as HTMLInputElement).files?.[0]
-                              if (file) {
-                                const url = URL.createObjectURL(file)
-                                setCurrentImageUrl(url)
-                              }
-                            }
-                            input.click()
-                          }}
+                          onClick={handleUploadImage}
                         >
                           <Upload className="mr-1 h-3 w-3" />
                           Upload Image
@@ -506,7 +550,7 @@ Don't get left behind. Start automating now!
                           variant="outline" 
                           size="sm" 
                           className="flex-1 border-gray-200 hover:bg-gray-50 hover:scale-105 transition-all duration-200"
-                          onClick={() => console.log("Apply logo clicked")}
+                          onClick={handleApplyLogo}
                         >
                           <Layers className="mr-1 h-3 w-3" />
                           Apply Logo
@@ -516,7 +560,7 @@ Don't get left behind. Start automating now!
                         variant="destructive" 
                         size="sm" 
                         className="w-full hover:scale-105 transition-all duration-200"
-                        onClick={() => setCurrentImageUrl("")}
+                        onClick={handleRemoveImage}
                       >
                         Remove Image
                       </Button>
