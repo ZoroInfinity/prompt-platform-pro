@@ -21,9 +21,7 @@ import {
   Save,
   Loader2,
   Upload,
-  Check,
-  ChevronLeft,
-  ChevronRight
+  Check
 } from "lucide-react"
 
 interface PersonaData {
@@ -47,15 +45,14 @@ export function BrandPersonaGenerator() {
   const [personaData, setPersonaData] = useState<PersonaData | null>(null)
   const [editingField, setEditingField] = useState<string | null>(null)
   const [editValues, setEditValues] = useState<Partial<PersonaData>>({})
-  const [selectedLogoIndex, setSelectedLogoIndex] = useState(0)
-  const [currentLogoIndex, setCurrentLogoIndex] = useState(0)
+  const [selectedLogoIndex, setSelectedLogoIndex] = useState<number | null>(null)
 
   // Mock AI-generated logos
   const aiLogos = [
-    "https://images.unsplash.com/photo-1618160702438-9b02040d0a901?w=150&h=150&fit=crop",
-    "https://images.unsplash.com/photo-1582562124811-c09040d0a901?w=150&h=150&fit=crop",
-    "https://images.unsplash.com/photo-1466721591366-2d5fba72006d?w=150&h=150&fit=crop",
-    "https://images.unsplash.com/photo-1493962853295-0fd70327578a?w=150&h=150&fit=crop"
+    "https://images.unsplash.com/photo-1618160702438-9b02040d0a901?w=120&h=120&fit=crop",
+    "https://images.unsplash.com/photo-1582562124811-c09040d0a901?w=120&h=120&fit=crop",
+    "https://images.unsplash.com/photo-1466721591366-2d5fba72006d?w=120&h=120&fit=crop",
+    "https://images.unsplash.com/photo-1493962853295-0fd70327578a?w=120&h=120&fit=crop"
   ]
 
   const handleGeneratePersona = async () => {
@@ -116,12 +113,8 @@ export function BrandPersonaGenerator() {
     input.click()
   }
 
-  const nextLogo = () => {
-    setCurrentLogoIndex((prev) => (prev + 1) % aiLogos.length)
-  }
-
-  const prevLogo = () => {
-    setCurrentLogoIndex((prev) => (prev - 1 + aiLogos.length) % aiLogos.length)
+  const handleLogoSelect = (index: number) => {
+    setSelectedLogoIndex(index)
   }
 
   const personaFields = [
@@ -185,52 +178,36 @@ export function BrandPersonaGenerator() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {/* Logo Carousel */}
-                <div className="relative">
-                  <div className="flex justify-center">
-                    <div className="relative w-32 h-32 rounded-lg overflow-hidden border-2 border-white shadow-lg">
-                      <img
-                        src={aiLogos[currentLogoIndex]}
-                        alt="AI Generated Logo"
-                        className="w-full h-full object-cover"
-                      />
-                      {selectedLogoIndex === currentLogoIndex && (
-                        <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
-                          <Check className="h-8 w-8 text-primary bg-white rounded-full p-1" />
+                {/* Logo Row */}
+                <div className="flex justify-center gap-4">
+                  {aiLogos.map((logo, index) => (
+                    <div
+                      key={index}
+                      className={`relative cursor-pointer transition-all duration-200 ${
+                        selectedLogoIndex === index
+                          ? 'ring-2 ring-primary ring-offset-2'
+                          : 'hover:scale-105'
+                      }`}
+                      onClick={() => handleLogoSelect(index)}
+                    >
+                      <div className="w-24 h-24 rounded-lg overflow-hidden shadow-md">
+                        <img
+                          src={logo}
+                          alt={`AI Generated Logo ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      {selectedLogoIndex === index && (
+                        <div className="absolute -top-2 -right-2 bg-primary text-white rounded-full p-1">
+                          <Check className="h-3 w-3" />
                         </div>
                       )}
                     </div>
-                  </div>
-                  
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="absolute left-4 top-1/2 -translate-y-1/2 h-10 w-10 p-0 bg-white/90 hover:bg-white shadow-md rounded-full hover:scale-105 transition-all duration-200"
-                    onClick={prevLogo}
-                  >
-                    <ChevronLeft className="h-5 w-5" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-4 top-1/2 -translate-y-1/2 h-10 w-10 p-0 bg-white/90 hover:bg-white shadow-md rounded-full hover:scale-105 transition-all duration-200"
-                    onClick={nextLogo}
-                  >
-                    <ChevronRight className="h-5 w-5" />
-                  </Button>
+                  ))}
                 </div>
 
-                {/* Logo Actions */}
-                <div className="flex gap-3 justify-center">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setSelectedLogoIndex(currentLogoIndex)}
-                    className="border-gray-200 hover:bg-gray-50"
-                  >
-                    <Check className="h-3 w-3 mr-2" />
-                    Select This Logo
-                  </Button>
+                {/* Upload Button */}
+                <div className="flex justify-center">
                   <Button
                     variant="outline"
                     size="sm"
