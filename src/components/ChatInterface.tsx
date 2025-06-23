@@ -447,10 +447,34 @@ Please direct any questions or concerns to the Executive Management team. We app
                 showCitations={featureConfig.showCitations}
               />
             ) : (
-              // Quick Post Content - Fixed layout
+              // Quick Post Content - Fixed layout with external arrows
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Content Card with Platform Tabs - Fixed Height */}
-                <div className="space-y-4">
+                <div className="space-y-4 relative">
+                  {/* External Navigation Arrows for Content */}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute left-[-50px] top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white/90 hover:bg-white shadow-lg rounded-full hover:scale-105 transition-all duration-200 z-10 hover:shadow-xl"
+                    onClick={() => {
+                      const currentTab = document.querySelector('[data-state="active"]')?.getAttribute('value') || 'instagram'
+                      prevContent(currentTab)
+                    }}
+                  >
+                    <ChevronLeft className="h-6 w-6" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-[-50px] top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white/90 hover:bg-white shadow-lg rounded-full hover:scale-105 transition-all duration-200 z-10 hover:shadow-xl"
+                    onClick={() => {
+                      const currentTab = document.querySelector('[data-state="active"]')?.getAttribute('value') || 'instagram'
+                      nextContent(currentTab)
+                    }}
+                  >
+                    <ChevronRight className="h-6 w-6" />
+                  </Button>
+
                   <Card className="glass-card shadow-lg flex flex-col" style={{ height: '600px' }}>
                     <CardContent className="p-6 flex-1 flex flex-col">
                       <Tabs defaultValue="instagram" className="space-y-4 flex-1 flex flex-col">
@@ -484,7 +508,7 @@ Please direct any questions or concerns to the Executive Management team. We app
                               </Badge>
                             </div>
                             
-                            {/* Fixed height content container */}
+                            {/* Fixed height content container - No internal arrows */}
                             <div className="relative flex-1" style={{ height: '350px' }}>
                               {editingContent.isEditing && editingContent.platform === platform ? (
                                 <div className="flex flex-col h-full">
@@ -504,35 +528,13 @@ Please direct any questions or concerns to the Executive Management team. We app
                                   </div>
                                 </div>
                               ) : (
-                                <>
-                                  {/* Fixed height content display */}
-                                  <div 
-                                    className="bg-white/70 rounded-lg p-6 border border-gray-100 overflow-y-auto"
-                                    style={{ height: '300px' }}
-                                  >
-                                    <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap text-left">
-                                      {getCurrentContent(platform)}
-                                    </p>
-                                  </div>
-                                  
-                                  {/* Navigation arrows */}
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="absolute left-2 top-1/2 -translate-y-1/2 h-10 w-10 p-0 bg-white/90 hover:bg-white shadow-md rounded-full hover:scale-105 transition-all duration-200"
-                                    onClick={() => prevContent(platform)}
-                                  >
-                                    <ChevronLeft className="h-5 w-5" />
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 p-0 bg-white/90 hover:bg-white shadow-md rounded-full hover:scale-105 transition-all duration-200"
-                                    onClick={() => nextContent(platform)}
-                                  >
-                                    <ChevronRight className="h-5 w-5" />
-                                  </Button>
-                                </>
+                                <div 
+                                  className="bg-white/70 rounded-lg p-6 border border-gray-100 overflow-y-auto h-full"
+                                >
+                                  <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap text-left">
+                                    {getCurrentContent(platform)}
+                                  </p>
+                                </div>
                               )}
                             </div>
                           </TabsContent>
@@ -570,11 +572,29 @@ Please direct any questions or concerns to the Executive Management team. We app
                   </Card>
                 </div>
 
-                {/* Image Card - Matching height */}
-                <div className="space-y-4">
+                {/* Image Card - Matching height with external arrows */}
+                <div className="space-y-4 relative">
+                  {/* External Navigation Arrows for Images */}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute left-[-50px] top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white/90 hover:bg-white shadow-lg rounded-full hover:scale-105 transition-all duration-200 z-10 hover:shadow-xl"
+                    onClick={prevImage}
+                  >
+                    <ChevronLeft className="h-6 w-6" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-[-50px] top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white/90 hover:bg-white shadow-lg rounded-full hover:scale-105 transition-all duration-200 z-10 hover:shadow-xl"
+                    onClick={nextImage}
+                  >
+                    <ChevronRight className="h-6 w-6" />
+                  </Button>
+
                   <Card className="glass-card shadow-lg flex flex-col" style={{ height: '600px' }}>
                     <CardContent className="p-6 flex-1 flex flex-col">
-                      {/* Fixed height image container */}
+                      {/* Fixed height image container - No internal arrows */}
                       <div className="relative bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg flex items-center justify-center border border-gray-100 overflow-hidden" style={{ height: '400px' }}>
                         {currentImages[currentImageIndex] ? (
                           <div className="relative w-full h-full">
@@ -606,24 +626,6 @@ Please direct any questions or concerns to the Executive Management team. We app
                             <p className="text-xs text-gray-400">AI-created visual content</p>
                           </div>
                         )}
-                        
-                        {/* Image carousel arrows - centered */}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="absolute left-4 top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white/90 hover:bg-white shadow-md rounded-full hover:scale-105 transition-all duration-200"
-                          onClick={prevImage}
-                        >
-                          <ChevronLeft className="h-6 w-6" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="absolute right-4 top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white/90 hover:bg-white shadow-md rounded-full hover:scale-105 transition-all duration-200"
-                          onClick={nextImage}
-                        >
-                          <ChevronRight className="h-6 w-6" />
-                        </Button>
                       </div>
 
                       {/* Image indicator dots */}
