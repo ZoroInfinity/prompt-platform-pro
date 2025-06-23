@@ -1,3 +1,4 @@
+
 import { useState, useRef } from "react"
 import { Send, MessageSquarePlus, FileText, Palette, Wand2, Sparkles, Calendar, ChevronLeft, ChevronRight, Edit2, Upload, Layers, Instagram, Linkedin, Twitter, Trash2, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -338,14 +339,14 @@ Please direct any questions or concerns to the Executive Management team. We app
 
   return (
     <div className="w-full h-full">
-      {/* Chat Section - Fixed width matching content below */}
+      {/* Chat Section - Full width input */}
       <div className={`w-full transition-all duration-300 ${
         isLandingState 
           ? "flex items-center justify-center min-h-screen px-4" 
-          : "flex justify-center py-6 px-4"
+          : "flex justify-center py-6 px-6"
       }`}>
         <div className={`transition-all duration-300 ${
-          isLandingState ? "max-w-2xl w-full" : "max-w-6xl w-full" // Match content width
+          isLandingState ? "max-w-2xl w-full" : "max-w-7xl w-full"
         }`}>
           {isLandingState && (
             <div className="text-center mb-8">
@@ -429,7 +430,7 @@ Please direct any questions or concerns to the Executive Management team. We app
       {/* Generated Content Section */}
       {(generatedContent || isGenerating) && (
         <div className="px-6 pb-6">
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-7xl mx-auto">
             {isGenerating ? (
               <div className="flex items-center justify-center py-12">
                 <div className="text-center">
@@ -447,79 +448,86 @@ Please direct any questions or concerns to the Executive Management team. We app
                 showCitations={featureConfig.showCitations}
               />
             ) : (
-              // Quick Post Content - Fixed layout with external arrows
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Content Card with Platform Tabs - Fixed Height */}
-                <div className="space-y-4 relative">
+              // Quick Post Content - Redesigned Layout
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Content Container */}
+                <div className="relative">
                   {/* External Navigation Arrows for Content */}
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="absolute left-[-50px] top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white/90 hover:bg-white shadow-lg rounded-full hover:scale-105 transition-all duration-200 z-10 hover:shadow-xl"
+                    className="absolute left-[-60px] top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white/95 hover:bg-white shadow-lg rounded-full hover:scale-110 transition-all duration-200 z-20 border border-gray-100"
                     onClick={() => {
                       const currentTab = document.querySelector('[data-state="active"]')?.getAttribute('value') || 'instagram'
                       prevContent(currentTab)
                     }}
                   >
-                    <ChevronLeft className="h-6 w-6" />
+                    <ChevronLeft className="h-6 w-6 text-gray-700" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="absolute right-[-50px] top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white/90 hover:bg-white shadow-lg rounded-full hover:scale-105 transition-all duration-200 z-10 hover:shadow-xl"
+                    className="absolute right-[-60px] top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white/95 hover:bg-white shadow-lg rounded-full hover:scale-110 transition-all duration-200 z-20 border border-gray-100"
                     onClick={() => {
                       const currentTab = document.querySelector('[data-state="active"]')?.getAttribute('value') || 'instagram'
                       nextContent(currentTab)
                     }}
                   >
-                    <ChevronRight className="h-6 w-6" />
+                    <ChevronRight className="h-6 w-6 text-gray-700" />
                   </Button>
 
-                  <Card className="glass-card shadow-lg flex flex-col" style={{ height: '600px' }}>
-                    <CardContent className="p-6 flex-1 flex flex-col">
+                  <Card className="bg-white/80 backdrop-blur-sm shadow-lg border border-gray-100/50 rounded-2xl h-[600px] flex flex-col">
+                    {/* Header */}
+                    <div className="p-6 pb-4 border-b border-gray-100">
+                      <h3 className="text-lg font-semibold text-gray-800 mb-0">Platform Content</h3>
+                    </div>
+
+                    <CardContent className="p-6 pt-4 flex-1 flex flex-col">
                       <Tabs defaultValue="instagram" className="space-y-4 flex-1 flex flex-col">
-                        <TabsList className="grid w-full grid-cols-3 bg-muted/50">
-                          <TabsTrigger value="instagram" className="data-[state=active]:bg-white data-[state=active]:shadow-sm hover:bg-white/50 transition-colors">
+                        <TabsList className="grid w-full grid-cols-3 bg-gray-50/80 rounded-xl p-1">
+                          <TabsTrigger value="instagram" className="data-[state=active]:bg-white data-[state=active]:shadow-sm hover:bg-white/50 transition-colors rounded-lg">
                             <div className="flex items-center gap-2">
                               <Instagram className="w-4 h-4 text-pink-500" />
-                              <span className="text-sm">Instagram</span>
+                              <span className="text-sm font-medium">Instagram</span>
                             </div>
                           </TabsTrigger>
-                          <TabsTrigger value="linkedin" className="data-[state=active]:bg-white data-[state=active]:shadow-sm hover:bg-white/50 transition-colors">
+                          <TabsTrigger value="linkedin" className="data-[state=active]:bg-white data-[state=active]:shadow-sm hover:bg-white/50 transition-colors rounded-lg">
                             <div className="flex items-center gap-2">
                               <Linkedin className="w-4 h-4 text-blue-600" />
-                              <span className="text-sm">LinkedIn</span>
+                              <span className="text-sm font-medium">LinkedIn</span>
                             </div>
                           </TabsTrigger>
-                          <TabsTrigger value="twitter" className="data-[state=active]:bg-white data-[state=active]:shadow-sm hover:bg-white/50 transition-colors">
+                          <TabsTrigger value="twitter" className="data-[state=active]:bg-white data-[state=active]:shadow-sm hover:bg-white/50 transition-colors rounded-lg">
                             <div className="flex items-center gap-2">
                               <Twitter className="w-4 h-4 text-blue-400" />
-                              <span className="text-sm">Twitter</span>
+                              <span className="text-sm font-medium">Twitter</span>
                             </div>
                           </TabsTrigger>
                         </TabsList>
                         
-                        {/* Platform Content Tabs - Fixed height and positioning */}
+                        {/* Platform Content Tabs */}
                         {["instagram", "linkedin", "twitter"].map((platform) => (
                           <TabsContent key={platform} value={platform} className="flex-1 flex flex-col mt-4">
-                            <div className="text-center mb-4">
-                              <Badge variant="secondary" className="text-xs bg-white/90">
-                                Version {currentContentIndex[platform as keyof typeof currentContentIndex] + 1} of 2
+                            {/* Version Label */}
+                            <div className="flex items-center justify-between mb-3">
+                              <Badge variant="secondary" className="text-xs bg-blue-50 text-blue-700 border border-blue-200">
+                                Version {currentContentIndex[platform as keyof typeof currentContentIndex] + 1}
+                                {currentContentIndex[platform as keyof typeof currentContentIndex] === 0 && " (Recommended)"}
                               </Badge>
                             </div>
                             
-                            {/* Fixed height content container - No internal arrows */}
-                            <div className="relative flex-1" style={{ height: '350px' }}>
+                            {/* Content Display Area - Fixed Height */}
+                            <div className="flex-1 min-h-[350px] max-h-[350px]">
                               {editingContent.isEditing && editingContent.platform === platform ? (
                                 <div className="flex flex-col h-full">
                                   <Textarea
                                     value={editableContent}
                                     onChange={(e) => setEditableContent(e.target.value)}
-                                    className="flex-1 resize-none border border-gray-200 rounded-lg p-4 text-sm leading-relaxed transition-all duration-200"
-                                    style={{ height: '300px' }}
+                                    className="flex-1 resize-none border border-gray-200 rounded-xl p-4 text-sm leading-relaxed h-[300px] bg-white"
                                   />
                                   <div className="flex gap-2 mt-3">
                                     <Button size="sm" onClick={handleSaveEdit} className="bg-primary hover:bg-primary/90">
+                                      <Check className="mr-1 h-3 w-3" />
                                       Save
                                     </Button>
                                     <Button size="sm" variant="outline" onClick={handleCancelEdit}>
@@ -528,10 +536,8 @@ Please direct any questions or concerns to the Executive Management team. We app
                                   </div>
                                 </div>
                               ) : (
-                                <div 
-                                  className="bg-white/70 rounded-lg p-6 border border-gray-100 overflow-y-auto h-full"
-                                >
-                                  <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap text-left">
+                                <div className="bg-gray-50/50 rounded-xl p-6 border border-gray-100 h-full overflow-y-auto">
+                                  <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap text-left">
                                     {getCurrentContent(platform)}
                                   </p>
                                 </div>
@@ -542,11 +548,11 @@ Please direct any questions or concerns to the Executive Management team. We app
                       </Tabs>
                     </CardContent>
                     
-                    <CardFooter className="flex gap-2 pt-0 px-6 pb-6">
+                    <CardFooter className="flex gap-3 pt-0 px-6 pb-6 border-t border-gray-100 mt-auto">
                       <Button 
                         variant="outline" 
                         size="sm" 
-                        className="flex-1 border-gray-200 hover:bg-gray-50 hover:scale-105 transition-all duration-200"
+                        className="flex-1 border-gray-200 hover:bg-gray-50 hover:scale-105 transition-all duration-200 rounded-lg"
                         onClick={() => handleEditText("instagram")}
                       >
                         <Edit2 className="mr-1 h-3 w-3" />
@@ -555,14 +561,14 @@ Please direct any questions or concerns to the Executive Management team. We app
                       <Button 
                         variant="outline" 
                         size="sm"
-                        className="flex-1 border-gray-200 hover:bg-gray-50 hover:scale-105 transition-all duration-200"
+                        className="flex-1 border-gray-200 hover:bg-gray-50 hover:scale-105 transition-all duration-200 rounded-lg"
                       >
                         <Calendar className="mr-1 h-3 w-3" />
                         Schedule
                       </Button>
                       <Button 
                         size="sm"
-                        className="flex-1 bg-primary hover:bg-primary/90 text-white shadow-md hover:scale-105 transition-all duration-200"
+                        className="flex-1 bg-primary hover:bg-primary/90 text-white shadow-md hover:scale-105 transition-all duration-200 rounded-lg"
                         onClick={handlePostNow}
                       >
                         <Send className="mr-1 h-3 w-3" />
@@ -572,70 +578,93 @@ Please direct any questions or concerns to the Executive Management team. We app
                   </Card>
                 </div>
 
-                {/* Image Card - Matching height with external arrows */}
-                <div className="space-y-4 relative">
+                {/* Image Container */}
+                <div className="relative">
                   {/* External Navigation Arrows for Images */}
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="absolute left-[-50px] top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white/90 hover:bg-white shadow-lg rounded-full hover:scale-105 transition-all duration-200 z-10 hover:shadow-xl"
+                    className="absolute left-[-60px] top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white/95 hover:bg-white shadow-lg rounded-full hover:scale-110 transition-all duration-200 z-20 border border-gray-100"
                     onClick={prevImage}
                   >
-                    <ChevronLeft className="h-6 w-6" />
+                    <ChevronLeft className="h-6 w-6 text-gray-700" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="absolute right-[-50px] top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white/90 hover:bg-white shadow-lg rounded-full hover:scale-105 transition-all duration-200 z-10 hover:shadow-xl"
+                    className="absolute right-[-60px] top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white/95 hover:bg-white shadow-lg rounded-full hover:scale-110 transition-all duration-200 z-20 border border-gray-100"
                     onClick={nextImage}
                   >
-                    <ChevronRight className="h-6 w-6" />
+                    <ChevronRight className="h-6 w-6 text-gray-700" />
                   </Button>
 
-                  <Card className="glass-card shadow-lg flex flex-col" style={{ height: '600px' }}>
-                    <CardContent className="p-6 flex-1 flex flex-col">
-                      {/* Fixed height image container - No internal arrows */}
-                      <div className="relative bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg flex items-center justify-center border border-gray-100 overflow-hidden" style={{ height: '400px' }}>
+                  <Card className="bg-white/80 backdrop-blur-sm shadow-lg border border-gray-100/50 rounded-2xl h-[600px] flex flex-col">
+                    {/* Header */}
+                    <div className="p-6 pb-4 border-b border-gray-100 flex items-center justify-between">
+                      <h3 className="text-lg font-semibold text-gray-800">Recommended Image</h3>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all duration-200"
+                        onClick={handleRemoveImage}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+
+                    <CardContent className="p-6 pt-4 flex-1 flex flex-col">
+                      {/* Image Display Area - Fixed Height */}
+                      <div className="flex-1 min-h-[350px] max-h-[350px] bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-100 overflow-hidden relative">
                         {currentImages[currentImageIndex] ? (
                           <div className="relative w-full h-full">
                             <img 
                               src={currentImages[currentImageIndex]} 
                               alt="Generated content" 
-                              className="w-full h-full object-cover rounded-lg"
+                              className="w-full h-full object-cover"
                             />
                             {selectedImageIndex === currentImageIndex && (
-                              <div className="absolute top-2 right-2">
-                                <div className="bg-primary text-white rounded-full p-1">
+                              <div className="absolute top-3 right-3">
+                                <div className="bg-primary text-white rounded-full p-1.5 shadow-lg">
                                   <Check className="h-4 w-4" />
                                 </div>
                               </div>
                             )}
-                            {/* Image selection button */}
+                            {/* Recommended Badge */}
+                            {currentImageIndex === 0 && (
+                              <div className="absolute top-3 left-3">
+                                <Badge className="bg-blue-500 text-white text-xs border-0 shadow-lg">
+                                  Recommended
+                                </Badge>
+                              </div>
+                            )}
+                            {/* Selection Button */}
                             <Button
                               size="sm"
-                              className="absolute bottom-2 right-2 bg-white/90 hover:bg-white text-gray-800 shadow-md"
+                              className="absolute bottom-3 right-3 bg-white/95 hover:bg-white text-gray-800 shadow-lg border border-gray-200 rounded-lg"
                               onClick={() => handleSelectImage(currentImageIndex)}
                             >
                               {selectedImageIndex === currentImageIndex ? "Selected" : "Select"}
                             </Button>
                           </div>
                         ) : (
-                          <div className="text-center text-muted-foreground">
-                            <Palette className="h-12 w-12 mx-auto mb-2 opacity-40" />
-                            <p className="text-sm font-medium">Generated Image</p>
-                            <p className="text-xs text-gray-400">AI-created visual content</p>
+                          <div className="flex items-center justify-center h-full text-center text-gray-400">
+                            <div>
+                              <Palette className="h-12 w-12 mx-auto mb-3 opacity-40" />
+                              <p className="text-sm font-medium">Generated Image</p>
+                              <p className="text-xs">AI-created visual content</p>
+                            </div>
                           </div>
                         )}
                       </div>
 
-                      {/* Image indicator dots */}
+                      {/* Image Indicator Dots */}
                       <div className="flex justify-center gap-2 mt-4">
                         {currentImages.map((_, index) => (
                           <button
                             key={index}
-                            className={`w-3 h-3 rounded-full transition-all ${
+                            className={`w-2.5 h-2.5 rounded-full transition-all duration-200 ${
                               index === currentImageIndex 
-                                ? "bg-primary" 
+                                ? "bg-primary shadow-sm" 
                                 : "bg-gray-300 hover:bg-gray-400"
                             }`}
                             onClick={() => setCurrentImageIndex(index)}
@@ -644,11 +673,11 @@ Please direct any questions or concerns to the Executive Management team. We app
                       </div>
                     </CardContent>
                     
-                    <CardFooter className="flex gap-2 pt-0 px-6 pb-6">
+                    <CardFooter className="flex gap-3 pt-0 px-6 pb-6 border-t border-gray-100 mt-auto">
                       <Button 
                         variant="outline" 
                         size="sm" 
-                        className="flex-1 border-gray-200 hover:bg-gray-50 hover:scale-105 transition-all duration-200"
+                        className="flex-1 border-gray-200 hover:bg-gray-50 hover:scale-105 transition-all duration-200 rounded-lg"
                         onClick={handleEditImage}
                       >
                         <Edit2 className="mr-1 h-3 w-3" />
@@ -657,7 +686,7 @@ Please direct any questions or concerns to the Executive Management team. We app
                       <Button 
                         variant="outline" 
                         size="sm" 
-                        className="flex-1 border-gray-200 hover:bg-gray-50 hover:scale-105 transition-all duration-200"
+                        className="flex-1 border-gray-200 hover:bg-gray-50 hover:scale-105 transition-all duration-200 rounded-lg"
                         onClick={handleUploadImage}
                       >
                         <Upload className="mr-1 h-3 w-3" />
@@ -666,19 +695,11 @@ Please direct any questions or concerns to the Executive Management team. We app
                       <Button 
                         variant="outline" 
                         size="sm" 
-                        className="flex-1 border-gray-200 hover:bg-gray-50 hover:scale-105 transition-all duration-200"
+                        className="flex-1 border-gray-200 hover:bg-gray-50 hover:scale-105 transition-all duration-200 rounded-lg"
                         onClick={handleApplyLogo}
                       >
                         <Layers className="mr-1 h-3 w-3" />
                         Apply Logo
-                      </Button>
-                      <Button 
-                        variant="destructive" 
-                        size="sm" 
-                        className="h-9 w-9 p-0 hover:scale-105 transition-all duration-200"
-                        onClick={handleRemoveImage}
-                      >
-                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </CardFooter>
                   </Card>
