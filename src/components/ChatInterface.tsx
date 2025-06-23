@@ -447,11 +447,11 @@ Please direct any questions or concerns to the Executive Management team. We app
                 showCitations={featureConfig.showCitations}
               />
             ) : (
-              // Quick Post Content (existing grid layout with fixes)
+              // Quick Post Content - Fixed layout
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Content Card with Platform Tabs */}
+                {/* Content Card with Platform Tabs - Fixed Height */}
                 <div className="space-y-4">
-                  <Card className="glass-card shadow-lg h-[600px] flex flex-col">
+                  <Card className="glass-card shadow-lg flex flex-col" style={{ height: '600px' }}>
                     <CardContent className="p-6 flex-1 flex flex-col">
                       <Tabs defaultValue="instagram" className="space-y-4 flex-1 flex flex-col">
                         <TabsList className="grid w-full grid-cols-3 bg-muted/50">
@@ -475,22 +475,24 @@ Please direct any questions or concerns to the Executive Management team. We app
                           </TabsTrigger>
                         </TabsList>
                         
-                        {/* Platform Content Tabs */}
+                        {/* Platform Content Tabs - Fixed height and positioning */}
                         {["instagram", "linkedin", "twitter"].map((platform) => (
-                          <TabsContent key={platform} value={platform} className="space-y-4 flex-1 flex flex-col mt-4">
-                            <div className="text-center">
+                          <TabsContent key={platform} value={platform} className="flex-1 flex flex-col mt-4">
+                            <div className="text-center mb-4">
                               <Badge variant="secondary" className="text-xs bg-white/90">
                                 Version {currentContentIndex[platform as keyof typeof currentContentIndex] + 1} of 2
                               </Badge>
                             </div>
-                            <div className="relative flex-1 flex flex-col">
+                            
+                            {/* Fixed height content container */}
+                            <div className="relative flex-1" style={{ height: '350px' }}>
                               {editingContent.isEditing && editingContent.platform === platform ? (
-                                <div className="flex flex-col flex-1">
+                                <div className="flex flex-col h-full">
                                   <Textarea
                                     value={editableContent}
                                     onChange={(e) => setEditableContent(e.target.value)}
                                     className="flex-1 resize-none border border-gray-200 rounded-lg p-4 text-sm leading-relaxed transition-all duration-200"
-                                    style={{ minHeight: '300px' }}
+                                    style={{ height: '300px' }}
                                   />
                                   <div className="flex gap-2 mt-3">
                                     <Button size="sm" onClick={handleSaveEdit} className="bg-primary hover:bg-primary/90">
@@ -503,12 +505,17 @@ Please direct any questions or concerns to the Executive Management team. We app
                                 </div>
                               ) : (
                                 <>
-                                  <div className="bg-white/70 rounded-lg p-6 border border-gray-100 flex-1 overflow-y-auto flex items-start justify-center" style={{ minHeight: '300px' }}>
-                                    <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap text-left w-full">
+                                  {/* Fixed height content display */}
+                                  <div 
+                                    className="bg-white/70 rounded-lg p-6 border border-gray-100 overflow-y-auto"
+                                    style={{ height: '300px' }}
+                                  >
+                                    <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap text-left">
                                       {getCurrentContent(platform)}
                                     </p>
                                   </div>
                                   
+                                  {/* Navigation arrows */}
                                   <Button
                                     variant="ghost"
                                     size="sm"
@@ -533,7 +540,7 @@ Please direct any questions or concerns to the Executive Management team. We app
                       </Tabs>
                     </CardContent>
                     
-                    <CardFooter className="flex gap-2 pt-0 px-6 pb-6 mt-auto">
+                    <CardFooter className="flex gap-2 pt-0 px-6 pb-6">
                       <Button 
                         variant="outline" 
                         size="sm" 
@@ -563,11 +570,12 @@ Please direct any questions or concerns to the Executive Management team. We app
                   </Card>
                 </div>
 
-                {/* Image Card - Multiple images carousel */}
+                {/* Image Card - Matching height */}
                 <div className="space-y-4">
-                  <Card className="glass-card shadow-lg h-[600px] flex flex-col">
+                  <Card className="glass-card shadow-lg flex flex-col" style={{ height: '600px' }}>
                     <CardContent className="p-6 flex-1 flex flex-col">
-                      <div className="relative aspect-square bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg flex items-center justify-center border border-gray-100 flex-1 max-h-[400px] overflow-hidden">
+                      {/* Fixed height image container */}
+                      <div className="relative bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg flex items-center justify-center border border-gray-100 overflow-hidden" style={{ height: '400px' }}>
                         {currentImages[currentImageIndex] ? (
                           <div className="relative w-full h-full">
                             <img 
@@ -599,22 +607,22 @@ Please direct any questions or concerns to the Executive Management team. We app
                           </div>
                         )}
                         
-                        {/* Image carousel arrows */}
+                        {/* Image carousel arrows - centered */}
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="absolute left-2 top-1/2 -translate-y-1/2 h-10 w-10 p-0 bg-white/90 hover:bg-white shadow-md rounded-full hover:scale-105 transition-all duration-200"
+                          className="absolute left-4 top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white/90 hover:bg-white shadow-md rounded-full hover:scale-105 transition-all duration-200"
                           onClick={prevImage}
                         >
-                          <ChevronLeft className="h-5 w-5" />
+                          <ChevronLeft className="h-6 w-6" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 p-0 bg-white/90 hover:bg-white shadow-md rounded-full hover:scale-105 transition-all duration-200"
+                          className="absolute right-4 top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white/90 hover:bg-white shadow-md rounded-full hover:scale-105 transition-all duration-200"
                           onClick={nextImage}
                         >
-                          <ChevronRight className="h-5 w-5" />
+                          <ChevronRight className="h-6 w-6" />
                         </Button>
                       </div>
 
@@ -623,7 +631,7 @@ Please direct any questions or concerns to the Executive Management team. We app
                         {currentImages.map((_, index) => (
                           <button
                             key={index}
-                            className={`w-2 h-2 rounded-full transition-all ${
+                            className={`w-3 h-3 rounded-full transition-all ${
                               index === currentImageIndex 
                                 ? "bg-primary" 
                                 : "bg-gray-300 hover:bg-gray-400"
@@ -634,7 +642,7 @@ Please direct any questions or concerns to the Executive Management team. We app
                       </div>
                     </CardContent>
                     
-                    <CardFooter className="flex gap-2 pt-0 px-6 pb-6 mt-auto">
+                    <CardFooter className="flex gap-2 pt-0 px-6 pb-6">
                       <Button 
                         variant="outline" 
                         size="sm" 

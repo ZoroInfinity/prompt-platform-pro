@@ -21,7 +21,8 @@ import {
   Save,
   Loader2,
   Upload,
-  Check
+  Check,
+  Copy
 } from "lucide-react"
 
 interface PersonaData {
@@ -47,13 +48,16 @@ export function BrandPersonaGenerator() {
   const [editValues, setEditValues] = useState<Partial<PersonaData>>({})
   const [selectedLogoIndex, setSelectedLogoIndex] = useState<number | null>(null)
 
-  // Mock AI-generated logos
+  // Mock AI-generated logos with better placeholders
   const aiLogos = [
     "https://images.unsplash.com/photo-1618160702438-9b02040d0a901?w=120&h=120&fit=crop",
     "https://images.unsplash.com/photo-1582562124811-c09040d0a901?w=120&h=120&fit=crop",
     "https://images.unsplash.com/photo-1466721591366-2d5fba72006d?w=120&h=120&fit=crop",
     "https://images.unsplash.com/photo-1493962853295-0fd70327578a?w=120&h=120&fit=crop"
   ]
+
+  // Sample brand names for placeholder
+  const sampleBrands = ["Apple", "Google", "Tesla", "Nike", "Spotify"]
 
   const handleGeneratePersona = async () => {
     if (!websiteUrl.trim()) return
@@ -74,7 +78,11 @@ export function BrandPersonaGenerator() {
         taglines: "• \"Innovation Simplified\"\n• \"Your Digital Partner\"\n• \"Technology That Works\"\n• \"Empowering Your Digital Future\"\n• \"Solutions That Scale\"",
         reviews: "• \"Excellent service and support\" - 4.8/5 stars\n• \"Transformed our business operations\"\n• \"Professional and reliable team\"\n• \"Outstanding technical expertise\"\n• \"Highly recommend their services\"",
         brandColors: ["#2563eb", "#1e40af", "#3b82f6", "#60a5fa", "#93c5fd"],
-        images: []
+        images: [
+          "https://images.unsplash.com/photo-1560472355-536de3962603?w=300&h=200&fit=crop",
+          "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=300&h=200&fit=crop",
+          "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=300&h=200&fit=crop"
+        ]
       }
       setPersonaData(mockData)
       setIsLoading(false)
@@ -117,6 +125,29 @@ export function BrandPersonaGenerator() {
     setSelectedLogoIndex(index)
   }
 
+  const handleUploadImage = () => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = 'image/*'
+    input.multiple = true
+    input.onchange = (e) => {
+      const files = (e.target as HTMLInputElement).files
+      if (files && personaData) {
+        const newImages = Array.from(files).map(file => URL.createObjectURL(file))
+        setPersonaData({ 
+          ...personaData, 
+          images: [...personaData.images, ...newImages] 
+        })
+      }
+    }
+    input.click()
+  }
+
+  const copyColorToClipboard = (color: string) => {
+    navigator.clipboard.writeText(color)
+    // Could add toast notification here
+  }
+
   const personaFields = [
     { key: "brandName", label: "Brand Name", icon: Building2 },
     { key: "industry", label: "Industry", icon: Globe },
@@ -124,7 +155,7 @@ export function BrandPersonaGenerator() {
     { key: "coreValues", label: "Core Values", icon: Heart },
     { key: "personalityTraits", label: "Personality Traits", icon: Sparkles },
     { key: "brandVoice", label: "Brand Voice / Tonality", icon: Volume2 },
-    { key: "valueProp", label: "Value Proposition", icon: Target },
+    { key: "valueProp", label: "Brand Benefit / Value Proposition", icon: Target },
     { key: "keyOfferings", label: "Key Offerings", icon: Package },
     { key: "taglines", label: "Brand Taglines", icon: Quote },
     { key: "reviews", label: "Brand Reviews", icon: Star },
@@ -135,6 +166,14 @@ export function BrandPersonaGenerator() {
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-foreground mb-2">Brand Persona Generator</h1>
         <p className="text-muted-foreground">Enter a website URL to automatically generate a comprehensive brand persona</p>
+        <div className="mt-4 text-sm text-gray-500">
+          <span>Try with brands like: </span>
+          {sampleBrands.map((brand, index) => (
+            <span key={brand} className="font-medium text-primary">
+              {brand}{index < sampleBrands.length - 1 ? ", " : ""}
+            </span>
+          ))}
+        </div>
       </div>
 
       {/* URL Input Section */}
@@ -167,61 +206,94 @@ export function BrandPersonaGenerator() {
 
       {/* Generated Persona */}
       {personaData && (
-        <div className="space-y-6">
+        <div className="space-y-8">
           {/* Company Logo Section */}
           <Card className="glass-card hover:shadow-lg transition-all duration-200">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Building2 className="h-4 w-4 text-primary" />
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Building2 className="h-5 w-5 text-primary" />
                 Company Logo
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {/* Logo Row */}
-                <div className="flex justify-center gap-4">
-                  {aiLogos.map((logo, index) => (
-                    <div
-                      key={index}
-                      className={`relative cursor-pointer transition-all duration-200 ${
-                        selectedLogoIndex === index
-                          ? 'ring-2 ring-primary ring-offset-2'
-                          : 'hover:scale-105'
-                      }`}
-                      onClick={() => handleLogoSelect(index)}
-                    >
-                      <div className="w-24 h-24 rounded-lg overflow-hidden shadow-md">
-                        <img
-                          src={logo}
-                          alt={`AI Generated Logo ${index + 1}`}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      {selectedLogoIndex === index && (
-                        <div className="absolute -top-2 -right-2 bg-primary text-white rounded-full p-1">
-                          <Check className="h-3 w-3" />
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Upload Button */}
-                <div className="flex justify-center">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleUploadLogo}
-                    className="border-gray-200 hover:bg-gray-50"
+            <CardContent className="space-y-6">
+              {/* Logo Row */}
+              <div className="flex justify-center gap-6">
+                {aiLogos.map((logo, index) => (
+                  <div
+                    key={index}
+                    className={`relative cursor-pointer transition-all duration-200 ${
+                      selectedLogoIndex === index
+                        ? 'ring-2 ring-primary ring-offset-2'
+                        : 'hover:scale-105'
+                    }`}
+                    onClick={() => handleLogoSelect(index)}
                   >
-                    <Upload className="h-3 w-3 mr-2" />
-                    Upload Your Own Logo
-                  </Button>
-                </div>
+                    <div className="w-28 h-28 rounded-xl overflow-hidden shadow-md bg-white">
+                      <img
+                        src={logo}
+                        alt={`AI Generated Logo ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    {selectedLogoIndex === index && (
+                      <div className="absolute -top-2 -right-2 bg-primary text-white rounded-full p-1">
+                        <Check className="h-4 w-4" />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Upload Button */}
+              <div className="flex justify-center">
+                <Button
+                  variant="outline"
+                  onClick={handleUploadLogo}
+                  className="border-gray-200 hover:bg-gray-50"
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Upload Your Own Logo
+                </Button>
               </div>
             </CardContent>
           </Card>
 
+          {/* Brand Colors Section */}
+          <Card className="glass-card hover:shadow-lg transition-all duration-200">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Palette className="h-5 w-5 text-primary" />
+                Brand Colours
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-4 justify-center">
+                {personaData.brandColors.map((color, index) => (
+                  <div key={index} className="flex flex-col items-center gap-2">
+                    <div 
+                      className="w-16 h-16 rounded-full border-4 border-white shadow-lg cursor-pointer hover:scale-105 transition-transform"
+                      style={{ backgroundColor: color }}
+                      onClick={() => copyColorToClipboard(color)}
+                    />
+                    <div className="text-center">
+                      <span className="text-xs text-muted-foreground font-mono block">{color}</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 px-2 text-xs mt-1"
+                        onClick={() => copyColorToClipboard(color)}
+                      >
+                        <Copy className="h-3 w-3 mr-1" />
+                        Copy
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Persona Details Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {personaFields.map((field) => {
               const Icon = field.icon
@@ -229,7 +301,7 @@ export function BrandPersonaGenerator() {
               const value = personaData[field.key as keyof PersonaData] as string
 
               return (
-                <Card key={field.key} className="glass-card hover:shadow-lg transition-all duration-200">
+                <Card key={field.key} className="glass-card hover:shadow-lg transition-all duration-200 h-60">
                   <CardHeader className="pb-3">
                     <CardTitle className="flex items-center justify-between text-base">
                       <div className="flex items-center gap-2">
@@ -250,16 +322,16 @@ export function BrandPersonaGenerator() {
                       </Button>
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="flex-1">
                     {isEditing ? (
                       <Textarea
                         value={editValues[field.key as keyof PersonaData] as string || ""}
                         onChange={(e) => setEditValues({ ...editValues, [field.key]: e.target.value })}
-                        className="min-h-[120px] resize-none"
-                        rows={5}
+                        className="h-full resize-none"
+                        rows={6}
                       />
                     ) : (
-                      <div className="text-sm text-foreground leading-relaxed whitespace-pre-wrap min-h-[120px]">
+                      <div className="text-sm text-foreground leading-relaxed whitespace-pre-wrap h-full overflow-y-auto text-left">
                         {value}
                       </div>
                     )}
@@ -268,42 +340,45 @@ export function BrandPersonaGenerator() {
               )
             })}
 
-            {/* Brand Colors Card */}
-            <Card className="glass-card hover:shadow-lg transition-all duration-200">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <Palette className="h-4 w-4 text-primary" />
-                  Brand Colors
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-3">
-                  {personaData.brandColors.map((color, index) => (
-                    <div key={index} className="flex flex-col items-center gap-1">
-                      <div 
-                        className="w-12 h-12 rounded-lg border-2 border-white shadow-sm"
-                        style={{ backgroundColor: color }}
-                      />
-                      <span className="text-xs text-muted-foreground font-mono">{color}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
             {/* Images Gallery Card */}
-            <Card className="glass-card hover:shadow-lg transition-all duration-200">
+            <Card className="glass-card hover:shadow-lg transition-all duration-200 h-60 lg:col-span-2">
               <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <Image className="h-4 w-4 text-primary" />
-                  Images Gallery
+                <CardTitle className="flex items-center justify-between text-base">
+                  <div className="flex items-center gap-2">
+                    <Image className="h-4 w-4 text-primary" />
+                    Images Gallery
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleUploadImage}
+                    className="h-8 px-3"
+                  >
+                    <Upload className="h-3 w-3 mr-1" />
+                    Upload
+                  </Button>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="text-center py-8 text-muted-foreground">
-                  <Image className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                  <p className="text-sm">Brand images will appear here</p>
-                </div>
+              <CardContent className="flex-1">
+                {personaData.images.length > 0 ? (
+                  <div className="grid grid-cols-3 gap-4 h-full">
+                    {personaData.images.map((image, index) => (
+                      <div key={index} className="relative rounded-lg overflow-hidden bg-gray-100">
+                        <img
+                          src={image}
+                          alt={`Brand image ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground h-full flex flex-col justify-center">
+                    <Image className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">Brand images will appear here</p>
+                    <p className="text-xs mt-1">Upload images or they'll be generated automatically</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
