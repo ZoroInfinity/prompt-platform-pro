@@ -1,6 +1,5 @@
-
 import { useState, useRef } from "react"
-import { Send, MessageSquarePlus, FileText, Palette, Wand2, Sparkles, Calendar, ChevronLeft, ChevronRight, Edit2, Upload, Layers, Instagram, Linkedin, Twitter, Trash2 } from "lucide-react"
+import { Send, MessageSquarePlus, FileText, Palette, Wand2, Sparkles, Calendar, ChevronLeft, ChevronRight, Edit2, Upload, Layers, Instagram, Linkedin, Twitter, Trash2, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
@@ -25,7 +24,15 @@ export function ChatInterface({ onModeActivation, activeMode }: ChatInterfacePro
   const [selectedFeature, setSelectedFeature] = useState("quick-post")
   const [editingContent, setEditingContent] = useState({ platform: "", isEditing: false })
   const [editableContent, setEditableContent] = useState("")
-  const [currentImageUrl, setCurrentImageUrl] = useState("")
+  
+  // Multiple images for carousel
+  const [currentImages, setCurrentImages] = useState([
+    "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=400&h=400&fit=crop",
+    "https://images.unsplash.com/photo-1560472355-536de3962603?w=400&h=400&fit=crop",
+    "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=400&h=400&fit=crop"
+  ])
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   
   // Feature tray state with improved hover behavior
   const [featureTrayOpen, setFeatureTrayOpen] = useState(false)
@@ -183,13 +190,19 @@ Please direct any questions or concerns to the Executive Management team. We app
         setGeneratedContent(businessContentSample)
       } else {
         setGeneratedContent(contentVariations.instagram[0])
-        setCurrentImageUrl("https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=400&h=400&fit=crop")
+        setCurrentImages([
+          "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=400&h=400&fit=crop",
+          "https://images.unsplash.com/photo-1560472355-536de3962603?w=400&h=400&fit=crop",
+          "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=400&h=400&fit=crop"
+        ])
       }
       setCurrentContentIndex({
         instagram: 0,
         linkedin: 0,
         twitter: 0
       })
+      setCurrentImageIndex(0)
+      setSelectedImageIndex(0)
       setIsGenerating(false)
     }, 2000)
   }
@@ -231,12 +244,27 @@ Please direct any questions or concerns to the Executive Management team. We app
     setFeatureTrayOpen(false)
   }
 
+  // Image carousel functions
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % currentImages.length)
+  }
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => (prev - 1 + currentImages.length) % currentImages.length)
+  }
+
+  const handleSelectImage = (index: number) => {
+    setSelectedImageIndex(index)
+  }
+
   const handleEditImage = () => {
     setShowImageEditTray(true)
   }
 
   const handleImageSelect = (imageUrl: string) => {
-    setCurrentImageUrl(imageUrl)
+    const newImages = [...currentImages]
+    newImages[currentImageIndex] = imageUrl
+    setCurrentImages(newImages)
     setShowImageEditTray(false)
   }
 
@@ -248,7 +276,9 @@ Please direct any questions or concerns to the Executive Management team. We app
       const file = (e.target as HTMLInputElement).files?.[0]
       if (file) {
         const url = URL.createObjectURL(file)
-        setCurrentImageUrl(url)
+        const newImages = [...currentImages]
+        newImages[currentImageIndex] = url
+        setCurrentImages(newImages)
       }
     }
     input.click()
@@ -259,7 +289,9 @@ Please direct any questions or concerns to the Executive Management team. We app
   }
 
   const handleRemoveImage = () => {
-    setCurrentImageUrl("")
+    const newImages = [...currentImages]
+    newImages[currentImageIndex] = ""
+    setCurrentImages(newImages)
   }
 
   const handlePostNow = () => {
@@ -331,8 +363,7 @@ Please direct any questions or concerns to the Executive Management team. We app
                   onChange={(e) => setInput(e.target.value)}
                   placeholder={selectedFeature === "business-writing" 
                     ? "Describe the business document you need..." 
-                    : "What would you like to create today?"
-                  }
+                    : "What would you like to create today?"}
                   className={`resize-none transition-all duration-300 border-0 focus:ring-2 focus:ring-primary/20 ${
                     isLandingState ? "min-h-[80px]" : "min-h-[40px]"
                   }`}
@@ -444,167 +475,61 @@ Please direct any questions or concerns to the Executive Management team. We app
                           </TabsTrigger>
                         </TabsList>
                         
-                        {/* Instagram Tab */}
-                        <TabsContent value="instagram" className="space-y-4 flex-1 flex flex-col mt-4">
-                          <div className="text-center">
-                            <Badge variant="secondary" className="text-xs bg-white/90">
-                              Version {currentContentIndex.instagram + 1} of 2
-                            </Badge>
-                          </div>
-                          <div className="relative flex-1 flex flex-col">
-                            {editingContent.isEditing && editingContent.platform === "instagram" ? (
-                              <div className="flex flex-col flex-1">
-                                <Textarea
-                                  value={editableContent}
-                                  onChange={(e) => setEditableContent(e.target.value)}
-                                  className="flex-1 resize-none border border-gray-200 rounded-lg p-4 text-sm leading-relaxed transition-all duration-200"
-                                  style={{ minHeight: '300px' }}
-                                />
-                                <div className="flex gap-2 mt-3">
-                                  <Button size="sm" onClick={handleSaveEdit} className="bg-primary hover:bg-primary/90">
-                                    Save
-                                  </Button>
-                                  <Button size="sm" variant="outline" onClick={handleCancelEdit}>
-                                    Cancel
-                                  </Button>
+                        {/* Platform Content Tabs */}
+                        {["instagram", "linkedin", "twitter"].map((platform) => (
+                          <TabsContent key={platform} value={platform} className="space-y-4 flex-1 flex flex-col mt-4">
+                            <div className="text-center">
+                              <Badge variant="secondary" className="text-xs bg-white/90">
+                                Version {currentContentIndex[platform as keyof typeof currentContentIndex] + 1} of 2
+                              </Badge>
+                            </div>
+                            <div className="relative flex-1 flex flex-col">
+                              {editingContent.isEditing && editingContent.platform === platform ? (
+                                <div className="flex flex-col flex-1">
+                                  <Textarea
+                                    value={editableContent}
+                                    onChange={(e) => setEditableContent(e.target.value)}
+                                    className="flex-1 resize-none border border-gray-200 rounded-lg p-4 text-sm leading-relaxed transition-all duration-200"
+                                    style={{ minHeight: '300px' }}
+                                  />
+                                  <div className="flex gap-2 mt-3">
+                                    <Button size="sm" onClick={handleSaveEdit} className="bg-primary hover:bg-primary/90">
+                                      Save
+                                    </Button>
+                                    <Button size="sm" variant="outline" onClick={handleCancelEdit}>
+                                      Cancel
+                                    </Button>
+                                  </div>
                                 </div>
-                              </div>
-                            ) : (
-                              <>
-                                <div className="bg-white/70 rounded-lg p-6 border border-gray-100 flex-1 overflow-y-auto flex items-start justify-center" style={{ minHeight: '300px' }}>
-                                  <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap text-left w-full">
-                                    {getCurrentContent("instagram")}
-                                  </p>
-                                </div>
-                                
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="absolute left-2 top-1/2 -translate-y-1/2 h-10 w-10 p-0 bg-white/90 hover:bg-white shadow-md rounded-full hover:scale-105 transition-all duration-200"
-                                  onClick={() => prevContent("instagram")}
-                                >
-                                  <ChevronLeft className="h-5 w-5" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 p-0 bg-white/90 hover:bg-white shadow-md rounded-full hover:scale-105 transition-all duration-200"
-                                  onClick={() => nextContent("instagram")}
-                                >
-                                  <ChevronRight className="h-5 w-5" />
-                                </Button>
-                              </>
-                            )}
-                          </div>
-                        </TabsContent>
-                        
-                        {/* LinkedIn Tab */}
-                        <TabsContent value="linkedin" className="space-y-4 flex-1 flex flex-col mt-4">
-                          <div className="text-center">
-                            <Badge variant="secondary" className="text-xs bg-white/90">
-                              Version {currentContentIndex.linkedin + 1} of 2
-                            </Badge>
-                          </div>
-                          <div className="relative flex-1 flex flex-col">
-                            {editingContent.isEditing && editingContent.platform === "linkedin" ? (
-                              <div className="flex flex-col flex-1">
-                                <Textarea
-                                  value={editableContent}
-                                  onChange={(e) => setEditableContent(e.target.value)}
-                                  className="flex-1 resize-none border border-gray-200 rounded-lg p-4 text-sm leading-relaxed transition-all duration-200"
-                                  style={{ minHeight: '300px' }}
-                                />
-                                <div className="flex gap-2 mt-3">
-                                  <Button size="sm" onClick={handleSaveEdit} className="bg-primary hover:bg-primary/90">
-                                    Save
+                              ) : (
+                                <>
+                                  <div className="bg-white/70 rounded-lg p-6 border border-gray-100 flex-1 overflow-y-auto flex items-start justify-center" style={{ minHeight: '300px' }}>
+                                    <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap text-left w-full">
+                                      {getCurrentContent(platform)}
+                                    </p>
+                                  </div>
+                                  
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="absolute left-2 top-1/2 -translate-y-1/2 h-10 w-10 p-0 bg-white/90 hover:bg-white shadow-md rounded-full hover:scale-105 transition-all duration-200"
+                                    onClick={() => prevContent(platform)}
+                                  >
+                                    <ChevronLeft className="h-5 w-5" />
                                   </Button>
-                                  <Button size="sm" variant="outline" onClick={handleCancelEdit}>
-                                    Cancel
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 p-0 bg-white/90 hover:bg-white shadow-md rounded-full hover:scale-105 transition-all duration-200"
+                                    onClick={() => nextContent(platform)}
+                                  >
+                                    <ChevronRight className="h-5 w-5" />
                                   </Button>
-                                </div>
-                              </div>
-                            ) : (
-                              <>
-                                <div className="bg-white/70 rounded-lg p-6 border border-gray-100 flex-1 overflow-y-auto flex items-start justify-center" style={{ minHeight: '300px' }}>
-                                  <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap text-left w-full">
-                                    {getCurrentContent("linkedin")}
-                                  </p>
-                                </div>
-                                
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="absolute left-2 top-1/2 -translate-y-1/2 h-10 w-10 p-0 bg-white/90 hover:bg-white shadow-md rounded-full hover:scale-105 transition-all duration-200"
-                                  onClick={() => prevContent("linkedin")}
-                                >
-                                  <ChevronLeft className="h-5 w-5" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 p-0 bg-white/90 hover:bg-white shadow-md rounded-full hover:scale-105 transition-all duration-200"
-                                  onClick={() => nextContent("linkedin")}
-                                >
-                                  <ChevronRight className="h-5 w-5" />
-                                </Button>
-                              </>
-                            )}
-                          </div>
-                        </TabsContent>
-
-                        {/* Twitter Tab */}
-                        <TabsContent value="twitter" className="space-y-4 flex-1 flex flex-col mt-4">
-                          <div className="text-center">
-                            <Badge variant="secondary" className="text-xs bg-white/90">
-                              Version {currentContentIndex.twitter + 1} of 2
-                            </Badge>
-                          </div>
-                          <div className="relative flex-1 flex flex-col">
-                            {editingContent.isEditing && editingContent.platform === "twitter" ? (
-                              <div className="flex flex-col flex-1">
-                                <Textarea
-                                  value={editableContent}
-                                  onChange={(e) => setEditableContent(e.target.value)}
-                                  className="flex-1 resize-none border border-gray-200 rounded-lg p-4 text-sm leading-relaxed transition-all duration-200"
-                                  style={{ minHeight: '300px' }}
-                                />
-                                <div className="flex gap-2 mt-3">
-                                  <Button size="sm" onClick={handleSaveEdit} className="bg-primary hover:bg-primary/90">
-                                    Save
-                                  </Button>
-                                  <Button size="sm" variant="outline" onClick={handleCancelEdit}>
-                                    Cancel
-                                  </Button>
-                                </div>
-                              </div>
-                            ) : (
-                              <>
-                                <div className="bg-white/70 rounded-lg p-6 border border-gray-100 flex-1 overflow-y-auto flex items-start justify-center" style={{ minHeight: '300px' }}>
-                                  <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap text-left w-full">
-                                    {getCurrentContent("twitter")}
-                                  </p>
-                                </div>
-                                
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="absolute left-2 top-1/2 -translate-y-1/2 h-10 w-10 p-0 bg-white/90 hover:bg-white shadow-md rounded-full hover:scale-105 transition-all duration-200"
-                                  onClick={() => prevContent("twitter")}
-                                >
-                                  <ChevronLeft className="h-5 w-5" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 p-0 bg-white/90 hover:bg-white shadow-md rounded-full hover:scale-105 transition-all duration-200"
-                                  onClick={() => nextContent("twitter")}
-                                >
-                                  <ChevronRight className="h-5 w-5" />
-                                </Button>
-                              </>
-                            )}
-                          </div>
-                        </TabsContent>
+                                </>
+                              )}
+                            </div>
+                          </TabsContent>
+                        ))}
                       </Tabs>
                     </CardContent>
                     
@@ -638,17 +563,34 @@ Please direct any questions or concerns to the Executive Management team. We app
                   </Card>
                 </div>
 
-                {/* Image Card - Fixed button layout */}
+                {/* Image Card - Multiple images carousel */}
                 <div className="space-y-4">
                   <Card className="glass-card shadow-lg h-[600px] flex flex-col">
                     <CardContent className="p-6 flex-1 flex flex-col">
-                      <div className="aspect-square bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg flex items-center justify-center border border-gray-100 flex-1 max-h-[400px] overflow-hidden">
-                        {currentImageUrl ? (
-                          <img 
-                            src={currentImageUrl} 
-                            alt="Generated content" 
-                            className="w-full h-full object-cover rounded-lg"
-                          />
+                      <div className="relative aspect-square bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg flex items-center justify-center border border-gray-100 flex-1 max-h-[400px] overflow-hidden">
+                        {currentImages[currentImageIndex] ? (
+                          <div className="relative w-full h-full">
+                            <img 
+                              src={currentImages[currentImageIndex]} 
+                              alt="Generated content" 
+                              className="w-full h-full object-cover rounded-lg"
+                            />
+                            {selectedImageIndex === currentImageIndex && (
+                              <div className="absolute top-2 right-2">
+                                <div className="bg-primary text-white rounded-full p-1">
+                                  <Check className="h-4 w-4" />
+                                </div>
+                              </div>
+                            )}
+                            {/* Image selection button */}
+                            <Button
+                              size="sm"
+                              className="absolute bottom-2 right-2 bg-white/90 hover:bg-white text-gray-800 shadow-md"
+                              onClick={() => handleSelectImage(currentImageIndex)}
+                            >
+                              {selectedImageIndex === currentImageIndex ? "Selected" : "Select"}
+                            </Button>
+                          </div>
                         ) : (
                           <div className="text-center text-muted-foreground">
                             <Palette className="h-12 w-12 mx-auto mb-2 opacity-40" />
@@ -656,48 +598,78 @@ Please direct any questions or concerns to the Executive Management team. We app
                             <p className="text-xs text-gray-400">AI-created visual content</p>
                           </div>
                         )}
+                        
+                        {/* Image carousel arrows */}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="absolute left-2 top-1/2 -translate-y-1/2 h-10 w-10 p-0 bg-white/90 hover:bg-white shadow-md rounded-full hover:scale-105 transition-all duration-200"
+                          onClick={prevImage}
+                        >
+                          <ChevronLeft className="h-5 w-5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 p-0 bg-white/90 hover:bg-white shadow-md rounded-full hover:scale-105 transition-all duration-200"
+                          onClick={nextImage}
+                        >
+                          <ChevronRight className="h-5 w-5" />
+                        </Button>
+                      </div>
+
+                      {/* Image indicator dots */}
+                      <div className="flex justify-center gap-2 mt-4">
+                        {currentImages.map((_, index) => (
+                          <button
+                            key={index}
+                            className={`w-2 h-2 rounded-full transition-all ${
+                              index === currentImageIndex 
+                                ? "bg-primary" 
+                                : "bg-gray-300 hover:bg-gray-400"
+                            }`}
+                            onClick={() => setCurrentImageIndex(index)}
+                          />
+                        ))}
                       </div>
                     </CardContent>
                     
-                    <CardFooter className="flex flex-col gap-3 pt-0 px-6 pb-6 mt-auto">
-                      {/* Single row of buttons with trash icon */}
-                      <div className="flex gap-2 w-full items-center">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="flex-1 border-gray-200 hover:bg-gray-50 hover:scale-105 transition-all duration-200"
-                          onClick={handleEditImage}
-                        >
-                          <Edit2 className="mr-1 h-3 w-3" />
-                          Edit Image
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="flex-1 border-gray-200 hover:bg-gray-50 hover:scale-105 transition-all duration-200"
-                          onClick={handleUploadImage}
-                        >
-                          <Upload className="mr-1 h-3 w-3" />
-                          Upload Image
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="flex-1 border-gray-200 hover:bg-gray-50 hover:scale-105 transition-all duration-200"
-                          onClick={handleApplyLogo}
-                        >
-                          <Layers className="mr-1 h-3 w-3" />
-                          Apply Logo
-                        </Button>
-                        <Button 
-                          variant="destructive" 
-                          size="sm" 
-                          className="h-9 w-9 p-0 hover:scale-105 transition-all duration-200"
-                          onClick={handleRemoveImage}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
+                    <CardFooter className="flex gap-2 pt-0 px-6 pb-6 mt-auto">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="flex-1 border-gray-200 hover:bg-gray-50 hover:scale-105 transition-all duration-200"
+                        onClick={handleEditImage}
+                      >
+                        <Edit2 className="mr-1 h-3 w-3" />
+                        Edit Image
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="flex-1 border-gray-200 hover:bg-gray-50 hover:scale-105 transition-all duration-200"
+                        onClick={handleUploadImage}
+                      >
+                        <Upload className="mr-1 h-3 w-3" />
+                        Upload Image
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="flex-1 border-gray-200 hover:bg-gray-50 hover:scale-105 transition-all duration-200"
+                        onClick={handleApplyLogo}
+                      >
+                        <Layers className="mr-1 h-3 w-3" />
+                        Apply Logo
+                      </Button>
+                      <Button 
+                        variant="destructive" 
+                        size="sm" 
+                        className="h-9 w-9 p-0 hover:scale-105 transition-all duration-200"
+                        onClick={handleRemoveImage}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </CardFooter>
                   </Card>
                 </div>
