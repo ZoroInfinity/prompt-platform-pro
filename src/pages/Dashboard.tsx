@@ -1,4 +1,4 @@
-
+import { useState } from "react"
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LineChart, Line } from "recharts"
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/AppSidebar"
@@ -8,6 +8,18 @@ import { UserProfile } from "@/components/UserProfile"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 const Dashboard = () => {
+  const [activeMode, setActiveMode] = useState<string>("dashboard")
+
+  const handleModeChange = (mode: string) => {
+    // Handle mode changes if needed
+    setActiveMode(mode)
+  }
+
+  const handleHomeClick = () => {
+    // Navigate to home if needed
+    window.location.href = "/"
+  }
+
   const summaryData = [
     { title: "Posts Made", value: "142", change: "+12%" },
     { title: "Total Reach", value: "24.5K", change: "+8%" },
@@ -30,7 +42,11 @@ const Dashboard = () => {
       <div className="min-h-screen gradient-bg">
         <SidebarProvider>
           <div className="flex min-h-screen w-full">
-            <AppSidebar />
+            <AppSidebar 
+              activeMode={activeMode}
+              onModeChange={handleModeChange}
+              onHomeClick={handleHomeClick}
+            />
             
             <main className="flex-1 flex flex-col">
               <header className="glass-card border-b backdrop-blur-xl bg-white/25 dark:bg-slate-900/30 sticky top-0 z-50">

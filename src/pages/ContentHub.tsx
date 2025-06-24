@@ -1,4 +1,3 @@
-
 import { useState } from "react"
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/AppSidebar"
@@ -13,6 +12,17 @@ import { Calendar, Edit, Trash2 } from "lucide-react"
 
 const ContentHub = () => {
   const [activeTab, setActiveTab] = useState("drafts")
+  const [activeMode, setActiveMode] = useState<string>("content-hub")
+
+  const handleModeChange = (mode: string) => {
+    // Handle mode changes if needed
+    setActiveMode(mode)
+  }
+
+  const handleHomeClick = () => {
+    // Navigate to home if needed
+    window.location.href = "/"
+  }
 
   const drafts = [
     { id: 1, content: "Exciting product launch coming soon! 🚀", platform: "LinkedIn", date: "2024-01-15" },
@@ -36,7 +46,11 @@ const ContentHub = () => {
       <div className="min-h-screen gradient-bg">
         <SidebarProvider>
           <div className="flex min-h-screen w-full">
-            <AppSidebar />
+            <AppSidebar 
+              activeMode={activeMode}
+              onModeChange={handleModeChange}
+              onHomeClick={handleHomeClick}
+            />
             
             <main className="flex-1 flex flex-col">
               <header className="glass-card border-b backdrop-blur-xl bg-white/25 dark:bg-slate-900/30 sticky top-0 z-50">
