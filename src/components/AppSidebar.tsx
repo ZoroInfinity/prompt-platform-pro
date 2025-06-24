@@ -95,7 +95,7 @@ export function AppSidebar({ activeMode, onModeChange, onHomeClick }: AppSidebar
 
   return (
     <div 
-      className={`fixed left-0 top-0 h-full bg-sidebar border-r transition-all duration-300 ease-in-out z-40 ${
+      className={`fixed left-0 top-0 h-full bg-white border-r border-gray-200 transition-all duration-250 ease-in-out z-40 shadow-sm ${
         isHovered ? 'w-64' : 'w-16'
       } ${isMobile ? 'hidden' : 'block'}`}
       onMouseEnter={() => setIsHovered(true)}
@@ -106,16 +106,16 @@ export function AppSidebar({ activeMode, onModeChange, onHomeClick }: AppSidebar
         <div className="p-2">
           <div 
             onClick={() => handleItemClick("home")}
-            className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer hover:bg-sidebar-accent transition-colors ${
-              activeMode === "quick-post" ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""
+            className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-all duration-200 ease-in-out ${
+              activeMode === "quick-post" ? "bg-sky-50 text-sky-600" : "text-gray-600 hover:text-sky-600 hover:bg-sky-50"
             }`}
           >
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-sidebar-primary text-sidebar-primary-foreground flex-shrink-0">
-              <Home className="w-4 h-4" />
+            <div className="flex items-center justify-center w-8 h-8 flex-shrink-0">
+              <Home className="w-5 h-5 transition-colors duration-200 ease-in-out" />
             </div>
-            <div className={`transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'} ${!isHovered ? 'w-0 overflow-hidden' : ''}`}>
-              <div className="font-semibold text-sm">Home</div>
-              <div className="text-xs text-muted-foreground">Quick Post</div>
+            <div className={`transition-all duration-250 ease-in-out ${isHovered ? 'opacity-100 w-auto' : 'opacity-0 w-0 overflow-hidden'}`}>
+              <div className="font-semibold text-sm whitespace-nowrap">Home</div>
+              <div className="text-xs text-gray-500 whitespace-nowrap">Quick Post</div>
             </div>
           </div>
         </div>
@@ -124,9 +124,9 @@ export function AppSidebar({ activeMode, onModeChange, onHomeClick }: AppSidebar
         <div className="flex-1 overflow-y-auto">
           {/* AI Content Creation */}
           <div className="p-2">
-            <div className={`px-2 py-1 text-xs font-medium text-sidebar-foreground/70 transition-opacity duration-300 ${
-              isHovered ? 'opacity-100' : 'opacity-0'
-            } ${!isHovered ? 'h-0 overflow-hidden' : 'h-auto'}`}>
+            <div className={`px-2 py-1 text-xs font-medium text-gray-500 transition-all duration-250 ease-in-out ${
+              isHovered ? 'opacity-100 h-auto' : 'opacity-0 h-0 overflow-hidden'
+            }`}>
               AI Content Creation
             </div>
             <div className="space-y-1 mt-1">
@@ -134,14 +134,14 @@ export function AppSidebar({ activeMode, onModeChange, onHomeClick }: AppSidebar
                 <div 
                   key={item.mode}
                   onClick={() => handleItemClick(item.mode)}
-                  className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer hover:bg-sidebar-accent transition-colors ${
-                    activeMode === item.mode ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""
+                  className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-all duration-200 ease-in-out ${
+                    activeMode === item.mode ? "bg-sky-50 text-sky-600" : "text-gray-600 hover:text-sky-600 hover:bg-sky-50"
                   }`}
                 >
-                  <item.icon className="w-4 h-4 flex-shrink-0" />
-                  <span className={`text-sm transition-opacity duration-300 ${
-                    isHovered ? 'opacity-100' : 'opacity-0'
-                  } ${!isHovered ? 'w-0 overflow-hidden' : ''}`}>
+                  <item.icon className="w-5 h-5 flex-shrink-0 transition-colors duration-200 ease-in-out" />
+                  <span className={`text-sm transition-all duration-250 ease-in-out whitespace-nowrap ${
+                    isHovered ? 'opacity-100 w-auto' : 'opacity-0 w-0 overflow-hidden'
+                  }`}>
                     {item.title}
                   </span>
                 </div>
@@ -151,9 +151,9 @@ export function AppSidebar({ activeMode, onModeChange, onHomeClick }: AppSidebar
           
           {/* Brand Management Tools */}
           <div className="p-2 mt-4">
-            <div className={`px-2 py-1 text-xs font-medium text-sidebar-foreground/70 transition-opacity duration-300 ${
-              isHovered ? 'opacity-100' : 'opacity-0'
-            } ${!isHovered ? 'h-0 overflow-hidden' : 'h-auto'}`}>
+            <div className={`px-2 py-1 text-xs font-medium text-gray-500 transition-all duration-250 ease-in-out ${
+              isHovered ? 'opacity-100 h-auto' : 'opacity-0 h-0 overflow-hidden'
+            }`}>
               Brand Management Tools
             </div>
             <div className="space-y-1 mt-1">
@@ -161,14 +161,14 @@ export function AppSidebar({ activeMode, onModeChange, onHomeClick }: AppSidebar
                 <div 
                   key={item.mode}
                   onClick={() => handleItemClick(item.mode)}
-                  className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer hover:bg-sidebar-accent transition-colors ${
-                    activeMode === item.mode ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""
+                  className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-all duration-200 ease-in-out ${
+                    activeMode === item.mode ? "bg-sky-50 text-sky-600" : "text-gray-600 hover:text-sky-600 hover:bg-sky-50"
                   }`}
                 >
-                  <item.icon className="w-4 h-4 flex-shrink-0" />
-                  <span className={`text-sm transition-opacity duration-300 ${
-                    isHovered ? 'opacity-100' : 'opacity-0'
-                  } ${!isHovered ? 'w-0 overflow-hidden' : ''}`}>
+                  <item.icon className="w-5 h-5 flex-shrink-0 transition-colors duration-200 ease-in-out" />
+                  <span className={`text-sm transition-all duration-250 ease-in-out whitespace-nowrap ${
+                    isHovered ? 'opacity-100 w-auto' : 'opacity-0 w-0 overflow-hidden'
+                  }`}>
                     {item.title}
                   </span>
                 </div>
@@ -181,17 +181,17 @@ export function AppSidebar({ activeMode, onModeChange, onHomeClick }: AppSidebar
         <div className="p-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <div className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer hover:bg-sidebar-accent transition-colors`}>
-                <div className="w-8 h-8 rounded-full bg-sidebar-accent flex items-center justify-center flex-shrink-0">
+              <div className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-all duration-200 ease-in-out text-gray-600 hover:text-sky-600 hover:bg-sky-50`}>
+                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
                   <User2 className="w-4 h-4" />
                 </div>
-                <div className={`transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'} ${!isHovered ? 'w-0 overflow-hidden' : ''}`}>
-                  <div className="font-semibold text-sm">User</div>
-                  <div className="text-xs text-muted-foreground">user@example.com</div>
+                <div className={`transition-all duration-250 ease-in-out ${isHovered ? 'opacity-100 w-auto' : 'opacity-0 w-0 overflow-hidden'}`}>
+                  <div className="font-semibold text-sm whitespace-nowrap">User</div>
+                  <div className="text-xs text-gray-500 whitespace-nowrap">user@example.com</div>
                 </div>
-                <ChevronUp className={`w-4 h-4 ml-auto transition-opacity duration-300 ${
-                  isHovered ? 'opacity-100' : 'opacity-0'
-                } ${!isHovered ? 'w-0 overflow-hidden' : ''}`} />
+                <ChevronUp className={`w-4 h-4 ml-auto transition-all duration-250 ease-in-out ${
+                  isHovered ? 'opacity-100 w-auto' : 'opacity-0 w-0 overflow-hidden'
+                }`} />
               </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent
