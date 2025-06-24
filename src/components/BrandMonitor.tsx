@@ -141,28 +141,30 @@ export function BrandMonitor() {
             <CardTitle>Sentiment Summary</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
-              <div className="flex items-center gap-3">
-                <ThumbsUp className="h-5 w-5 text-green-600" />
-                <span className="font-medium text-green-800">Positive</span>
+            <div className="space-y-3">
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <ThumbsUp className="h-5 w-5 text-green-600" />
+                  <span className="font-semibold text-green-800">Positive ({sentimentData.positive})</span>
+                </div>
+                <p className="text-sm text-gray-600 ml-8">Customers love our innovative solutions and excellent support team.</p>
               </div>
-              <span className="text-2xl font-bold text-green-600">{sentimentData.positive}</span>
-            </div>
-            
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <div className="flex items-center gap-3">
-                <Minus className="h-5 w-5 text-gray-600" />
-                <span className="font-medium text-gray-800">Neutral</span>
+              
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <Minus className="h-5 w-5 text-gray-600" />
+                  <span className="font-semibold text-gray-800">Neutral ({sentimentData.neutral})</span>
+                </div>
+                <p className="text-sm text-gray-600 ml-8">General feedback about features and user experience improvements.</p>
               </div>
-              <span className="text-2xl font-bold text-gray-600">{sentimentData.neutral}</span>
-            </div>
 
-            <div className="flex items-center justify-between p-4 bg-red-50 rounded-lg border border-red-200">
-              <div className="flex items-center gap-3">
-                <ThumbsDown className="h-5 w-5 text-red-600" />
-                <span className="font-medium text-red-800">Negative</span>
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <ThumbsDown className="h-5 w-5 text-red-600" />
+                  <span className="font-semibold text-red-800">Negative ({sentimentData.negative})</span>
+                </div>
+                <p className="text-sm text-gray-600 ml-8">Concerns about onboarding process and response times.</p>
               </div>
-              <span className="text-2xl font-bold text-red-600">{sentimentData.negative}</span>
             </div>
           </CardContent>
         </Card>
@@ -229,6 +231,7 @@ export function BrandMonitor() {
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
                         <PlatformIcon className="h-4 w-4 text-gray-600" />
+                        <span className="text-sm font-medium text-gray-900">User Review</span>
                         <span className="text-sm text-gray-500">{review.timestamp}</span>
                       </div>
                       <Badge className={`text-xs ${getSentimentColor(review.sentiment)}`}>

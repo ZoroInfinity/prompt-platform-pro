@@ -1,4 +1,3 @@
-
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -228,91 +227,94 @@ export function BrandPersonaGenerator() {
             })}
           </div>
 
-          {/* Logo Section */}
-          <Card className="glass-card hover:shadow-lg transition-all duration-200">
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <Building2 className="h-5 w-5 text-primary" />
-                Company Logo
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Logo Row */}
-              <div className="flex justify-center gap-6">
-                {aiLogos.map((logo, index) => (
-                  <div
-                    key={index}
-                    className={`relative cursor-pointer transition-all duration-200 ${
-                      selectedLogoIndex === index
-                        ? 'ring-2 ring-primary ring-offset-2'
-                        : 'hover:scale-105'
-                    }`}
-                    onClick={() => handleLogoSelect(index)}
-                  >
-                    <div className="w-28 h-28 rounded-xl overflow-hidden shadow-md bg-white">
-                      <img
-                        src={logo}
-                        alt={`AI Generated Logo ${index + 1}`}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    {selectedLogoIndex === index && (
-                      <div className="absolute -top-2 -right-2 bg-primary text-white rounded-full p-1">
-                        <Check className="h-4 w-4" />
+          {/* Logo and Brand Colors Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Logo Section */}
+            <Card className="glass-card hover:shadow-lg transition-all duration-200">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Building2 className="h-5 w-5 text-primary" />
+                  Company Logo
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Logo Grid */}
+                <div className="grid grid-cols-2 gap-4">
+                  {aiLogos.map((logo, index) => (
+                    <div
+                      key={index}
+                      className={`relative cursor-pointer transition-all duration-200 ${
+                        selectedLogoIndex === index
+                          ? 'ring-2 ring-primary ring-offset-2'
+                          : 'hover:scale-105'
+                      }`}
+                      onClick={() => handleLogoSelect(index)}
+                    >
+                      <div className="w-full h-24 rounded-xl overflow-hidden shadow-md bg-white">
+                        <img
+                          src={logo}
+                          alt={`AI Generated Logo ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              {/* Upload Button */}
-              <div className="flex justify-center">
-                <Button
-                  variant="outline"
-                  onClick={handleUploadLogo}
-                  className="border-gray-200 hover:bg-gray-50"
-                >
-                  <Upload className="h-4 w-4 mr-2" />
-                  Upload Your Own Logo
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Brand Colors Section */}
-          <Card className="glass-card hover:shadow-lg transition-all duration-200">
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <div className="h-5 w-5 rounded-full bg-gradient-to-r from-blue-500 to-purple-500" />
-                Brand Colours
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-4 justify-center">
-                {personaData.brandColors.map((color, index) => (
-                  <div key={index} className="flex flex-col items-center gap-2">
-                    <div 
-                      className="w-16 h-16 rounded-full border-4 border-white shadow-lg cursor-pointer hover:scale-105 transition-transform"
-                      style={{ backgroundColor: color }}
-                      onClick={() => copyColorToClipboard(color)}
-                    />
-                    <div className="text-center">
-                      <span className="text-xs text-muted-foreground font-mono block">{color}</span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 px-2 text-xs mt-1"
-                        onClick={() => copyColorToClipboard(color)}
-                      >
-                        <Copy className="h-3 w-3 mr-1" />
-                        Copy
-                      </Button>
+                      {selectedLogoIndex === index && (
+                        <div className="absolute -top-2 -right-2 bg-primary text-white rounded-full p-1">
+                          <Check className="h-4 w-4" />
+                        </div>
+                      )}
                     </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                  ))}
+                </div>
+
+                {/* Upload Button */}
+                <div className="flex justify-center">
+                  <Button
+                    variant="outline"
+                    onClick={handleUploadLogo}
+                    className="border-gray-200 hover:bg-gray-50"
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    Upload Custom Logo
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Brand Colors Section */}
+            <Card className="glass-card hover:shadow-lg transition-all duration-200">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <div className="h-5 w-5 rounded-full bg-gradient-to-r from-blue-500 to-purple-500" />
+                  Brand Colours
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-4">
+                  {personaData.brandColors.map((color, index) => (
+                    <div key={index} className="flex flex-col items-center gap-2">
+                      <div 
+                        className="w-16 h-16 rounded-full border-4 border-white shadow-lg cursor-pointer hover:scale-105 transition-transform"
+                        style={{ backgroundColor: color }}
+                        onClick={() => copyColorToClipboard(color)}
+                      />
+                      <div className="text-center">
+                        <span className="text-xs text-muted-foreground font-mono block">{color}</span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 px-2 text-xs mt-1"
+                          onClick={() => copyColorToClipboard(color)}
+                        >
+                          <Copy className="h-3 w-3 mr-1" />
+                          Copy
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
           {/* Save Button */}
           <div className="flex justify-center pt-6">

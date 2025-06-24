@@ -1,316 +1,193 @@
 
 import { useState, useEffect } from "react"
-import { 
-  Home, 
-  FolderOpen, 
-  Activity, 
-  User,
-  MessageSquarePlus,
-  FileText,
-  Edit,
-  ChevronDown,
-  ChevronRight,
-  Palette,
-  Briefcase,
-  Compass,
-  Volume2,
-  Archive,
-  BarChart3,
-  Plug,
-  Zap,
-  Users
-} from "lucide-react"
-import { Link, useLocation } from "react-router-dom"
+import { Calendar, Home, Inbox, Search, Settings, ChevronUp, User2, Building2, PenTool, Image, BarChart3, Archive, Plug, Compass, Target, Eye, Lightbulb, Users, MessageSquare } from "lucide-react"
+
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuItem,
   SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarHeader,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { Button } from "@/components/ui/button"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { ThemeToggle } from "@/components/ThemeToggle"
-import { UserProfile } from "@/components/UserProfile"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 interface AppSidebarProps {
-  activeMode?: string | null
-  onModeChange?: (mode: string) => void
-  onHomeClick?: () => void
+  activeMode: string
+  onModeChange: (mode: string) => void
+  onHomeClick: () => void
 }
 
-const contentCreationItems = [
-  { id: "quick-post", title: "Quick Post", icon: MessageSquarePlus },
-  { id: "business-writing", title: "Business Writing", icon: FileText },
-  { id: "content-creation", title: "Content Creation", icon: Edit },
-]
-
-const brandManagementToolsItems = [
-  { id: "brand-persona-generator", title: "Brand Persona", icon: Users },
-  { id: "brand-persona", title: "Brand Persona Setup", icon: User },
-  { id: "brand-steering-wheel", title: "Steering Wheel", icon: Compass },
-  { id: "brand-voice", title: "Brand Voice", icon: Volume2 },
-  { id: "asset-manager", title: "Asset Manager", icon: Archive },
-  { id: "brand-monitor", title: "Brand Monitor", icon: BarChart3 },
-  { id: "brand-integrations", title: "Integrations", icon: Plug },
-  { id: "image-finetuning", title: "Image Fine-Tuning", icon: Palette },
-]
-
 export function AppSidebar({ activeMode, onModeChange, onHomeClick }: AppSidebarProps) {
-  const { state, open, setOpen } = useSidebar()
-  const [isHovered, setIsHovered] = useState(false)
-  const [contentHubOpen, setContentHubOpen] = useState(true)
-  const [brandManagementToolsOpen, setBrandManagementToolsOpen] = useState(true)
-  const location = useLocation()
+  const { isMobile } = useSidebar()
 
-  // Auto-expand on hover with smooth transition
-  useEffect(() => {
-    let timeoutId: NodeJS.Timeout
-
-    if (isHovered && !open) {
-      timeoutId = setTimeout(() => {
-        setOpen(true)
-      }, 150)
-    } else if (!isHovered && open) {
-      timeoutId = setTimeout(() => {
-        setOpen(false)
-      }, 300)
+  // AI Content Creation items
+  const contentItems = [
+    {
+      title: "Quick Post",
+      icon: PenTool,
+      mode: "quick-post"
+    },
+    {
+      title: "Business Writing",
+      icon: Building2,
+      mode: "business-writing"
+    },
+    {
+      title: "Content Creation",
+      icon: Image,
+      mode: "content-creation"
+    },
+    {
+      title: "Image Fine-tuning",
+      icon: Image,
+      mode: "image-finetuning"
     }
+  ]
 
-    return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId)
-      }
+  // Brand Management Tools - exactly 5 tools
+  const brandItems = [
+    {
+      title: "Brand Persona",
+      icon: User2,
+      mode: "brand-persona-generator"
+    },
+    {
+      title: "Brand Steering Wheel",
+      icon: Compass,
+      mode: "brand-steering-wheel"
+    },
+    {
+      title: "Brand Monitor",
+      icon: BarChart3,
+      mode: "brand-monitor"
+    },
+    {
+      title: "Asset Manager",
+      icon: Archive,
+      mode: "asset-manager"
+    },
+    {
+      title: "Integrations",
+      icon: Plug,
+      mode: "brand-integrations"
     }
-  }, [isHovered, open, setOpen])
+  ]
 
-  const collapsed = !open
-
-  const getHomeButtonCls = () =>
-    `flex items-center w-full px-3 py-2 rounded-lg transition-all duration-300 ${
-      activeMode === null && location.pathname === "/"
-        ? "bg-primary/10 text-primary font-medium shadow-sm" 
-        : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-    }`
-
-  const getModeButtonCls = (modeId: string) =>
-    `w-full justify-start text-sm font-normal transition-all duration-300 ${
-      activeMode === modeId
-        ? "bg-primary/10 text-primary font-medium"
-        : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-    }`
-
-  const isAnyContentModeActive = contentCreationItems.some(item => activeMode === item.id)
-  const isAnyBrandToolActive = brandManagementToolsItems.some(item => activeMode === item.id)
+  const handleItemClick = (mode: string) => {
+    if (mode === "home") {
+      onHomeClick()
+    } else {
+      onModeChange(mode)
+    }
+  }
 
   return (
-    <Sidebar
-      className="glass-card border-r transition-all duration-300 ease-in-out scrollbar-hide"
-      collapsible="icon"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      {/* Top Section with Logo/Brand */}
-      <div className="p-4">
-        {collapsed ? (
-          <div className="flex justify-center">
-            <Zap className="h-6 w-6 text-primary" />
-          </div>
-        ) : (
-          <div className="mb-6">
-            <div className="flex items-center gap-2">
-              <Zap className="h-6 w-6 text-primary" />
-              <div>
-                <h2 className="text-lg font-semibold text-foreground">AutoText AI</h2>
-                <p className="text-sm text-muted-foreground">AI Content Studio</p>
+    <Sidebar variant="sidebar" collapsible="icon">
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton 
+              size="lg" 
+              onClick={() => handleItemClick("home")}
+              className={activeMode === "quick-post" ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""}
+            >
+              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                <Home className="size-4" />
               </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <SidebarContent className="scrollbar-hide">
+              <div className="grid flex-1 text-left text-sm leading-tight">
+                <span className="truncate font-semibold">Home</span>
+                <span className="truncate text-xs">Quick Post</span>
+              </div>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
+      
+      <SidebarContent>
         <SidebarGroup>
+          <SidebarGroupLabel>AI Content Creation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link
-                    to="/"
-                    onClick={onHomeClick}
-                    className={getHomeButtonCls()}
+              {contentItems.map((item) => (
+                <SidebarMenuItem key={item.mode}>
+                  <SidebarMenuButton 
+                    onClick={() => handleItemClick(item.mode)}
+                    className={activeMode === item.mode ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""}
                   >
-                    <Home className={`h-5 w-5 ${collapsed ? "" : "mr-3"}`} />
-                    {!collapsed && <span>Home</span>}
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link
-                    to="/analytics"
-                    className="flex items-center w-full px-3 py-2 rounded-lg transition-all duration-300 text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-                  >
-                    <Activity className={`h-5 w-5 ${collapsed ? "" : "mr-3"}`} />
-                    {!collapsed && <span>Analytics</span>}
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+                    <item.icon />
+                    <span>{item.title}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-
+        
         <SidebarGroup>
+          <SidebarGroupLabel>Brand Management Tools</SidebarGroupLabel>
           <SidebarGroupContent>
-            {collapsed ? (
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <Button
-                      variant="ghost"
-                      onClick={() => setContentHubOpen(!contentHubOpen)}
-                      className={`w-full justify-center p-3 transition-all duration-300 ${
-                        isAnyContentModeActive
-                          ? "bg-primary/10 text-primary font-medium"
-                          : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-                      }`}
-                      title="Content Creation Hub"
-                    >
-                      <FolderOpen className="h-5 w-5" />
-                    </Button>
+            <SidebarMenu>
+              {brandItems.map((item) => (
+                <SidebarMenuItem key={item.mode}>
+                  <SidebarMenuButton 
+                    onClick={() => handleItemClick(item.mode)}
+                    className={activeMode === item.mode ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""}
+                  >
+                    <item.icon />
+                    <span>{item.title}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-              </SidebarMenu>
-            ) : (
-              <Collapsible open={contentHubOpen} onOpenChange={setContentHubOpen}>
-                <CollapsibleTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-between px-3 py-2 h-auto font-medium text-sm transition-all duration-300"
-                  >
-                    <div className="flex items-center">
-                      <FolderOpen className="h-5 w-5 mr-3" />
-                      Content Creation Hub
-                    </div>
-                    {contentHubOpen ? (
-                      <ChevronDown className="h-4 w-4" />
-                    ) : (
-                      <ChevronRight className="h-4 w-4" />
-                    )}
-                  </Button>
-                </CollapsibleTrigger>
-                <CollapsibleContent className="space-y-1 mt-2">
-                  {contentCreationItems.map((item) => {
-                    const Icon = item.icon
-                    return (
-                      <Button
-                        key={item.id}
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onModeChange?.(item.id)}
-                        className={getModeButtonCls(item.id)}
-                      >
-                        <Icon className="h-4 w-4 mr-3" />
-                        {item.title}
-                      </Button>
-                    )
-                  })}
-                </CollapsibleContent>
-              </Collapsible>
-            )}
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup>
-          <SidebarGroupContent>
-            {collapsed ? (
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <Button
-                      variant="ghost"
-                      onClick={() => setBrandManagementToolsOpen(!brandManagementToolsOpen)}
-                      className={`w-full justify-center p-3 transition-all duration-300 ${
-                        isAnyBrandToolActive
-                          ? "bg-primary/10 text-primary font-medium"
-                          : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-                      }`}
-                      title="Brand Management Tools"
-                    >
-                      <Briefcase className="h-5 w-5" />
-                    </Button>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            ) : (
-              <Collapsible open={brandManagementToolsOpen} onOpenChange={setBrandManagementToolsOpen}>
-                <CollapsibleTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-between px-3 py-2 h-auto font-medium text-sm transition-all duration-300"
-                  >
-                    <div className="flex items-center">
-                      <Briefcase className="h-5 w-5 mr-3" />
-                      Brand Management Tools
-                    </div>
-                    {brandManagementToolsOpen ? (
-                      <ChevronDown className="h-4 w-4" />
-                    ) : (
-                      <ChevronRight className="h-4 w-4" />
-                    )}
-                  </Button>
-                </CollapsibleTrigger>
-                <CollapsibleContent className="space-y-1 mt-2">
-                  {brandManagementToolsItems.map((item) => {
-                    const Icon = item.icon
-                    return (
-                      <Button
-                        key={item.id}
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onModeChange?.(item.id)}
-                        className={getModeButtonCls(item.id)}
-                      >
-                        <Icon className="h-4 w-4 mr-3" />
-                        {item.title}
-                      </Button>
-                    )
-                  })}
-                </CollapsibleContent>
-              </Collapsible>
-            )}
+              ))}
+            </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-
-      {/* Bottom section with Theme Toggle and User Profile - Always at bottom */}
-      <div className="mt-auto p-4 space-y-2">
-        {collapsed ? (
-          <>
-            <div className="flex justify-center">
-              <ThemeToggle />
-            </div>
-            <div className="flex justify-center">
-              <UserProfile />
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="flex items-center gap-3 px-3 py-2">
-              <ThemeToggle />
-              <span className="text-sm text-muted-foreground">Theme</span>
-            </div>
-            <div className="flex items-center gap-3 px-3 py-2">
-              <UserProfile />
-              <span className="text-sm text-muted-foreground">Account</span>
-            </div>
-          </>
-        )}
-      </div>
+      
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton
+                  size="lg"
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                >
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-semibold">User</span>
+                    <span className="truncate text-xs">user@example.com</span>
+                  </div>
+                  <ChevronUp className="ml-auto size-4" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                side={isMobile ? "bottom" : "right"}
+                align="end"
+                sideOffset={4}
+              >
+                <DropdownMenuItem>
+                  <Settings />
+                  Account
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   )
 }

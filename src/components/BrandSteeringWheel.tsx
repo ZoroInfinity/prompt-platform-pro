@@ -1,4 +1,3 @@
-
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -113,37 +112,15 @@ export function BrandSteeringWheel() {
             return (
               <div
                 key={segment.id}
-                className={`absolute w-20 h-20 rounded-full border-2 ${segment.color} shadow-md cursor-pointer hover:scale-105 transition-transform flex items-center justify-center`}
+                className={`absolute w-20 h-20 rounded-full border-2 ${segment.color} shadow-md cursor-pointer hover:scale-105 transition-transform flex flex-col items-center justify-center`}
                 style={{
                   left: `calc(50% + ${x}px - 40px)`,
                   top: `calc(50% + ${y}px - 40px)`
                 }}
                 onClick={() => handleEdit(segment.id)}
               >
-                <Icon className="h-6 w-6 text-gray-700" />
-              </div>
-            )
-          })}
-
-          {/* Segment Labels */}
-          {segments.map((segment, index) => {
-            const angle = (index * 60) - 90
-            const radian = (angle * Math.PI) / 180
-            const labelRadius = 180
-            const x = Math.cos(radian) * labelRadius
-            const y = Math.sin(radian) * labelRadius
-
-            return (
-              <div
-                key={`label-${segment.id}`}
-                className="absolute text-sm font-medium text-gray-700 text-center"
-                style={{
-                  left: `calc(50% + ${x}px)`,
-                  top: `calc(50% + ${y}px)`,
-                  transform: 'translate(-50%, -50%)'
-                }}
-              >
-                {segment.label}
+                <Icon className="h-4 w-4 text-gray-700 mb-1" />
+                <span className="text-xs text-gray-700 font-medium text-center leading-tight">{segment.label.split(' ')[0]}</span>
               </div>
             )
           })}

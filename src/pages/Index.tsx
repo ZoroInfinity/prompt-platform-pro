@@ -1,4 +1,3 @@
-
 import { useState } from "react"
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/AppSidebar"
@@ -24,18 +23,14 @@ const Index = () => {
         return <ChatInterface onModeActivation={setActiveMode} activeMode={activeMode} />
       case "content-creation":
         return <ContentCreationMode />
-      case "brand-persona":
-        return <BrandPersonaMode />
       case "brand-persona-generator":
         return <BrandPersonaGenerator />
       case "brand-steering-wheel":
         return <BrandSteeringWheel />
-      case "brand-voice":
-        return <BrandVoice />
-      case "asset-manager":
-        return <AssetManager />
       case "brand-monitor":
         return <BrandMonitor />
+      case "asset-manager":
+        return <AssetManager />
       case "brand-integrations":
         return <BrandIntegrations />
       case "image-finetuning":
