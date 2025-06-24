@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react"
 import { Send, MessageSquarePlus, FileText, Palette, Wand2, Sparkles, Calendar, ChevronLeft, ChevronRight, Edit2, Upload, Layers, Instagram, Linkedin, Twitter, Trash2, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -313,6 +312,11 @@ Please direct any questions or concerns to the Executive Management team. We app
     setEditingContent({ platform: "", isEditing: false })
   }
 
+  const handleSchedule = () => {
+    console.log("Schedule post clicked")
+    // Add basic scheduling functionality
+  }
+
   const nextContent = (platform: string) => {
     const nextIndex = (currentContentIndex[platform as keyof typeof currentContentIndex] + 1) % 2
     setCurrentContentIndex(prev => ({
@@ -448,15 +452,15 @@ Please direct any questions or concerns to the Executive Management team. We app
                 showCitations={featureConfig.showCitations}
               />
             ) : (
-              // Quick Post Content - Redesigned Layout
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Content Container */}
+              // Quick Post Content - Fixed Layout with Buttons Inside Content Container
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 relative">
+                {/* Content Container with Navigation */}
                 <div className="relative">
                   {/* External Navigation Arrows for Content */}
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="absolute left-[-60px] top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white/95 hover:bg-white shadow-lg rounded-full hover:scale-110 transition-all duration-200 z-20 border border-gray-100"
+                    className="absolute left-[-80px] top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white/95 hover:bg-white shadow-lg rounded-full hover:scale-110 transition-all duration-200 z-20 border border-gray-100"
                     onClick={() => {
                       const currentTab = document.querySelector('[data-state="active"]')?.getAttribute('value') || 'instagram'
                       prevContent(currentTab)
@@ -467,7 +471,7 @@ Please direct any questions or concerns to the Executive Management team. We app
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="absolute right-[-60px] top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white/95 hover:bg-white shadow-lg rounded-full hover:scale-110 transition-all duration-200 z-20 border border-gray-100"
+                    className="absolute right-[-80px] top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white/95 hover:bg-white shadow-lg rounded-full hover:scale-110 transition-all duration-200 z-20 border border-gray-100"
                     onClick={() => {
                       const currentTab = document.querySelector('[data-state="active"]')?.getAttribute('value') || 'instagram'
                       nextContent(currentTab)
@@ -517,13 +521,13 @@ Please direct any questions or concerns to the Executive Management team. We app
                             </div>
                             
                             {/* Content Display Area - Fixed Height */}
-                            <div className="flex-1 min-h-[350px] max-h-[350px]">
+                            <div className="flex-1 min-h-[280px] max-h-[280px]">
                               {editingContent.isEditing && editingContent.platform === platform ? (
                                 <div className="flex flex-col h-full">
                                   <Textarea
                                     value={editableContent}
                                     onChange={(e) => setEditableContent(e.target.value)}
-                                    className="flex-1 resize-none border border-gray-200 rounded-xl p-4 text-sm leading-relaxed h-[300px] bg-white"
+                                    className="flex-1 resize-none border border-gray-200 rounded-xl p-4 text-sm leading-relaxed h-[240px] bg-white"
                                   />
                                   <div className="flex gap-2 mt-3">
                                     <Button size="sm" onClick={handleSaveEdit} className="bg-primary hover:bg-primary/90">
@@ -543,38 +547,40 @@ Please direct any questions or concerns to the Executive Management team. We app
                                 </div>
                               )}
                             </div>
+
+                            {/* Action Buttons - Now Inside Content Container */}
+                            <div className="flex gap-3 mt-4 pt-4 border-t border-gray-100">
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="flex-1 border-gray-200 hover:bg-gray-50 hover:scale-105 transition-all duration-200 rounded-lg"
+                                onClick={() => handleEditText(platform)}
+                              >
+                                <Edit2 className="mr-1 h-3 w-3" />
+                                Edit Text
+                              </Button>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                className="flex-1 border-gray-200 hover:bg-gray-50 hover:scale-105 transition-all duration-200 rounded-lg"
+                                onClick={handleSchedule}
+                              >
+                                <Calendar className="mr-1 h-3 w-3" />
+                                Schedule
+                              </Button>
+                              <Button 
+                                size="sm"
+                                className="flex-1 bg-primary hover:bg-primary/90 text-white shadow-md hover:scale-105 transition-all duration-200 rounded-lg"
+                                onClick={handlePostNow}
+                              >
+                                <Send className="mr-1 h-3 w-3" />
+                                Post Now
+                              </Button>
+                            </div>
                           </TabsContent>
                         ))}
                       </Tabs>
                     </CardContent>
-                    
-                    <CardFooter className="flex gap-3 pt-0 px-6 pb-6 border-t border-gray-100 mt-auto">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="flex-1 border-gray-200 hover:bg-gray-50 hover:scale-105 transition-all duration-200 rounded-lg"
-                        onClick={() => handleEditText("instagram")}
-                      >
-                        <Edit2 className="mr-1 h-3 w-3" />
-                        Edit Text
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="flex-1 border-gray-200 hover:bg-gray-50 hover:scale-105 transition-all duration-200 rounded-lg"
-                      >
-                        <Calendar className="mr-1 h-3 w-3" />
-                        Schedule
-                      </Button>
-                      <Button 
-                        size="sm"
-                        className="flex-1 bg-primary hover:bg-primary/90 text-white shadow-md hover:scale-105 transition-all duration-200 rounded-lg"
-                        onClick={handlePostNow}
-                      >
-                        <Send className="mr-1 h-3 w-3" />
-                        Post Now
-                      </Button>
-                    </CardFooter>
                   </Card>
                 </div>
 
@@ -584,7 +590,7 @@ Please direct any questions or concerns to the Executive Management team. We app
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="absolute left-[-60px] top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white/95 hover:bg-white shadow-lg rounded-full hover:scale-110 transition-all duration-200 z-20 border border-gray-100"
+                    className="absolute left-[-80px] top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white/95 hover:bg-white shadow-lg rounded-full hover:scale-110 transition-all duration-200 z-20 border border-gray-100"
                     onClick={prevImage}
                   >
                     <ChevronLeft className="h-6 w-6 text-gray-700" />
@@ -592,7 +598,7 @@ Please direct any questions or concerns to the Executive Management team. We app
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="absolute right-[-60px] top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white/95 hover:bg-white shadow-lg rounded-full hover:scale-110 transition-all duration-200 z-20 border border-gray-100"
+                    className="absolute right-[-80px] top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white/95 hover:bg-white shadow-lg rounded-full hover:scale-110 transition-all duration-200 z-20 border border-gray-100"
                     onClick={nextImage}
                   >
                     <ChevronRight className="h-6 w-6 text-gray-700" />
@@ -614,7 +620,7 @@ Please direct any questions or concerns to the Executive Management team. We app
 
                     <CardContent className="p-6 pt-4 flex-1 flex flex-col">
                       {/* Image Display Area - Fixed Height */}
-                      <div className="flex-1 min-h-[350px] max-h-[350px] bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-100 overflow-hidden relative">
+                      <div className="flex-1 min-h-[400px] max-h-[400px] bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-100 overflow-hidden relative">
                         {currentImages[currentImageIndex] ? (
                           <div className="relative w-full h-full">
                             <img 

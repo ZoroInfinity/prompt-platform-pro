@@ -15,8 +15,6 @@ import {
   Package, 
   Quote, 
   Star,
-  Palette,
-  Image,
   Edit2,
   Save,
   Loader2,
@@ -37,7 +35,6 @@ interface PersonaData {
   taglines: string
   reviews: string
   brandColors: string[]
-  images: string[]
 }
 
 export function BrandPersonaGenerator() {
@@ -48,7 +45,7 @@ export function BrandPersonaGenerator() {
   const [editValues, setEditValues] = useState<Partial<PersonaData>>({})
   const [selectedLogoIndex, setSelectedLogoIndex] = useState<number | null>(null)
 
-  // Mock AI-generated logos with better placeholders
+  // Mock AI-generated logos
   const aiLogos = [
     "https://images.unsplash.com/photo-1618160702438-9b02040d0a901?w=120&h=120&fit=crop",
     "https://images.unsplash.com/photo-1582562124811-c09040d0a901?w=120&h=120&fit=crop",
@@ -64,7 +61,7 @@ export function BrandPersonaGenerator() {
     
     setIsLoading(true)
     
-    // Simulate API call - replace with actual Perplexity API integration
+    // Simulate API call
     setTimeout(() => {
       const mockData: PersonaData = {
         brandName: "• TechCorp Solutions\n• Innovative Technology Partner\n• Digital Transformation Leader\n• Enterprise Software Provider\n• Cloud Solutions Specialist",
@@ -77,12 +74,7 @@ export function BrandPersonaGenerator() {
         keyOfferings: "• Cloud migration and management\n• Custom software development\n• Digital consulting services\n• IT support and maintenance\n• Business process automation",
         taglines: "• \"Innovation Simplified\"\n• \"Your Digital Partner\"\n• \"Technology That Works\"\n• \"Empowering Your Digital Future\"\n• \"Solutions That Scale\"",
         reviews: "• \"Excellent service and support\" - 4.8/5 stars\n• \"Transformed our business operations\"\n• \"Professional and reliable team\"\n• \"Outstanding technical expertise\"\n• \"Highly recommend their services\"",
-        brandColors: ["#2563eb", "#1e40af", "#3b82f6", "#60a5fa", "#93c5fd"],
-        images: [
-          "https://images.unsplash.com/photo-1560472355-536de3962603?w=300&h=200&fit=crop",
-          "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=300&h=200&fit=crop",
-          "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=300&h=200&fit=crop"
-        ]
+        brandColors: ["#2563eb", "#1e40af", "#3b82f6", "#60a5fa", "#93c5fd"]
       }
       setPersonaData(mockData)
       setIsLoading(false)
@@ -114,7 +106,6 @@ export function BrandPersonaGenerator() {
     input.onchange = (e) => {
       const file = (e.target as HTMLInputElement).files?.[0]
       if (file) {
-        // Handle uploaded logo
         console.log("Logo uploaded:", file)
       }
     }
@@ -125,29 +116,11 @@ export function BrandPersonaGenerator() {
     setSelectedLogoIndex(index)
   }
 
-  const handleUploadImage = () => {
-    const input = document.createElement('input')
-    input.type = 'file'
-    input.accept = 'image/*'
-    input.multiple = true
-    input.onchange = (e) => {
-      const files = (e.target as HTMLInputElement).files
-      if (files && personaData) {
-        const newImages = Array.from(files).map(file => URL.createObjectURL(file))
-        setPersonaData({ 
-          ...personaData, 
-          images: [...personaData.images, ...newImages] 
-        })
-      }
-    }
-    input.click()
-  }
-
   const copyColorToClipboard = (color: string) => {
     navigator.clipboard.writeText(color)
-    // Could add toast notification here
   }
 
+  // Updated persona fields with new order
   const personaFields = [
     { key: "brandName", label: "Brand Name", icon: Building2 },
     { key: "industry", label: "Industry", icon: Globe },
@@ -207,7 +180,55 @@ export function BrandPersonaGenerator() {
       {/* Generated Persona */}
       {personaData && (
         <div className="space-y-8">
-          {/* Company Logo Section */}
+          {/* Persona Details Grid - 2 columns */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {personaFields.map((field) => {
+              const Icon = field.icon
+              const isEditing = editingField === field.key
+              const value = personaData[field.key as keyof PersonaData] as string
+
+              return (
+                <Card key={field.key} className="glass-card hover:shadow-lg transition-all duration-200 h-60">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center justify-between text-base">
+                      <div className="flex items-center gap-2">
+                        <Icon className="h-4 w-4 text-primary" />
+                        {field.label}
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => isEditing ? handleSaveEdit(field.key) : handleEdit(field.key)}
+                        className="h-8 w-8 p-0"
+                      >
+                        {isEditing ? (
+                          <Save className="h-3 w-3" />
+                        ) : (
+                          <Edit2 className="h-3 w-3" />
+                        )}
+                      </Button>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex-1">
+                    {isEditing ? (
+                      <Textarea
+                        value={editValues[field.key as keyof PersonaData] as string || ""}
+                        onChange={(e) => setEditValues({ ...editValues, [field.key]: e.target.value })}
+                        className="h-full resize-none"
+                        rows={6}
+                      />
+                    ) : (
+                      <div className="text-sm text-foreground leading-relaxed whitespace-pre-wrap h-full overflow-y-auto text-left">
+                        {value}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )
+            })}
+          </div>
+
+          {/* Logo Section */}
           <Card className="glass-card hover:shadow-lg transition-all duration-200">
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2 text-lg">
@@ -262,7 +283,7 @@ export function BrandPersonaGenerator() {
           <Card className="glass-card hover:shadow-lg transition-all duration-200">
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2 text-lg">
-                <Palette className="h-5 w-5 text-primary" />
+                <div className="h-5 w-5 rounded-full bg-gradient-to-r from-blue-500 to-purple-500" />
                 Brand Colours
               </CardTitle>
             </CardHeader>
@@ -292,96 +313,6 @@ export function BrandPersonaGenerator() {
               </div>
             </CardContent>
           </Card>
-
-          {/* Persona Details Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {personaFields.map((field) => {
-              const Icon = field.icon
-              const isEditing = editingField === field.key
-              const value = personaData[field.key as keyof PersonaData] as string
-
-              return (
-                <Card key={field.key} className="glass-card hover:shadow-lg transition-all duration-200 h-60">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="flex items-center justify-between text-base">
-                      <div className="flex items-center gap-2">
-                        <Icon className="h-4 w-4 text-primary" />
-                        {field.label}
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => isEditing ? handleSaveEdit(field.key) : handleEdit(field.key)}
-                        className="h-8 w-8 p-0"
-                      >
-                        {isEditing ? (
-                          <Save className="h-3 w-3" />
-                        ) : (
-                          <Edit2 className="h-3 w-3" />
-                        )}
-                      </Button>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="flex-1">
-                    {isEditing ? (
-                      <Textarea
-                        value={editValues[field.key as keyof PersonaData] as string || ""}
-                        onChange={(e) => setEditValues({ ...editValues, [field.key]: e.target.value })}
-                        className="h-full resize-none"
-                        rows={6}
-                      />
-                    ) : (
-                      <div className="text-sm text-foreground leading-relaxed whitespace-pre-wrap h-full overflow-y-auto text-left">
-                        {value}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              )
-            })}
-
-            {/* Images Gallery Card */}
-            <Card className="glass-card hover:shadow-lg transition-all duration-200 h-60 lg:col-span-2">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center justify-between text-base">
-                  <div className="flex items-center gap-2">
-                    <Image className="h-4 w-4 text-primary" />
-                    Images Gallery
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleUploadImage}
-                    className="h-8 px-3"
-                  >
-                    <Upload className="h-3 w-3 mr-1" />
-                    Upload
-                  </Button>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex-1">
-                {personaData.images.length > 0 ? (
-                  <div className="grid grid-cols-3 gap-4 h-full">
-                    {personaData.images.map((image, index) => (
-                      <div key={index} className="relative rounded-lg overflow-hidden bg-gray-100">
-                        <img
-                          src={image}
-                          alt={`Brand image ${index + 1}`}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8 text-muted-foreground h-full flex flex-col justify-center">
-                    <Image className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">Brand images will appear here</p>
-                    <p className="text-xs mt-1">Upload images or they'll be generated automatically</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
 
           {/* Save Button */}
           <div className="flex justify-center pt-6">
