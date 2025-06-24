@@ -452,32 +452,32 @@ Please direct any questions or concerns to the Executive Management team. We app
                 showCitations={featureConfig.showCitations}
               />
             ) : (
-              // Quick Post Content - Fixed Layout with Buttons Inside Content Container
+              // Quick Post Content - Fixed Layout with Swipe Button Updates
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 relative">
                 {/* Content Container with Navigation */}
                 <div className="relative">
-                  {/* External Navigation Arrows for Content */}
+                  {/* External Navigation Arrows for Content - Updated sizing */}
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="absolute left-[-80px] top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white/95 hover:bg-white shadow-lg rounded-full hover:scale-110 transition-all duration-200 z-20 border border-gray-100"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 h-6 w-6 p-0 bg-white/95 hover:bg-white shadow-lg rounded-full hover:scale-110 transition-all duration-200 z-20 border border-gray-100"
                     onClick={() => {
                       const currentTab = document.querySelector('[data-state="active"]')?.getAttribute('value') || 'instagram'
                       prevContent(currentTab)
                     }}
                   >
-                    <ChevronLeft className="h-6 w-6 text-gray-700" />
+                    <ChevronLeft className="h-4 w-4 text-gray-700" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="absolute right-[-80px] top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white/95 hover:bg-white shadow-lg rounded-full hover:scale-110 transition-all duration-200 z-20 border border-gray-100"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 h-6 w-6 p-0 bg-white/95 hover:bg-white shadow-lg rounded-full hover:scale-110 transition-all duration-200 z-20 border border-gray-100"
                     onClick={() => {
                       const currentTab = document.querySelector('[data-state="active"]')?.getAttribute('value') || 'instagram'
                       nextContent(currentTab)
                     }}
                   >
-                    <ChevronRight className="h-6 w-6 text-gray-700" />
+                    <ChevronRight className="h-4 w-4 text-gray-700" />
                   </Button>
 
                   <Card className="bg-white/80 backdrop-blur-sm shadow-lg border border-gray-100/50 rounded-2xl h-[600px] flex flex-col">
@@ -586,22 +586,22 @@ Please direct any questions or concerns to the Executive Management team. We app
 
                 {/* Image Container */}
                 <div className="relative">
-                  {/* External Navigation Arrows for Images */}
+                  {/* External Navigation Arrows for Images - Updated sizing */}
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="absolute left-[-80px] top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white/95 hover:bg-white shadow-lg rounded-full hover:scale-110 transition-all duration-200 z-20 border border-gray-100"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 h-6 w-6 p-0 bg-white/95 hover:bg-white shadow-lg rounded-full hover:scale-110 transition-all duration-200 z-20 border border-gray-100"
                     onClick={prevImage}
                   >
-                    <ChevronLeft className="h-6 w-6 text-gray-700" />
+                    <ChevronLeft className="h-4 w-4 text-gray-700" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="absolute right-[-80px] top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white/95 hover:bg-white shadow-lg rounded-full hover:scale-110 transition-all duration-200 z-20 border border-gray-100"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 h-6 w-6 p-0 bg-white/95 hover:bg-white shadow-lg rounded-full hover:scale-110 transition-all duration-200 z-20 border border-gray-100"
                     onClick={nextImage}
                   >
-                    <ChevronRight className="h-6 w-6 text-gray-700" />
+                    <ChevronRight className="h-4 w-4 text-gray-700" />
                   </Button>
 
                   <Card className="bg-white/80 backdrop-blur-sm shadow-lg border border-gray-100/50 rounded-2xl h-[600px] flex flex-col">
