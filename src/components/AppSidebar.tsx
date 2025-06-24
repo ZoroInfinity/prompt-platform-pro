@@ -30,6 +30,7 @@ interface AppSidebarProps {
 
 export function AppSidebar({ activeMode, onModeChange, onHomeClick }: AppSidebarProps) {
   const { isMobile } = useSidebar()
+  const [isHovered, setIsHovered] = useState(false)
 
   // AI Content Creation items
   const contentItems = [
@@ -93,101 +94,123 @@ export function AppSidebar({ activeMode, onModeChange, onHomeClick }: AppSidebar
   }
 
   return (
-    <Sidebar variant="sidebar" collapsible="icon">
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton 
-              size="lg" 
-              onClick={() => handleItemClick("home")}
-              className={activeMode === "quick-post" ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""}
-            >
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                <Home className="size-4" />
-              </div>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">Home</span>
-                <span className="truncate text-xs">Quick Post</span>
-              </div>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarHeader>
-      
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>AI Content Creation</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {contentItems.map((item) => (
-                <SidebarMenuItem key={item.mode}>
-                  <SidebarMenuButton 
-                    onClick={() => handleItemClick(item.mode)}
-                    className={activeMode === item.mode ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""}
-                  >
-                    <item.icon />
-                    <span>{item.title}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+    <div 
+      className={`fixed left-0 top-0 h-full bg-sidebar border-r transition-all duration-300 ease-in-out z-40 ${
+        isHovered ? 'w-64' : 'w-16'
+      } ${isMobile ? 'hidden' : 'block'}`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="flex flex-col h-full">
+        {/* Header */}
+        <div className="p-2">
+          <div 
+            onClick={() => handleItemClick("home")}
+            className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer hover:bg-sidebar-accent transition-colors ${
+              activeMode === "quick-post" ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""
+            }`}
+          >
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-sidebar-primary text-sidebar-primary-foreground flex-shrink-0">
+              <Home className="w-4 h-4" />
+            </div>
+            <div className={`transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'} ${!isHovered ? 'w-0 overflow-hidden' : ''}`}>
+              <div className="font-semibold text-sm">Home</div>
+              <div className="text-xs text-muted-foreground">Quick Post</div>
+            </div>
+          </div>
+        </div>
         
-        <SidebarGroup>
-          <SidebarGroupLabel>Brand Management Tools</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {brandItems.map((item) => (
-                <SidebarMenuItem key={item.mode}>
-                  <SidebarMenuButton 
-                    onClick={() => handleItemClick(item.mode)}
-                    className={activeMode === item.mode ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""}
-                  >
-                    <item.icon />
-                    <span>{item.title}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-      
-      <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton
-                  size="lg"
-                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto">
+          {/* AI Content Creation */}
+          <div className="p-2">
+            <div className={`px-2 py-1 text-xs font-medium text-sidebar-foreground/70 transition-opacity duration-300 ${
+              isHovered ? 'opacity-100' : 'opacity-0'
+            } ${!isHovered ? 'h-0 overflow-hidden' : 'h-auto'}`}>
+              AI Content Creation
+            </div>
+            <div className="space-y-1 mt-1">
+              {contentItems.map((item) => (
+                <div 
+                  key={item.mode}
+                  onClick={() => handleItemClick(item.mode)}
+                  className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer hover:bg-sidebar-accent transition-colors ${
+                    activeMode === item.mode ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""
+                  }`}
                 >
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">User</span>
-                    <span className="truncate text-xs">user@example.com</span>
-                  </div>
-                  <ChevronUp className="ml-auto size-4" />
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-                side={isMobile ? "bottom" : "right"}
-                align="end"
-                sideOffset={4}
-              >
-                <DropdownMenuItem>
-                  <Settings />
-                  Account
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  Sign out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
-    </Sidebar>
+                  <item.icon className="w-4 h-4 flex-shrink-0" />
+                  <span className={`text-sm transition-opacity duration-300 ${
+                    isHovered ? 'opacity-100' : 'opacity-0'
+                  } ${!isHovered ? 'w-0 overflow-hidden' : ''}`}>
+                    {item.title}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          {/* Brand Management Tools */}
+          <div className="p-2 mt-4">
+            <div className={`px-2 py-1 text-xs font-medium text-sidebar-foreground/70 transition-opacity duration-300 ${
+              isHovered ? 'opacity-100' : 'opacity-0'
+            } ${!isHovered ? 'h-0 overflow-hidden' : 'h-auto'}`}>
+              Brand Management Tools
+            </div>
+            <div className="space-y-1 mt-1">
+              {brandItems.map((item) => (
+                <div 
+                  key={item.mode}
+                  onClick={() => handleItemClick(item.mode)}
+                  className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer hover:bg-sidebar-accent transition-colors ${
+                    activeMode === item.mode ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""
+                  }`}
+                >
+                  <item.icon className="w-4 h-4 flex-shrink-0" />
+                  <span className={`text-sm transition-opacity duration-300 ${
+                    isHovered ? 'opacity-100' : 'opacity-0'
+                  } ${!isHovered ? 'w-0 overflow-hidden' : ''}`}>
+                    {item.title}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        
+        {/* Footer */}
+        <div className="p-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <div className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer hover:bg-sidebar-accent transition-colors`}>
+                <div className="w-8 h-8 rounded-full bg-sidebar-accent flex items-center justify-center flex-shrink-0">
+                  <User2 className="w-4 h-4" />
+                </div>
+                <div className={`transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'} ${!isHovered ? 'w-0 overflow-hidden' : ''}`}>
+                  <div className="font-semibold text-sm">User</div>
+                  <div className="text-xs text-muted-foreground">user@example.com</div>
+                </div>
+                <ChevronUp className={`w-4 h-4 ml-auto transition-opacity duration-300 ${
+                  isHovered ? 'opacity-100' : 'opacity-0'
+                } ${!isHovered ? 'w-0 overflow-hidden' : ''}`} />
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              className="w-56 rounded-lg"
+              side={isMobile ? "bottom" : "right"}
+              align="end"
+              sideOffset={4}
+            >
+              <DropdownMenuItem>
+                <Settings className="w-4 h-4 mr-2" />
+                Account
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                Sign out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+    </div>
   )
 }
