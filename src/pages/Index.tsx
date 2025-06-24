@@ -47,20 +47,22 @@ const Index = () => {
 
   return (
     <ThemeProvider>
-      <div className="min-h-screen gradient-bg overflow-hidden">
-        <div className="flex min-h-screen w-full">
-          <AppSidebar 
-            activeMode={activeMode} 
-            onModeChange={setActiveMode}
-            onHomeClick={handleHomeClick}
-          />
-          
-          <main className="flex-1 flex flex-col overflow-hidden ml-16">
-            <div className="flex-1 flex flex-col overflow-y-auto scrollbar-hide">
-              {renderActiveMode()}
-            </div>
-          </main>
-        </div>
+      <div className="min-h-screen gradient-bg">
+        <SidebarProvider>
+          <div className="flex min-h-screen w-full">
+            <AppSidebar 
+              activeMode={activeMode} 
+              onModeChange={setActiveMode}
+              onHomeClick={handleHomeClick}
+            />
+            
+            <main className="flex-1 flex flex-col overflow-hidden">
+              <div className="flex-1 flex flex-col overflow-y-auto scrollbar-hide">
+                {renderActiveMode()}
+              </div>
+            </main>
+          </div>
+        </SidebarProvider>
       </div>
     </ThemeProvider>
   )
