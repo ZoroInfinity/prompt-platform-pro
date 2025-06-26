@@ -12,7 +12,7 @@ import { BrandSteeringWheel } from "@/components/BrandSteeringWheel"
 import { BrandVoice } from "@/components/BrandVoice"
 import { AssetManager } from "@/components/AssetManager"
 import { BrandMonitor } from "@/components/BrandMonitor"
-import { BrandIntegrations } from "@/components/BrandIntegrations"
+import { CompetitorAnalysis } from "@/components/CompetitorAnalysis"
 
 const Index = () => {
   const [activeMode, setActiveMode] = useState<string>("quick-post")
@@ -32,8 +32,8 @@ const Index = () => {
         return <BrandMonitor />
       case "asset-manager":
         return <AssetManager />
-      case "brand-integrations":
-        return <BrandIntegrations />
+      case "competitor-analysis":
+        return <CompetitorAnalysis />
       case "image-finetuning":
         return <ImageFineTuningMode />
       default:

@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from "react"
-import { Calendar, Home, Inbox, Search, Settings, ChevronUp, User2, Building2, PenTool, Image, BarChart3, Archive, Plug, Compass, Target, Eye, Lightbulb, Users, MessageSquare } from "lucide-react"
+import { Calendar, Home, Inbox, Search, Settings, ChevronUp, User2, Building2, PenTool, Image, BarChart3, Archive, TrendingUp, Compass, Target, Eye, Lightbulb, Users, MessageSquare } from "lucide-react"
 
 import {
   Sidebar,
@@ -79,9 +78,9 @@ export function AppSidebar({ activeMode, onModeChange, onHomeClick }: AppSidebar
       mode: "asset-manager"
     },
     {
-      title: "Integrations",
-      icon: Plug,
-      mode: "brand-integrations"
+      title: "Competitor Analysis",
+      icon: TrendingUp,
+      mode: "competitor-analysis"
     }
   ]
 
