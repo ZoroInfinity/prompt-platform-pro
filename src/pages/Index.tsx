@@ -13,6 +13,7 @@ import { BrandVoice } from "@/components/BrandVoice"
 import { AssetManager } from "@/components/AssetManager"
 import { BrandMonitor } from "@/components/BrandMonitor"
 import { CompetitorAnalysis } from "@/components/CompetitorAnalysis"
+import { SwotAnalysis } from "@/components/SwotAnalysis"
 
 const Index = () => {
   const [activeMode, setActiveMode] = useState<string>("quick-post")
@@ -28,6 +29,8 @@ const Index = () => {
         return <BrandPersonaGenerator />
       case "brand-steering-wheel":
         return <BrandSteeringWheel />
+      case "swot-analysis":
+        return <SwotAnalysis />
       case "brand-monitor":
         return <BrandMonitor />
       case "asset-manager":

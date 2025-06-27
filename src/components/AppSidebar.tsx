@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Calendar, Home, Inbox, Search, Settings, ChevronUp, User2, Building2, PenTool, Image, BarChart3, Archive, TrendingUp, Compass, Target, Eye, Lightbulb, Users, MessageSquare } from "lucide-react"
+import { Calendar, Home, Inbox, Search, Settings, ChevronUp, User2, Building2, PenTool, Image, BarChart3, Archive, TrendingUp, Compass, Target, Eye, Lightbulb, Users, MessageSquare, Grid3X3 } from "lucide-react"
 
 import {
   Sidebar,
@@ -55,7 +55,7 @@ export function AppSidebar({ activeMode, onModeChange, onHomeClick }: AppSidebar
     }
   ]
 
-  // Brand Management Tools - exactly 5 tools
+  // Brand Management Tools - updated to include SWOT Analysis
   const brandItems = [
     {
       title: "Brand Persona",
@@ -66,6 +66,11 @@ export function AppSidebar({ activeMode, onModeChange, onHomeClick }: AppSidebar
       title: "Brand Steering Wheel",
       icon: Compass,
       mode: "brand-steering-wheel"
+    },
+    {
+      title: "SWOT Analysis",
+      icon: Grid3X3,
+      mode: "swot-analysis"
     },
     {
       title: "Brand Monitor",

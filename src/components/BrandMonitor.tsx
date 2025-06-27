@@ -1,13 +1,38 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ThumbsUp, ThumbsDown, Minus, Star } from "lucide-react"
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer } from "recharts"
 
 export function BrandMonitor() {
   const sentimentData = {
     positive: 68,
     neutral: 23,
     negative: 9
+  }
+
+  const monthlyTrendData = [
+    { month: "Jan", positive: 4.2, neutral: 3.1, negative: 2.1 },
+    { month: "Feb", positive: 4.1, neutral: 3.2, negative: 2.3 },
+    { month: "Mar", positive: 4.3, neutral: 3.0, negative: 2.0 },
+    { month: "Apr", positive: 4.4, neutral: 3.1, negative: 1.9 },
+    { month: "May", positive: 4.2, neutral: 3.3, negative: 2.2 },
+    { month: "Jun", positive: 4.5, neutral: 3.0, negative: 1.8 }
+  ]
+
+  const chartConfig = {
+    positive: {
+      label: "Positive",
+      color: "#22c55e",
+    },
+    neutral: {
+      label: "Neutral", 
+      color: "#6b7280",
+    },
+    negative: {
+      label: "Negative",
+      color: "#ef4444", 
+    },
   }
 
   const recentReviews = [
@@ -138,10 +163,10 @@ export function BrandMonitor() {
           </CardContent>
         </Card>
 
-        {/* Section 2: Sentiment Analysis */}
+        {/* Section 2: Enhanced Sentiment Analysis */}
         <Card className="glass-card">
           <CardHeader>
-            <CardTitle>Sentiment Distribution</CardTitle>
+            <CardTitle>Sentiment Analysis</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-6">
@@ -179,6 +204,41 @@ export function BrandMonitor() {
                   </div>
                   <span className="text-sm text-gray-600 w-12">{sentimentData.negative}%</span>
                 </div>
+              </div>
+
+              {/* Monthly Trend Chart */}
+              <div className="pt-4 border-t border-gray-100">
+                <h4 className="text-sm font-medium mb-3">6-Month Sentiment Trend</h4>
+                <ChartContainer config={chartConfig} className="h-[200px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={monthlyTrendData}>
+                      <XAxis dataKey="month" />
+                      <YAxis domain={[0, 5]} />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Line 
+                        type="monotone" 
+                        dataKey="positive" 
+                        stroke="#22c55e" 
+                        strokeWidth={2}
+                        dot={{ fill: "#22c55e", strokeWidth: 2, r: 4 }}
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="neutral" 
+                        stroke="#6b7280" 
+                        strokeWidth={2}
+                        dot={{ fill: "#6b7280", strokeWidth: 2, r: 4 }}
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="negative" 
+                        stroke="#ef4444" 
+                        strokeWidth={2}
+                        dot={{ fill: "#ef4444", strokeWidth: 2, r: 4 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
               </div>
 
               {/* Overall Score */}
