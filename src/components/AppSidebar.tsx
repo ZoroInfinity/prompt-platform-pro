@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Calendar, Home, Inbox, Search, Settings, ChevronUp, User2, Building2, PenTool, Image, BarChart3, Archive, TrendingUp, Compass, Target, Eye, Lightbulb, Users, MessageSquare, Grid3X3 } from "lucide-react"
+import { Calendar, Home, Inbox, Search, Settings, ChevronUp, User2, Building2, PenTool, Image, BarChart3, Archive, TrendingUp, Compass, Target, Eye, Lightbulb, Users, MessageSquare, Grid3X3, Megaphone } from "lucide-react"
 
 import {
   Sidebar,
@@ -47,6 +47,11 @@ export function AppSidebar({ activeMode, onModeChange, onHomeClick }: AppSidebar
       title: "Content Creation",
       icon: Image,
       mode: "content-creation"
+    },
+    {
+      title: "Campaigns",
+      icon: Megaphone,
+      mode: "campaigns"
     },
     {
       title: "Image Fine-tuning",

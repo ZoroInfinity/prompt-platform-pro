@@ -1,5 +1,5 @@
 import { useState, useRef } from "react"
-import { Send, MessageSquarePlus, FileText, Palette, Wand2, Sparkles, Calendar, ChevronLeft, ChevronRight, Edit2, Upload, Layers, Instagram, Linkedin, Twitter, Trash2, Check } from "lucide-react"
+import { Send, MessageSquarePlus, FileText, Palette, Wand2, Sparkles, Calendar, ChevronLeft, ChevronRight, Edit2, Upload, Layers, Instagram, Linkedin, Twitter, Trash2, Check, Paperclip } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
@@ -24,6 +24,7 @@ export function ChatInterface({ onModeActivation, activeMode }: ChatInterfacePro
   const [selectedFeature, setSelectedFeature] = useState("quick-post")
   const [editingContent, setEditingContent] = useState({ platform: "", isEditing: false })
   const [editableContent, setEditableContent] = useState("")
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null)
   
   // Multiple images for carousel
   const [currentImages, setCurrentImages] = useState([
@@ -284,6 +285,20 @@ Please direct any questions or concerns to the Executive Management team. We app
     input.click()
   }
 
+  const handleChatImageUpload = () => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = 'image/*'
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0]
+      if (file) {
+        const url = URL.createObjectURL(file)
+        setUploadedImage(url)
+      }
+    }
+    input.click()
+  }
+
   const handleApplyLogo = () => {
     console.log("Apply logo clicked")
   }
@@ -363,17 +378,44 @@ Please direct any questions or concerns to the Executive Management team. We app
           <Card className="glass-card shadow-lg">
             <CardContent className="p-6">
               <form onSubmit={handleSubmit} className="space-y-4">
-                <Textarea
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder={selectedFeature === "business-writing" 
-                    ? "Describe the business document you need..." 
-                    : "What would you like to create today?"}
-                  className={`resize-none transition-all duration-300 border-0 focus:ring-2 focus:ring-primary/20 ${
-                    isLandingState ? "min-h-[80px]" : "min-h-[40px]"
-                  }`}
-                  rows={isLandingState ? 3 : 1}
-                />
+                <div className="relative">
+                  <Textarea
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder={selectedFeature === "business-writing" 
+                      ? "Describe the business document you need..." 
+                      : "What would you like to create today?"}
+                    className={`resize-none transition-all duration-300 border-0 focus:ring-2 focus:ring-primary/20 pr-12 ${
+                      isLandingState ? "min-h-[80px]" : "min-h-[40px]"
+                    }`}
+                    rows={isLandingState ? 3 : 1}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-2 top-2 h-8 w-8 p-0 hover:bg-primary/10"
+                    onClick={handleChatImageUpload}
+                  >
+                    <Paperclip className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                {/* Image Preview */}
+                {uploadedImage && (
+                  <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-lg">
+                    <span className="text-sm text-muted-foreground">Image attached</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 w-6 p-0 ml-auto"
+                      onClick={() => setUploadedImage(null)}
+                    >
+                      ×
+                    </Button>
+                  </div>
+                )}
                 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">

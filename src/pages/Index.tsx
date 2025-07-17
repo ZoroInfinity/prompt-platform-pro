@@ -5,6 +5,7 @@ import { AppSidebar } from "@/components/AppSidebar"
 import { ThemeProvider } from "@/components/ThemeProvider"
 import { ChatInterface } from "@/components/ChatInterface"
 import { ContentCreationMode } from "@/components/ContentCreationMode"
+import { CampaignGenerator } from "@/components/CampaignGenerator"
 import { BrandPersonaMode } from "@/components/BrandPersonaMode"
 import { BrandPersonaGenerator } from "@/components/BrandPersonaGenerator"
 import { ImageFineTuningMode } from "@/components/ImageFineTuningMode"
@@ -25,6 +26,8 @@ const Index = () => {
         return <ChatInterface onModeActivation={setActiveMode} activeMode={activeMode} />
       case "content-creation":
         return <ContentCreationMode />
+      case "campaigns":
+        return <CampaignGenerator />
       case "brand-persona-generator":
         return <BrandPersonaGenerator />
       case "brand-steering-wheel":
