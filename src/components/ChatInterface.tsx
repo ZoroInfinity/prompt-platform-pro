@@ -378,38 +378,45 @@ Please direct any questions or concerns to the Executive Management team. We app
           <Card className="glass-card shadow-lg">
             <CardContent className="p-6">
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="relative">
-                  <Textarea
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder={selectedFeature === "business-writing" 
-                      ? "Describe the business document you need..." 
-                      : "What would you like to create today?"}
-                    className={`resize-none transition-all duration-300 border-0 focus:ring-2 focus:ring-primary/20 pr-12 ${
-                      isLandingState ? "min-h-[80px]" : "min-h-[40px]"
-                    }`}
-                    rows={isLandingState ? 3 : 1}
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-2 top-2 h-8 w-8 p-0 hover:bg-primary/10"
-                    onClick={handleChatImageUpload}
-                  >
-                    <Paperclip className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                {/* Image Preview */}
-                {uploadedImage && (
-                  <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-lg">
-                    <span className="text-sm text-muted-foreground">Image attached</span>
+                  <div className="relative">
+                    <Textarea
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      placeholder={selectedFeature === "business-writing" 
+                        ? "Describe the business document you need..." 
+                        : "What would you like to create today?"}
+                      className={`resize-none transition-all duration-300 border-0 focus:ring-2 focus:ring-primary/20 pr-12 ${
+                        isLandingState ? "min-h-[80px]" : "min-h-[40px]"
+                      }`}
+                      rows={isLandingState ? 3 : 1}
+                    />
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
-                      className="h-6 w-6 p-0 ml-auto"
+                      className="absolute right-2 top-2 h-8 w-8 p-0 hover:bg-primary/10"
+                      onClick={handleChatImageUpload}
+                    >
+                      <Paperclip className="h-4 w-4" />
+                    </Button>
+                  </div>
+
+                {/* Image Preview */}
+                {uploadedImage && (
+                  <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
+                    <div className="w-12 h-12 rounded-lg overflow-hidden bg-muted">
+                      <img 
+                        src={uploadedImage} 
+                        alt="Uploaded" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <span className="text-sm text-muted-foreground flex-1">Image attached</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 w-6 p-0"
                       onClick={() => setUploadedImage(null)}
                     >
                       ×
@@ -562,60 +569,60 @@ Please direct any questions or concerns to the Executive Management team. We app
                               </Badge>
                             </div>
                             
-                            {/* Content Display Area - Fixed Height */}
-                            <div className="flex-1 min-h-[280px] max-h-[280px]">
+                            {/* Content Display Area - Increased Height and Padding */}
+                            <div className="flex-1 min-h-[350px] max-h-[350px]">
                               {editingContent.isEditing && editingContent.platform === platform ? (
                                 <div className="flex flex-col h-full">
                                   <Textarea
                                     value={editableContent}
                                     onChange={(e) => setEditableContent(e.target.value)}
-                                    className="flex-1 resize-none border border-gray-200 rounded-xl p-4 text-sm leading-relaxed h-[240px] bg-white"
+                                    className="flex-1 resize-none border border-gray-200 rounded-xl p-6 text-base leading-relaxed h-[310px] bg-white"
                                   />
-                                  <div className="flex gap-2 mt-3">
-                                    <Button size="sm" onClick={handleSaveEdit} className="bg-primary hover:bg-primary/90">
-                                      <Check className="mr-1 h-3 w-3" />
+                                  <div className="flex gap-3 mt-4">
+                                    <Button size="default" onClick={handleSaveEdit} className="bg-primary hover:bg-primary/90">
+                                      <Check className="mr-2 h-4 w-4" />
                                       Save
                                     </Button>
-                                    <Button size="sm" variant="outline" onClick={handleCancelEdit}>
+                                    <Button size="default" variant="outline" onClick={handleCancelEdit}>
                                       Cancel
                                     </Button>
                                   </div>
                                 </div>
                               ) : (
-                                <div className="bg-gray-50/50 rounded-xl p-6 border border-gray-100 h-full overflow-y-auto">
-                                  <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap text-left">
+                                <div className="bg-gray-50/50 rounded-xl p-8 border border-gray-100 h-full overflow-y-auto">
+                                  <p className="text-base text-gray-800 leading-relaxed whitespace-pre-wrap text-left">
                                     {getCurrentContent(platform)}
                                   </p>
                                 </div>
                               )}
                             </div>
 
-                            {/* Action Buttons - Now Inside Content Container */}
-                            <div className="flex gap-3 mt-4 pt-4 border-t border-gray-100">
+                            {/* Action Buttons - Increased Size and Padding */}
+                            <div className="flex gap-4 mt-6 pt-6 border-t border-gray-100">
                               <Button 
                                 variant="outline" 
-                                size="sm" 
-                                className="flex-1 border-gray-200 hover:bg-gray-50 hover:scale-105 transition-all duration-200 rounded-lg"
+                                size="default" 
+                                className="flex-1 border-gray-200 hover:bg-gray-50 hover:scale-105 transition-all duration-200 rounded-lg h-12"
                                 onClick={() => handleEditText(platform)}
                               >
-                                <Edit2 className="mr-1 h-3 w-3" />
+                                <Edit2 className="mr-2 h-4 w-4" />
                                 Edit Text
                               </Button>
                               <Button 
                                 variant="outline" 
-                                size="sm"
-                                className="flex-1 border-gray-200 hover:bg-gray-50 hover:scale-105 transition-all duration-200 rounded-lg"
+                                size="default"
+                                className="flex-1 border-gray-200 hover:bg-gray-50 hover:scale-105 transition-all duration-200 rounded-lg h-12"
                                 onClick={handleSchedule}
                               >
-                                <Calendar className="mr-1 h-3 w-3" />
+                                <Calendar className="mr-2 h-4 w-4" />
                                 Schedule
                               </Button>
                               <Button 
-                                size="sm"
-                                className="flex-1 bg-primary hover:bg-primary/90 text-white shadow-md hover:scale-105 transition-all duration-200 rounded-lg"
+                                size="default"
+                                className="flex-1 bg-primary hover:bg-primary/90 text-white shadow-md hover:scale-105 transition-all duration-200 rounded-lg h-12"
                                 onClick={handlePostNow}
                               >
-                                <Send className="mr-1 h-3 w-3" />
+                                <Send className="mr-2 h-4 w-4" />
                                 Post Now
                               </Button>
                             </div>
