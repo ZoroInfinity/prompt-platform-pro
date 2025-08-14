@@ -1,11 +1,12 @@
 import { useState, useRef } from "react"
-import { Send, MessageSquarePlus, FileText, Palette, Wand2, Sparkles, Calendar, ChevronLeft, ChevronRight, Edit2, Upload, Layers, Instagram, Linkedin, Twitter, Trash2, Check, Paperclip } from "lucide-react"
+import { Send, MessageSquarePlus, FileText, Palette, Wand2, Sparkles, Calendar, ChevronLeft, ChevronRight, Edit2, Upload, Layers, Instagram, Linkedin, Twitter, Trash2, Check, Paperclip, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { FeatureTray } from "@/components/FeatureTray"
 import { PostPreviewModal } from "@/components/PostPreviewModal"
 import { ImageEditTray } from "@/components/ImageEditTray"
@@ -25,6 +26,9 @@ export function ChatInterface({ onModeActivation, activeMode }: ChatInterfacePro
   const [editingContent, setEditingContent] = useState({ platform: "", isEditing: false })
   const [editableContent, setEditableContent] = useState("")
   const [uploadedImage, setUploadedImage] = useState<string | null>(null)
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(["instagram"])
+  const [currentPlatform, setCurrentPlatform] = useState("instagram")
+  const [showPlatformSelector, setShowPlatformSelector] = useState(false)
   
   // Multiple images for carousel
   const [currentImages, setCurrentImages] = useState([
@@ -315,11 +319,11 @@ Please direct any questions or concerns to the Executive Management team. We app
 
   const handleEditText = (platform: string) => {
     setEditingContent({ platform, isEditing: true })
-    setEditableContent(generatedContent)
+    setEditableContent(getCurrentContent(platform))
   }
 
   const handleSaveEdit = () => {
-    setGeneratedContent(editableContent)
+    // Update content for current platform
     setEditingContent({ platform: "", isEditing: false })
   }
 
@@ -424,6 +428,63 @@ Please direct any questions or concerns to the Executive Management team. We app
                   </div>
                 )}
                 
+                {/* Platform Selection for Quick Post */}
+                {selectedFeature === "quick-post" && (
+                  <Collapsible open={showPlatformSelector} onOpenChange={setShowPlatformSelector}>
+                    <CollapsibleTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        className="w-full justify-between border-0 bg-muted/30 h-12 mb-4"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium">Select Platforms</span>
+                          {selectedPlatforms.length > 0 && (
+                            <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                              {selectedPlatforms.length} selected
+                            </span>
+                          )}
+                        </div>
+                        <ChevronDown className="h-4 w-4" />
+                      </Button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="mb-4">
+                      <div className="grid grid-cols-1 gap-2 p-4 bg-muted/20 rounded-lg">
+                        {["instagram", "linkedin", "twitter"].map((platformId) => (
+                          <label 
+                            key={platformId} 
+                            className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/30 cursor-pointer transition-colors"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectedPlatforms.includes(platformId)}
+                              onChange={() => {
+                                if (selectedPlatforms.includes(platformId)) {
+                                  setSelectedPlatforms(prev => prev.filter(p => p !== platformId))
+                                } else {
+                                  setSelectedPlatforms(prev => [...prev, platformId])
+                                }
+                              }}
+                              className="w-4 h-4 text-primary bg-background border-2 border-muted-foreground/30 rounded focus:ring-primary focus:ring-2"
+                            />
+                            <div className="flex items-center gap-2">
+                              <span className="text-lg">
+                                {platformId === "instagram" && "📷"}
+                                {platformId === "linkedin" && "💼"}
+                                {platformId === "twitter" && "🐦"}
+                              </span>
+                              <span className="text-sm font-medium">
+                                {platformId === "instagram" && "Instagram"}
+                                {platformId === "linkedin" && "LinkedIn"}
+                                {platformId === "twitter" && "Twitter"}
+                              </span>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                )}
+
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     {featureIcons.map((feature, index) => {
@@ -467,7 +528,7 @@ Please direct any questions or concerns to the Executive Management team. We app
                     <Button 
                       type="submit" 
                       size="sm"
-                      disabled={!input.trim() || isGenerating}
+                      disabled={!input.trim() || isGenerating || (selectedFeature === "quick-post" && selectedPlatforms.length === 0)}
                       className="h-8 w-8 p-0 bg-primary hover:bg-primary/90 shadow-md hover:scale-105 transition-all duration-200"
                     >
                       <Wand2 className="h-4 w-4" />
@@ -501,263 +562,76 @@ Please direct any questions or concerns to the Executive Management team. We app
                 showCitations={featureConfig.showCitations}
               />
             ) : (
-              // Quick Post Content - Fixed Layout with Swipe Button Updates
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 relative">
-                {/* Content Container with Navigation */}
-                <div className="relative">
-                  {/* External Navigation Arrows for Content - Updated sizing */}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="absolute left-4 top-1/2 -translate-y-1/2 h-6 w-6 p-0 bg-white/95 hover:bg-white shadow-lg rounded-full hover:scale-110 transition-all duration-200 z-20 border border-gray-100"
-                    onClick={() => {
-                      const currentTab = document.querySelector('[data-state="active"]')?.getAttribute('value') || 'instagram'
-                      prevContent(currentTab)
-                    }}
-                  >
-                    <ChevronLeft className="h-4 w-4 text-gray-700" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-4 top-1/2 -translate-y-1/2 h-6 w-6 p-0 bg-white/95 hover:bg-white shadow-lg rounded-full hover:scale-110 transition-all duration-200 z-20 border border-gray-100"
-                    onClick={() => {
-                      const currentTab = document.querySelector('[data-state="active"]')?.getAttribute('value') || 'instagram'
-                      nextContent(currentTab)
-                    }}
-                  >
-                    <ChevronRight className="h-4 w-4 text-gray-700" />
-                  </Button>
+              // Quick Post Content - Unified Output Box with Tabs
+              <div className="flex justify-center">
+                <div className={`w-full ${isLandingState ? "max-w-2xl" : "max-w-7xl"}`}>
+                  <Tabs value={currentPlatform} onValueChange={setCurrentPlatform} className="w-full">
+                    {/* Platform Tabs */}
+                    <TabsList className="grid w-full grid-cols-3 mb-6 bg-muted/30">
+                      {selectedPlatforms.map((platformId) => (
+                        <TabsTrigger 
+                          key={platformId} 
+                          value={platformId}
+                          className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:text-foreground"
+                        >
+                          <span className="text-sm">
+                            {platformId === "instagram" && "📷"}
+                            {platformId === "linkedin" && "💼"}
+                            {platformId === "twitter" && "🐦"}
+                          </span>
+                          <span className="hidden sm:inline text-xs">
+                            {platformId === "instagram" && "Instagram"}
+                            {platformId === "linkedin" && "LinkedIn"}
+                            {platformId === "twitter" && "Twitter"}
+                          </span>
+                        </TabsTrigger>
+                      ))}
+                    </TabsList>
 
-                  <Card className="bg-white/80 backdrop-blur-sm shadow-lg border border-gray-100/50 rounded-2xl h-[600px] flex flex-col">
-                    {/* Header */}
-                    <div className="p-6 pb-4 border-b border-gray-100">
-                      <h3 className="text-lg font-semibold text-gray-800 mb-0">Platform Content</h3>
-                    </div>
-
-                    <CardContent className="p-6 pt-4 flex-1 flex flex-col">
-                      <Tabs defaultValue="instagram" className="space-y-4 flex-1 flex flex-col">
-                        <TabsList className="grid w-full grid-cols-3 bg-gray-50/80 rounded-xl p-1">
-                          <TabsTrigger value="instagram" className="data-[state=active]:bg-white data-[state=active]:shadow-sm hover:bg-white/50 transition-colors rounded-lg">
-                            <div className="flex items-center gap-2">
-                              <Instagram className="w-4 h-4 text-pink-500" />
-                              <span className="text-sm font-medium">Instagram</span>
-                            </div>
-                          </TabsTrigger>
-                          <TabsTrigger value="linkedin" className="data-[state=active]:bg-white data-[state=active]:shadow-sm hover:bg-white/50 transition-colors rounded-lg">
-                            <div className="flex items-center gap-2">
-                              <Linkedin className="w-4 h-4 text-blue-600" />
-                              <span className="text-sm font-medium">LinkedIn</span>
-                            </div>
-                          </TabsTrigger>
-                          <TabsTrigger value="twitter" className="data-[state=active]:bg-white data-[state=active]:shadow-sm hover:bg-white/50 transition-colors rounded-lg">
-                            <div className="flex items-center gap-2">
-                              <Twitter className="w-4 h-4 text-blue-400" />
-                              <span className="text-sm font-medium">Twitter</span>
-                            </div>
-                          </TabsTrigger>
-                        </TabsList>
-                        
-                        {/* Platform Content Tabs */}
-                        {["instagram", "linkedin", "twitter"].map((platform) => (
-                          <TabsContent key={platform} value={platform} className="flex-1 flex flex-col mt-4">
-                            {/* Version Label */}
-                            <div className="flex items-center justify-between mb-3">
-                              <Badge variant="secondary" className="text-xs bg-blue-50 text-blue-700 border border-blue-200">
-                                Version {currentContentIndex[platform as keyof typeof currentContentIndex] + 1}
-                                {currentContentIndex[platform as keyof typeof currentContentIndex] === 0 && " (Recommended)"}
-                              </Badge>
-                            </div>
-                            
-                            {/* Content Display Area - Increased Height and Padding */}
-                            <div className="flex-1 min-h-[350px] max-h-[350px]">
-                              {editingContent.isEditing && editingContent.platform === platform ? (
-                                <div className="flex flex-col h-full">
-                                  <Textarea
-                                    value={editableContent}
-                                    onChange={(e) => setEditableContent(e.target.value)}
-                                    className="flex-1 resize-none border border-gray-200 rounded-xl p-6 text-base leading-relaxed h-[310px] bg-white"
-                                  />
-                                  <div className="flex gap-3 mt-4">
-                                    <Button size="default" onClick={handleSaveEdit} className="bg-primary hover:bg-primary/90">
-                                      <Check className="mr-2 h-4 w-4" />
-                                      Save
-                                    </Button>
-                                    <Button size="default" variant="outline" onClick={handleCancelEdit}>
-                                      Cancel
-                                    </Button>
-                                  </div>
-                                </div>
-                              ) : (
-                                <div className="bg-gray-50/50 rounded-xl p-8 border border-gray-100 h-full overflow-y-auto">
-                                  <p className="text-base text-gray-800 leading-relaxed whitespace-pre-wrap text-left">
-                                    {getCurrentContent(platform)}
-                                  </p>
-                                </div>
-                              )}
+                    {/* Tab Content */}
+                    {selectedPlatforms.map((platformId) => (
+                      <TabsContent key={platformId} value={platformId} className="mt-0">
+                        <Card className="glass-card shadow-lg">
+                          <CardContent className="p-8 space-y-6">
+                            {/* Content Display Area */}
+                            <div className="space-y-4">
+                              <Textarea
+                                value={getCurrentContent(platformId)}
+                                readOnly
+                                className="glass border-0 bg-white/50 dark:bg-slate-800/50 min-h-[250px] text-base leading-relaxed resize-none p-8"
+                              />
                             </div>
 
-                            {/* Action Buttons - Increased Size and Padding */}
-                            <div className="flex gap-4 mt-6 pt-6 border-t border-gray-100">
-                              <Button 
-                                variant="outline" 
-                                size="default" 
-                                className="flex-1 border-gray-200 hover:bg-gray-50 hover:scale-105 transition-all duration-200 rounded-lg h-12"
-                                onClick={() => handleEditText(platform)}
-                              >
-                                <Edit2 className="mr-2 h-4 w-4" />
+                            {uploadedImage && (
+                              <div className="relative">
+                                <img 
+                                  src={uploadedImage} 
+                                  alt="Content image" 
+                                  className="w-full h-64 object-cover rounded-lg"
+                                />
+                              </div>
+                            )}
+
+                            {/* Action Buttons */}
+                            <div className="flex gap-3 pt-4">
+                              <Button size="default" variant="outline" className="flex-1 glass border-0 h-12">
+                                <Edit2 className="h-4 w-4 mr-2" />
                                 Edit Text
                               </Button>
-                              <Button 
-                                variant="outline" 
-                                size="default"
-                                className="flex-1 border-gray-200 hover:bg-gray-50 hover:scale-105 transition-all duration-200 rounded-lg h-12"
-                                onClick={handleSchedule}
-                              >
-                                <Calendar className="mr-2 h-4 w-4" />
-                                Schedule
-                              </Button>
-                              <Button 
-                                size="default"
-                                className="flex-1 bg-primary hover:bg-primary/90 text-white shadow-md hover:scale-105 transition-all duration-200 rounded-lg h-12"
-                                onClick={handlePostNow}
-                              >
-                                <Send className="mr-2 h-4 w-4" />
+                              <Button size="default" className="flex-1 bg-primary hover:bg-primary/90 h-12">
+                                <Send className="h-4 w-4 mr-2" />
                                 Post Now
                               </Button>
+                              <Button size="default" variant="outline" className="flex-1 glass border-0 h-12">
+                                <Calendar className="h-4 w-4 mr-2" />
+                                Schedule
+                              </Button>
                             </div>
-                          </TabsContent>
-                        ))}
-                      </Tabs>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                {/* Image Container */}
-                <div className="relative">
-                  {/* External Navigation Arrows for Images - Updated sizing */}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="absolute left-4 top-1/2 -translate-y-1/2 h-6 w-6 p-0 bg-white/95 hover:bg-white shadow-lg rounded-full hover:scale-110 transition-all duration-200 z-20 border border-gray-100"
-                    onClick={prevImage}
-                  >
-                    <ChevronLeft className="h-4 w-4 text-gray-700" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-4 top-1/2 -translate-y-1/2 h-6 w-6 p-0 bg-white/95 hover:bg-white shadow-lg rounded-full hover:scale-110 transition-all duration-200 z-20 border border-gray-100"
-                    onClick={nextImage}
-                  >
-                    <ChevronRight className="h-4 w-4 text-gray-700" />
-                  </Button>
-
-                  <Card className="bg-white/80 backdrop-blur-sm shadow-lg border border-gray-100/50 rounded-2xl h-[600px] flex flex-col">
-                    {/* Header */}
-                    <div className="p-6 pb-4 border-b border-gray-100 flex items-center justify-between">
-                      <h3 className="text-lg font-semibold text-gray-800">Recommended Image</h3>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all duration-200"
-                        onClick={handleRemoveImage}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-
-                    <CardContent className="p-6 pt-4 flex-1 flex flex-col">
-                      {/* Image Display Area - Fixed Height */}
-                      <div className="flex-1 min-h-[400px] max-h-[400px] bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-100 overflow-hidden relative">
-                        {currentImages[currentImageIndex] ? (
-                          <div className="relative w-full h-full">
-                            <img 
-                              src={currentImages[currentImageIndex]} 
-                              alt="Generated content" 
-                              className="w-full h-full object-cover"
-                            />
-                            {selectedImageIndex === currentImageIndex && (
-                              <div className="absolute top-3 right-3">
-                                <div className="bg-primary text-white rounded-full p-1.5 shadow-lg">
-                                  <Check className="h-4 w-4" />
-                                </div>
-                              </div>
-                            )}
-                            {/* Recommended Badge */}
-                            {currentImageIndex === 0 && (
-                              <div className="absolute top-3 left-3">
-                                <Badge className="bg-blue-500 text-white text-xs border-0 shadow-lg">
-                                  Recommended
-                                </Badge>
-                              </div>
-                            )}
-                            {/* Selection Button */}
-                            <Button
-                              size="sm"
-                              className="absolute bottom-3 right-3 bg-white/95 hover:bg-white text-gray-800 shadow-lg border border-gray-200 rounded-lg"
-                              onClick={() => handleSelectImage(currentImageIndex)}
-                            >
-                              {selectedImageIndex === currentImageIndex ? "Selected" : "Select"}
-                            </Button>
-                          </div>
-                        ) : (
-                          <div className="flex items-center justify-center h-full text-center text-gray-400">
-                            <div>
-                              <Palette className="h-12 w-12 mx-auto mb-3 opacity-40" />
-                              <p className="text-sm font-medium">Generated Image</p>
-                              <p className="text-xs">AI-created visual content</p>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Image Indicator Dots */}
-                      <div className="flex justify-center gap-2 mt-4">
-                        {currentImages.map((_, index) => (
-                          <button
-                            key={index}
-                            className={`w-2.5 h-2.5 rounded-full transition-all duration-200 ${
-                              index === currentImageIndex 
-                                ? "bg-primary shadow-sm" 
-                                : "bg-gray-300 hover:bg-gray-400"
-                            }`}
-                            onClick={() => setCurrentImageIndex(index)}
-                          />
-                        ))}
-                      </div>
-                    </CardContent>
-                    
-                    <CardFooter className="flex gap-3 pt-0 px-6 pb-6 border-t border-gray-100 mt-auto">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="flex-1 border-gray-200 hover:bg-gray-50 hover:scale-105 transition-all duration-200 rounded-lg"
-                        onClick={handleEditImage}
-                      >
-                        <Edit2 className="mr-1 h-3 w-3" />
-                        Edit Image
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="flex-1 border-gray-200 hover:bg-gray-50 hover:scale-105 transition-all duration-200 rounded-lg"
-                        onClick={handleUploadImage}
-                      >
-                        <Upload className="mr-1 h-3 w-3" />
-                        Upload Image
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="flex-1 border-gray-200 hover:bg-gray-50 hover:scale-105 transition-all duration-200 rounded-lg"
-                        onClick={handleApplyLogo}
-                      >
-                        <Layers className="mr-1 h-3 w-3" />
-                        Apply Logo
-                      </Button>
-                    </CardFooter>
-                  </Card>
+                          </CardContent>
+                        </Card>
+                      </TabsContent>
+                    ))}
+                  </Tabs>
                 </div>
               </div>
             )}

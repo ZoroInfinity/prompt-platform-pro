@@ -1,11 +1,13 @@
 import { useState } from "react"
-import { Send, Paperclip, Image as ImageIcon, Edit2, Calendar, Share2 } from "lucide-react"
+import { Send, Paperclip, Image as ImageIcon, Edit2, Calendar, Share2, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 
 interface CampaignData {
   platform: string
@@ -34,13 +36,16 @@ const platformNames: Record<string, string> = {
 export function CampaignGenerator() {
   const [input, setInput] = useState("")
   const [uploadedImage, setUploadedImage] = useState<string | null>(null)
-  const [selectedPlatform, setSelectedPlatform] = useState("instagram")
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(["instagram"])
+  const [currentPlatform, setCurrentPlatform] = useState("instagram")
   const [targetAudience, setTargetAudience] = useState("")
   const [cta, setCta] = useState("")
   const [tone, setTone] = useState("")
   const [language, setLanguage] = useState("english")
   const [isGenerating, setIsGenerating] = useState(false)
-  const [generatedCampaigns, setGeneratedCampaigns] = useState<CampaignData[]>([])
+  const [generatedCampaigns, setGeneratedCampaigns] = useState<Record<string, CampaignData>>({})
+  const [showPlatformSelector, setShowPlatformSelector] = useState(false)
+  const [showOptionalParams, setShowOptionalParams] = useState(false)
 
   const platforms = [
     { id: "whatsapp", name: "WhatsApp Campaign" },
@@ -77,26 +82,40 @@ export function CampaignGenerator() {
     input.click()
   }
 
+  const handlePlatformToggle = (platformId: string) => {
+    setSelectedPlatforms(prev => {
+      if (prev.includes(platformId)) {
+        return prev.filter(p => p !== platformId)
+      } else {
+        return [...prev, platformId]
+      }
+    })
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!input.trim() || !selectedPlatform) return
+    if (!input.trim() || selectedPlatforms.length === 0) return
 
     setIsGenerating(true)
     
     setTimeout(() => {
-      const campaign = {
-        platform: selectedPlatform,
-        content: campaignContent[selectedPlatform] || `Generated campaign content for ${platformNames[selectedPlatform]}...`,
-        icon: platformIcons[selectedPlatform]
-      }
+      const campaigns: Record<string, CampaignData> = {}
+      selectedPlatforms.forEach(platform => {
+        campaigns[platform] = {
+          platform,
+          content: campaignContent[platform] || `Generated campaign content for ${platformNames[platform]}...`,
+          icon: platformIcons[platform]
+        }
+      })
       
-      setGeneratedCampaigns([campaign])
+      setGeneratedCampaigns(campaigns)
+      setCurrentPlatform(selectedPlatforms[0])
       setIsGenerating(false)
     }, 2000)
   }
 
 
-  const isLandingState = generatedCampaigns.length === 0 && !isGenerating
+  const isLandingState = Object.keys(generatedCampaigns).length === 0 && !isGenerating
 
   return (
     <div className="w-full h-full">
@@ -161,89 +180,123 @@ export function CampaignGenerator() {
                 )}
 
                 {/* Platform Selection */}
-                <div>
-                  <Label className="text-sm font-medium mb-3 block">Select Platform</Label>
-                  <Select value={selectedPlatform} onValueChange={setSelectedPlatform}>
-                    <SelectTrigger className="border-0 bg-muted/30">
-                      <SelectValue placeholder="Choose a platform" />
-                    </SelectTrigger>
-                    <SelectContent>
+                <Collapsible open={showPlatformSelector} onOpenChange={setShowPlatformSelector}>
+                  <CollapsibleTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-between border-0 bg-muted/30 h-12"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">Select Platforms</span>
+                        {selectedPlatforms.length > 0 && (
+                          <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                            {selectedPlatforms.length} selected
+                          </span>
+                        )}
+                      </div>
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="mt-2">
+                    <div className="grid grid-cols-1 gap-2 p-4 bg-muted/20 rounded-lg">
                       {platforms.map((platform) => (
-                        <SelectItem key={platform.id} value={platform.id}>
+                        <label 
+                          key={platform.id} 
+                          className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/30 cursor-pointer transition-colors"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedPlatforms.includes(platform.id)}
+                            onChange={() => handlePlatformToggle(platform.id)}
+                            className="w-4 h-4 text-primary bg-background border-2 border-muted-foreground/30 rounded focus:ring-primary focus:ring-2"
+                          />
                           <div className="flex items-center gap-2">
-                            <span>{platformIcons[platform.id]}</span>
-                            {platform.name}
+                            <span className="text-lg">{platformIcons[platform.id]}</span>
+                            <span className="text-sm font-medium">{platform.name}</span>
                           </div>
-                        </SelectItem>
+                        </label>
                       ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
 
                 {/* Optional Parameters */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div>
-                    <Label htmlFor="audience" className="text-sm font-medium">Target Audience</Label>
-                    <Input
-                      id="audience"
-                      value={targetAudience}
-                      onChange={(e) => setTargetAudience(e.target.value)}
-                      placeholder="e.g., Small business owners"
-                      className="mt-1 border-0 bg-muted/30"
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="cta" className="text-sm font-medium">Call to Action</Label>
-                    <Input
-                      id="cta"
-                      value={cta}
-                      onChange={(e) => setCta(e.target.value)}
-                      placeholder="e.g., Get started free"
-                      className="mt-1 border-0 bg-muted/30"
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="tone" className="text-sm font-medium">Tone</Label>
-                    <Select value={tone} onValueChange={setTone}>
-                      <SelectTrigger className="mt-1 border-0 bg-muted/30">
-                        <SelectValue placeholder="Select tone" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {tones.map((t) => (
-                          <SelectItem key={t} value={t.toLowerCase()}>{t}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="language" className="text-sm font-medium">Language</Label>
-                    <Select value={language} onValueChange={setLanguage}>
-                      <SelectTrigger className="mt-1 border-0 bg-muted/30">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {languages.map((lang) => (
-                          <SelectItem key={lang} value={lang.toLowerCase()}>{lang}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
+                <Collapsible open={showOptionalParams} onOpenChange={setShowOptionalParams}>
+                  <CollapsibleTrigger asChild>
+                    <Button 
+                      variant="ghost" 
+                      className="w-full justify-between text-sm text-muted-foreground hover:text-foreground"
+                    >
+                      Optional Parameters
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="mt-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-muted/20 rounded-lg">
+                      <div>
+                        <Label htmlFor="audience" className="text-sm font-medium">🎯 Target Audience</Label>
+                        <Input
+                          id="audience"
+                          value={targetAudience}
+                          onChange={(e) => setTargetAudience(e.target.value)}
+                          placeholder="e.g., Small business owners"
+                          className="mt-1 border-0 bg-background/50"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="cta" className="text-sm font-medium">🎯 Call to Action</Label>
+                        <Input
+                          id="cta"
+                          value={cta}
+                          onChange={(e) => setCta(e.target.value)}
+                          placeholder="e.g., Get started free"
+                          className="mt-1 border-0 bg-background/50"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="tone" className="text-sm font-medium">🎯 Tone</Label>
+                        <Select value={tone} onValueChange={setTone}>
+                          <SelectTrigger className="mt-1 border-0 bg-background/50">
+                            <SelectValue placeholder="Select tone" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {tones.map((t) => (
+                              <SelectItem key={t} value={t.toLowerCase()}>{t}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="language" className="text-sm font-medium">🎯 Language</Label>
+                        <Select value={language} onValueChange={setLanguage}>
+                          <SelectTrigger className="mt-1 border-0 bg-background/50">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {languages.map((lang) => (
+                              <SelectItem key={lang} value={lang.toLowerCase()}>{lang}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
 
                 <Button 
                   type="submit" 
-                  disabled={!input.trim() || !selectedPlatform || isGenerating}
-                  className="w-full bg-primary hover:bg-primary/90"
+                  disabled={!input.trim() || selectedPlatforms.length === 0 || isGenerating}
+                  className="w-full bg-primary hover:bg-primary/90 h-12"
                 >
                   {isGenerating ? (
-                    "Generating campaign..."
+                    "Generating campaigns..."
                   ) : (
                     <>
                       <Send className="h-4 w-4 mr-2" />
-                      Generate Campaign
+                      Generate Campaigns
                     </>
                   )}
                 </Button>
@@ -254,7 +307,7 @@ export function CampaignGenerator() {
       </div>
 
       {/* Generated Campaigns */}
-      {(generatedCampaigns.length > 0 || isGenerating) && (
+      {(Object.keys(generatedCampaigns).length > 0 || isGenerating) && (
         <div className="px-6 pb-6">
           <div className="max-w-7xl mx-auto">
             {isGenerating ? (
@@ -266,53 +319,72 @@ export function CampaignGenerator() {
               </div>
             ) : (
               <div className="flex justify-center">
-                <div className="w-full max-w-2xl">
-                  {generatedCampaigns.map((campaign, index) => (
-                    <Card key={index} className="glass-card shadow-lg">
-                      <CardHeader className="pb-4">
-                        <CardTitle className="text-xl flex items-center gap-3">
-                          <span className="text-2xl">{campaign.icon}</span>
-                          {platformNames[campaign.platform]}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-6">
-                        {/* Campaign Content */}
-                        <div className="space-y-4">
-                          <Textarea
-                            value={campaign.content}
-                            readOnly
-                            className="glass border-0 bg-white/50 dark:bg-slate-800/50 min-h-[200px] text-base leading-relaxed resize-none p-6"
-                          />
-                        </div>
+                <div className={`w-full ${isLandingState ? "max-w-2xl" : "max-w-7xl"}`}>
+                  <Tabs value={currentPlatform} onValueChange={setCurrentPlatform} className="w-full">
+                    {/* Platform Tabs */}
+                    <TabsList className="grid w-full grid-cols-5 mb-6 bg-muted/30">
+                      {selectedPlatforms.map((platformId) => (
+                        <TabsTrigger 
+                          key={platformId} 
+                          value={platformId}
+                          className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:text-foreground"
+                        >
+                          <span className="text-sm">{platformIcons[platformId]}</span>
+                          <span className="hidden sm:inline text-xs">{platformNames[platformId]}</span>
+                        </TabsTrigger>
+                      ))}
+                    </TabsList>
 
-                        {uploadedImage && (
-                          <div className="relative">
-                            <img 
-                              src={uploadedImage} 
-                              alt="Campaign image" 
-                              className="w-full h-64 object-cover rounded-lg"
-                            />
-                          </div>
-                        )}
+                    {/* Tab Content */}
+                    {selectedPlatforms.map((platformId) => (
+                      <TabsContent key={platformId} value={platformId} className="mt-0">
+                        <Card className="glass-card shadow-lg">
+                          <CardHeader className="pb-4">
+                            <CardTitle className="text-xl flex items-center gap-3">
+                              <span className="text-2xl">{generatedCampaigns[platformId]?.icon}</span>
+                              {platformNames[platformId]}
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent className="space-y-6">
+                            {/* Campaign Content */}
+                            <div className="space-y-4">
+                              <Textarea
+                                value={generatedCampaigns[platformId]?.content || ""}
+                                readOnly
+                                className="glass border-0 bg-white/50 dark:bg-slate-800/50 min-h-[250px] text-base leading-relaxed resize-none p-8"
+                              />
+                            </div>
 
-                        {/* Action Buttons */}
-                        <div className="flex gap-3 pt-4">
-                          <Button size="default" variant="outline" className="flex-1 glass border-0 h-12">
-                            <Edit2 className="h-4 w-4 mr-2" />
-                            Edit
-                          </Button>
-                          <Button size="default" className="flex-1 bg-primary hover:bg-primary/90 h-12">
-                            <Share2 className="h-4 w-4 mr-2" />
-                            Post
-                          </Button>
-                          <Button size="default" variant="outline" className="flex-1 glass border-0 h-12">
-                            <Calendar className="h-4 w-4 mr-2" />
-                            Schedule
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                            {uploadedImage && (
+                              <div className="relative">
+                                <img 
+                                  src={uploadedImage} 
+                                  alt="Campaign image" 
+                                  className="w-full h-64 object-cover rounded-lg"
+                                />
+                              </div>
+                            )}
+
+                            {/* Action Buttons */}
+                            <div className="flex gap-3 pt-4">
+                              <Button size="default" variant="outline" className="flex-1 glass border-0 h-12">
+                                <Edit2 className="h-4 w-4 mr-2" />
+                                Edit Text
+                              </Button>
+                              <Button size="default" className="flex-1 bg-primary hover:bg-primary/90 h-12">
+                                <Share2 className="h-4 w-4 mr-2" />
+                                Post Now
+                              </Button>
+                              <Button size="default" variant="outline" className="flex-1 glass border-0 h-12">
+                                <Calendar className="h-4 w-4 mr-2" />
+                                Schedule
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </TabsContent>
+                    ))}
+                  </Tabs>
                 </div>
               </div>
             )}
