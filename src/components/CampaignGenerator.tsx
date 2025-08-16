@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Send, Paperclip, Image as ImageIcon, Edit2, Calendar, Share2, ChevronDown, Download, Upload, Palette, X } from "lucide-react"
+import { Send, Paperclip, Image as ImageIcon, Edit2, Calendar, Share2, ChevronDown, Download, Upload, Palette, X, ChevronLeft, ChevronRight, Settings } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -8,10 +8,11 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { Checkbox } from "@/components/ui/checkbox"
 
 interface CampaignData {
   platform: string
-  content: string
+  content: string[]
   icon: string
 }
 
@@ -38,6 +39,7 @@ export function CampaignGenerator() {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null)
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(["instagram"])
   const [currentPlatform, setCurrentPlatform] = useState("instagram")
+  const [currentVersion, setCurrentVersion] = useState(0)
   const [targetAudience, setTargetAudience] = useState("")
   const [cta, setCta] = useState("")
   const [tone, setTone] = useState("")
@@ -45,7 +47,10 @@ export function CampaignGenerator() {
   const [isGenerating, setIsGenerating] = useState(false)
   const [generatedCampaigns, setGeneratedCampaigns] = useState<Record<string, CampaignData>>({})
   const [showPlatformSelector, setShowPlatformSelector] = useState(false)
-  const [showOptionalParams, setShowOptionalParams] = useState(false)
+  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false)
+  const [selectedImages, setSelectedImages] = useState<string[]>([])
+  const [isEditing, setIsEditing] = useState(false)
+  const [editContent, setEditContent] = useState("")
 
   const platforms = [
     { id: "whatsapp", name: "WhatsApp Campaign" },
@@ -58,14 +63,36 @@ export function CampaignGenerator() {
   const tones = ["Professional", "Casual", "Friendly", "Urgent", "Inspirational", "Humorous"]
   const languages = ["English", "Spanish", "French", "German", "Italian", "Portuguese"]
 
-  // Mock campaign content for each platform
-  const campaignContent: Record<string, string> = {
-    whatsapp: "🚀 Ready to transform your business? \n\nDiscover how our solution can help you:\n✅ Save 20+ hours per week\n✅ Increase productivity by 300%\n✅ Focus on what matters most\n\nJoin 10,000+ satisfied customers! Tap to learn more ⬇️",
-    google: "Transform Your Business | Save 20+ Hours Weekly\nAutomate repetitive tasks and focus on growth. Join 10,000+ successful businesses.\nGet Started Free →",
-    instagram: "🚀 Ready to level up your business game?\n\nOur automation solution helps entrepreneurs like you:\n✨ Save 20+ hours per week\n🎯 Boost productivity by 300%\n💡 Focus on strategic growth\n🔥 Join 10,000+ success stories\n\n#BusinessAutomation #Productivity #Entrepreneur #Growth #Success",
-    linkedin: "Ready to transform your business operations?\n\nOur automation platform delivers measurable results:\n• 20+ hours saved weekly\n• 300% productivity increase\n• Streamlined workflows\n• Proven ROI in 30 days\n\nJoin 10,000+ forward-thinking businesses that have already made the switch to smarter operations.\n\n#BusinessAutomation #Productivity #Innovation #DigitalTransformation",
-    facebook: "🚀 Ready to transform your business?\n\nDiscover how automation can revolutionize your operations:\n✅ Save 20+ hours per week\n✅ Increase productivity by 300%\n✅ Focus on strategic growth\n✅ Join 10,000+ success stories\n\nSee how it works and get started today!\n\nLearn More ↓"
+  // Mock campaign content with multiple versions
+  const campaignContent: Record<string, string[]> = {
+    whatsapp: [
+      "🚀 Ready to transform your business? \n\nDiscover how our solution can help you:\n✅ Save 20+ hours per week\n✅ Increase productivity by 300%\n✅ Focus on what matters most\n\nJoin 10,000+ satisfied customers! Tap to learn more ⬇️",
+      "💡 Struggling with time management? \n\nOur automation platform delivers:\n🎯 20+ hours saved weekly\n🎯 300% productivity boost\n🎯 Streamlined workflows\n\nReady to transform your business? Get started today! 🚀"
+    ],
+    google: [
+      "Transform Your Business | Save 20+ Hours Weekly\nAutomate repetitive tasks and focus on growth. Join 10,000+ successful businesses.\nGet Started Free →",
+      "Business Automation Made Simple | Boost Productivity 300%\nStreamline operations and save time instantly. Trusted by thousands.\nStart Your Free Trial →"
+    ],
+    instagram: [
+      "🚀 Ready to level up your business game?\n\nOur automation solution helps entrepreneurs like you:\n✨ Save 20+ hours per week\n🎯 Boost productivity by 300%\n💡 Focus on strategic growth\n🔥 Join 10,000+ success stories\n\n#BusinessAutomation #Productivity #Entrepreneur #Growth #Success",
+      "✨ Entrepreneurs, this is your moment! \n\nTransform your business with automation:\n🚀 Save 20+ hours weekly\n💪 300% productivity increase\n🎯 Focus on what truly matters\n\nJoin the revolution! 🔥\n\n#Automation #BusinessGrowth #Productivity #Success #Entrepreneur"
+    ],
+    linkedin: [
+      "Ready to transform your business operations?\n\nOur automation platform delivers measurable results:\n• 20+ hours saved weekly\n• 300% productivity increase\n• Streamlined workflows\n• Proven ROI in 30 days\n\nJoin 10,000+ forward-thinking businesses that have already made the switch to smarter operations.\n\n#BusinessAutomation #Productivity #Innovation #DigitalTransformation",
+      "The future of business is automated.\n\nWhy leading companies choose our platform:\n✓ Eliminate repetitive tasks\n✓ Boost team productivity by 300%\n✓ Save 20+ hours per week\n✓ Achieve ROI in 30 days\n\nTransform your operations today.\n\n#Automation #BusinessEfficiency #DigitalTransformation #Leadership"
+    ],
+    facebook: [
+      "🚀 Ready to transform your business?\n\nDiscover how automation can revolutionize your operations:\n✅ Save 20+ hours per week\n✅ Increase productivity by 300%\n✅ Focus on strategic growth\n✅ Join 10,000+ success stories\n\nSee how it works and get started today!\n\nLearn More ↓",
+      "💼 Business owners, listen up!\n\nStop wasting time on repetitive tasks:\n🎯 Save 20+ hours weekly\n🎯 Boost productivity by 300%\n🎯 Focus on growth strategies\n🎯 Join thousands of success stories\n\nReady to automate? Start your journey! 🚀"
+    ]
   }
+
+  // Mock AI-generated and search images
+  const mockImages = [
+    "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop",
+    "https://images.unsplash.com/photo-1551434678-e076c223a692?w=400&h=300&fit=crop",
+    "https://images.unsplash.com/photo-1553484771-371a605b060b?w=400&h=300&fit=crop"
+  ]
 
 
   const handleImageUpload = () => {
@@ -92,6 +119,26 @@ export function CampaignGenerator() {
     })
   }
 
+  const getCurrentContent = () => {
+    const campaign = generatedCampaigns[currentPlatform]
+    return campaign?.content[currentVersion] || ""
+  }
+
+  const handleEditToggle = () => {
+    if (isEditing) {
+      // Save edit
+      const campaign = generatedCampaigns[currentPlatform]
+      if (campaign) {
+        campaign.content[currentVersion] = editContent
+        setGeneratedCampaigns({...generatedCampaigns})
+      }
+    } else {
+      // Start editing
+      setEditContent(getCurrentContent())
+    }
+    setIsEditing(!isEditing)
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!input.trim() || selectedPlatforms.length === 0) return
@@ -101,15 +148,21 @@ export function CampaignGenerator() {
     setTimeout(() => {
       const campaigns: Record<string, CampaignData> = {}
       selectedPlatforms.forEach(platform => {
+        const hasAdvancedOptions = targetAudience || cta || tone || language !== "english"
+        const versions = hasAdvancedOptions ? 
+          campaignContent[platform] || [`Generated campaign content for ${platformNames[platform]}...`, `Alternative version for ${platformNames[platform]}...`] :
+          [campaignContent[platform]?.[0] || `Generated campaign content for ${platformNames[platform]}...`]
+        
         campaigns[platform] = {
           platform,
-          content: campaignContent[platform] || `Generated campaign content for ${platformNames[platform]}...`,
+          content: versions,
           icon: platformIcons[platform]
         }
       })
       
       setGeneratedCampaigns(campaigns)
       setCurrentPlatform(selectedPlatforms[0])
+      setCurrentVersion(0)
       setIsGenerating(false)
     }, 2000)
   }
@@ -142,24 +195,134 @@ export function CampaignGenerator() {
           <Card className="glass-card shadow-lg">
             <CardContent className="p-6 space-y-6">
               <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Top Controls Row */}
+                <div className="flex gap-4 items-center">
+                  {/* Image Upload */}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-10 glass border-0 bg-muted/30"
+                    onClick={handleImageUpload}
+                  >
+                    <Paperclip className="h-4 w-4 mr-2" />
+                    Attach Image
+                  </Button>
+
+                  {/* Platform Selector */}
+                  <Collapsible open={showPlatformSelector} onOpenChange={setShowPlatformSelector}>
+                    <CollapsibleTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        className="h-10 justify-between glass border-0 bg-muted/30 min-w-[150px]"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium">Platforms</span>
+                          {selectedPlatforms.length > 0 && (
+                            <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                              {selectedPlatforms.length}
+                            </span>
+                          )}
+                        </div>
+                        <ChevronDown className="h-4 w-4" />
+                      </Button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="absolute z-50 mt-2 w-64 bg-background border border-muted rounded-lg shadow-lg">
+                      <div className="p-4 space-y-3">
+                        {platforms.map((platform) => (
+                          <div key={platform.id} className="flex items-center space-x-3">
+                            <Checkbox
+                              id={platform.id}
+                              checked={selectedPlatforms.includes(platform.id)}
+                              onCheckedChange={() => handlePlatformToggle(platform.id)}
+                            />
+                            <label htmlFor={platform.id} className="flex items-center gap-2 cursor-pointer">
+                              <span className="text-lg">{platformIcons[platform.id]}</span>
+                              <span className="text-sm font-medium">{platform.name}</span>
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+
+                  {/* Advanced Options */}
+                  <Collapsible open={showAdvancedOptions} onOpenChange={setShowAdvancedOptions}>
+                    <CollapsibleTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        className="h-10 glass border-0 bg-muted/30"
+                      >
+                        <Settings className="h-4 w-4 mr-2" />
+                        Advanced
+                        <ChevronDown className="h-4 w-4 ml-2" />
+                      </Button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="absolute z-50 mt-2 w-80 bg-background border border-muted rounded-lg shadow-lg">
+                      <div className="p-4 grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="audience" className="text-sm font-medium">Target Audience</Label>
+                          <Input
+                            id="audience"
+                            value={targetAudience}
+                            onChange={(e) => setTargetAudience(e.target.value)}
+                            placeholder="e.g., Small business owners"
+                            className="mt-1 border-0 bg-background/50"
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="cta" className="text-sm font-medium">Call to Action</Label>
+                          <Input
+                            id="cta"
+                            value={cta}
+                            onChange={(e) => setCta(e.target.value)}
+                            placeholder="e.g., Get started free"
+                            className="mt-1 border-0 bg-background/50"
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="tone" className="text-sm font-medium">Tone</Label>
+                          <Select value={tone} onValueChange={setTone}>
+                            <SelectTrigger className="mt-1 border-0 bg-background/50">
+                              <SelectValue placeholder="Select tone" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-background border border-muted">
+                              {tones.map((t) => (
+                                <SelectItem key={t} value={t.toLowerCase()}>{t}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="language" className="text-sm font-medium">Language</Label>
+                          <Select value={language} onValueChange={setLanguage}>
+                            <SelectTrigger className="mt-1 border-0 bg-background/50">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="bg-background border border-muted">
+                              {languages.map((lang) => (
+                                <SelectItem key={lang} value={lang.toLowerCase()}>{lang}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                </div>
+
                 {/* Main Campaign Input */}
                 <div className="relative">
                   <Textarea
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder="Describe your campaign message or product..."
-                    className="resize-none border-0 focus:ring-2 focus:ring-primary/20 pr-12 min-h-[80px]"
+                    className="resize-none border-0 focus:ring-2 focus:ring-primary/20 min-h-[80px]"
                     rows={3}
                   />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-2 top-2 h-8 w-8 p-0 hover:bg-primary/10"
-                    onClick={handleImageUpload}
-                  >
-                    <Paperclip className="h-4 w-4" />
-                  </Button>
                 </div>
 
                 {/* Image Preview */}
@@ -178,113 +341,6 @@ export function CampaignGenerator() {
                     </Button>
                   </div>
                 )}
-
-                {/* Platform Selection */}
-                <Collapsible open={showPlatformSelector} onOpenChange={setShowPlatformSelector}>
-                  <CollapsibleTrigger asChild>
-                    <Button 
-                      variant="outline" 
-                      className="w-full justify-between border-0 bg-muted/30 h-12"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium">Select Platforms</span>
-                        {selectedPlatforms.length > 0 && (
-                          <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
-                            {selectedPlatforms.length} selected
-                          </span>
-                        )}
-                      </div>
-                      <ChevronDown className="h-4 w-4" />
-                    </Button>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="mt-2">
-                    <div className="grid grid-cols-1 gap-2 p-4 bg-muted/20 rounded-lg">
-                      {platforms.map((platform) => (
-                        <label 
-                          key={platform.id} 
-                          className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/30 cursor-pointer transition-colors"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selectedPlatforms.includes(platform.id)}
-                            onChange={() => handlePlatformToggle(platform.id)}
-                            className="w-4 h-4 text-primary bg-background border-2 border-muted-foreground/30 rounded focus:ring-primary focus:ring-2"
-                          />
-                          <div className="flex items-center gap-2">
-                            <span className="text-lg">{platformIcons[platform.id]}</span>
-                            <span className="text-sm font-medium">{platform.name}</span>
-                          </div>
-                        </label>
-                      ))}
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
-
-                {/* Optional Parameters */}
-                <Collapsible open={showOptionalParams} onOpenChange={setShowOptionalParams}>
-                  <CollapsibleTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      className="w-full justify-between text-sm text-muted-foreground hover:text-foreground"
-                    >
-                      Optional Parameters
-                      <ChevronDown className="h-4 w-4" />
-                    </Button>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="mt-2">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-muted/20 rounded-lg">
-                      <div>
-                        <Label htmlFor="audience" className="text-sm font-medium">🎯 Target Audience</Label>
-                        <Input
-                          id="audience"
-                          value={targetAudience}
-                          onChange={(e) => setTargetAudience(e.target.value)}
-                          placeholder="e.g., Small business owners"
-                          className="mt-1 border-0 bg-background/50"
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="cta" className="text-sm font-medium">🎯 Call to Action</Label>
-                        <Input
-                          id="cta"
-                          value={cta}
-                          onChange={(e) => setCta(e.target.value)}
-                          placeholder="e.g., Get started free"
-                          className="mt-1 border-0 bg-background/50"
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="tone" className="text-sm font-medium">🎯 Tone</Label>
-                        <Select value={tone} onValueChange={setTone}>
-                          <SelectTrigger className="mt-1 border-0 bg-background/50">
-                            <SelectValue placeholder="Select tone" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {tones.map((t) => (
-                              <SelectItem key={t} value={t.toLowerCase()}>{t}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="language" className="text-sm font-medium">🎯 Language</Label>
-                        <Select value={language} onValueChange={setLanguage}>
-                          <SelectTrigger className="mt-1 border-0 bg-background/50">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {languages.map((lang) => (
-                              <SelectItem key={lang} value={lang.toLowerCase()}>{lang}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
 
                 <Button 
                   type="submit" 
@@ -335,36 +391,79 @@ export function CampaignGenerator() {
                       ))}
                     </TabsList>
 
-                     {/* Tab Content - 2 Column Layout */}
+                    {/* 2-Column Layout matching Quick Post */}
                     {selectedPlatforms.map((platformId) => (
                       <TabsContent key={platformId} value={platformId} className="mt-0">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                           {/* Content Card (Left) */}
-                          <Card className="glass-card shadow-lg h-fit">
+                          <Card className="glass-card shadow-lg">
                             <CardContent className="p-8 space-y-6">
                               {/* Platform Tabs (Logo Only) */}
-                              <div className="flex items-center justify-center mb-4">
-                                <div className="flex items-center gap-2 px-4 py-2 bg-muted/30 rounded-lg">
-                                  <span className="text-2xl">{generatedCampaigns[platformId]?.icon}</span>
-                                  <span className="font-medium">{platformNames[platformId]}</span>
-                                </div>
+                              <TabsList className="grid grid-cols-3 w-full bg-muted/30">
+                                {selectedPlatforms.slice(0, 3).map((pid) => (
+                                  <TabsTrigger 
+                                    key={pid} 
+                                    value={pid}
+                                    className="data-[state=active]:bg-background"
+                                    onClick={() => setCurrentPlatform(pid)}
+                                  >
+                                    <span className="text-lg">{platformIcons[pid]}</span>
+                                  </TabsTrigger>
+                                ))}
+                              </TabsList>
+
+                              {/* Version Carousel */}
+                              <div className="relative">
+                                {generatedCampaigns[platformId]?.content.length > 1 && (
+                                  <>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 p-0"
+                                      onClick={() => setCurrentVersion(Math.max(0, currentVersion - 1))}
+                                      disabled={currentVersion === 0}
+                                    >
+                                      <ChevronLeft className="h-4 w-4" />
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 p-0"
+                                      onClick={() => setCurrentVersion(Math.min((generatedCampaigns[platformId]?.content.length || 1) - 1, currentVersion + 1))}
+                                      disabled={currentVersion >= (generatedCampaigns[platformId]?.content.length || 1) - 1}
+                                    >
+                                      <ChevronRight className="h-4 w-4" />
+                                    </Button>
+                                  </>
+                                )}
+                                
+                                {isEditing ? (
+                                  <Textarea
+                                    value={editContent}
+                                    onChange={(e) => setEditContent(e.target.value)}
+                                    className="glass border-0 bg-white/50 dark:bg-slate-800/50 min-h-[300px] text-base leading-relaxed resize-none p-6"
+                                  />
+                                ) : (
+                                  <Textarea
+                                    value={getCurrentContent()}
+                                    readOnly
+                                    className="glass border-0 bg-white/50 dark:bg-slate-800/50 min-h-[300px] text-base leading-relaxed resize-none p-6"
+                                  />
+                                )}
                               </div>
 
-                              {/* Generated Content */}
-                              <div className="space-y-4">
-                                <Textarea
-                                  value={generatedCampaigns[platformId]?.content || ""}
-                                  readOnly
-                                  className="glass border-0 bg-white/50 dark:bg-slate-800/50 min-h-[300px] text-base leading-relaxed resize-none p-6"
-                                />
-                                <p className="text-xs text-muted-foreground text-center">Version 1</p>
-                              </div>
+                              {/* Version Label */}
+                              {generatedCampaigns[platformId]?.content.length > 1 && (
+                                <p className="text-xs text-muted-foreground text-center">
+                                  Version {currentVersion + 1} of {generatedCampaigns[platformId]?.content.length}
+                                </p>
+                              )}
 
                               {/* Action Buttons - Left Aligned */}
                               <div className="flex gap-3 justify-start">
-                                <Button size="default" variant="outline" className="glass border-0 h-12">
+                                <Button size="default" variant="outline" className="glass border-0 h-12" onClick={handleEditToggle}>
                                   <Edit2 className="h-4 w-4 mr-2" />
-                                  Edit Text
+                                  {isEditing ? "Save" : "Edit Text"}
                                 </Button>
                                 <Button size="default" className="bg-primary hover:bg-primary/90 h-12">
                                   <Share2 className="h-4 w-4 mr-2" />
@@ -379,23 +478,50 @@ export function CampaignGenerator() {
                           </Card>
 
                           {/* Image Card (Right) */}
-                          <Card className="glass-card shadow-lg h-fit">
+                          <Card className="glass-card shadow-lg">
                             <CardContent className="p-8 space-y-6">
                               {/* Image Carousel */}
                               <div className="space-y-4">
-                                <div className="aspect-square bg-muted/20 rounded-lg flex items-center justify-center border-2 border-dashed border-muted-foreground/30">
-                                  {uploadedImage ? (
+                                <div className="relative aspect-square bg-muted/20 rounded-lg border-2 border-dashed border-muted-foreground/30 overflow-hidden">
+                                  {selectedImages.length > 0 || uploadedImage ? (
                                     <img 
-                                      src={uploadedImage} 
+                                      src={uploadedImage || selectedImages[0] || mockImages[0]} 
                                       alt="Campaign image" 
-                                      className="w-full h-full object-cover rounded-lg"
+                                      className="w-full h-full object-cover"
                                     />
                                   ) : (
-                                    <div className="text-center">
-                                      <ImageIcon className="h-12 w-12 text-muted-foreground/50 mx-auto mb-2" />
-                                      <p className="text-sm text-muted-foreground">No image selected</p>
+                                    <div className="flex items-center justify-center h-full">
+                                      <div className="text-center">
+                                        <ImageIcon className="h-12 w-12 text-muted-foreground/50 mx-auto mb-2" />
+                                        <p className="text-sm text-muted-foreground">Select an image</p>
+                                      </div>
                                     </div>
                                   )}
+                                </div>
+
+                                {/* Image Selection Grid */}
+                                <div className="grid grid-cols-3 gap-2">
+                                  {mockImages.map((img, idx) => (
+                                    <div key={idx} className="relative">
+                                      <img 
+                                        src={img} 
+                                        alt={`Option ${idx + 1}`}
+                                        className="w-full aspect-square object-cover rounded cursor-pointer border-2 border-transparent hover:border-primary"
+                                        onClick={() => setSelectedImages([img])}
+                                      />
+                                      <Checkbox 
+                                        className="absolute top-1 right-1"
+                                        checked={selectedImages.includes(img)}
+                                        onCheckedChange={(checked) => {
+                                          if (checked) {
+                                            setSelectedImages([img])
+                                          } else {
+                                            setSelectedImages([])
+                                          }
+                                        }}
+                                      />
+                                    </div>
+                                  ))}
                                 </div>
                               </div>
 
@@ -405,16 +531,24 @@ export function CampaignGenerator() {
                                   <Edit2 className="h-4 w-4 mr-2" />
                                   Edit with AI
                                 </Button>
-                                <Button size="default" variant="outline" className="glass border-0 h-12">
+                                <Button size="default" variant="outline" className="glass border-0 h-12" onClick={handleImageUpload}>
                                   <Upload className="h-4 w-4 mr-2" />
-                                  Upload Image
+                                  Upload
                                 </Button>
                                 <Button size="default" variant="outline" className="glass border-0 h-12">
                                   <Palette className="h-4 w-4 mr-2" />
                                   Apply Logo
                                 </Button>
-                                {uploadedImage && (
-                                  <Button size="default" variant="outline" className="glass border-0 h-12 w-12 p-0">
+                                {(selectedImages.length > 0 || uploadedImage) && (
+                                  <Button 
+                                    size="default" 
+                                    variant="outline" 
+                                    className="glass border-0 h-12 w-12 p-0"
+                                    onClick={() => {
+                                      setSelectedImages([])
+                                      setUploadedImage(null)
+                                    }}
+                                  >
                                     <X className="h-4 w-4" />
                                   </Button>
                                 )}
