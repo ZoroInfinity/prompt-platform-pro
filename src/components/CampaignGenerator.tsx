@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Send, Paperclip, Image as ImageIcon, Edit2, Calendar, Share2, ChevronDown } from "lucide-react"
+import { Send, Paperclip, Image as ImageIcon, Edit2, Calendar, Share2, ChevronDown, Download, Upload, Palette, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -335,53 +335,93 @@ export function CampaignGenerator() {
                       ))}
                     </TabsList>
 
-                    {/* Tab Content */}
+                     {/* Tab Content - 2 Column Layout */}
                     {selectedPlatforms.map((platformId) => (
                       <TabsContent key={platformId} value={platformId} className="mt-0">
-                        <Card className="glass-card shadow-lg">
-                          <CardHeader className="pb-4">
-                            <CardTitle className="text-xl flex items-center gap-3">
-                              <span className="text-2xl">{generatedCampaigns[platformId]?.icon}</span>
-                              {platformNames[platformId]}
-                            </CardTitle>
-                          </CardHeader>
-                          <CardContent className="space-y-6">
-                            {/* Campaign Content */}
-                            <div className="space-y-4">
-                              <Textarea
-                                value={generatedCampaigns[platformId]?.content || ""}
-                                readOnly
-                                className="glass border-0 bg-white/50 dark:bg-slate-800/50 min-h-[250px] text-base leading-relaxed resize-none p-8"
-                              />
-                            </div>
-
-                            {uploadedImage && (
-                              <div className="relative">
-                                <img 
-                                  src={uploadedImage} 
-                                  alt="Campaign image" 
-                                  className="w-full h-64 object-cover rounded-lg"
-                                />
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                          {/* Content Card (Left) */}
+                          <Card className="glass-card shadow-lg h-fit">
+                            <CardContent className="p-8 space-y-6">
+                              {/* Platform Tabs (Logo Only) */}
+                              <div className="flex items-center justify-center mb-4">
+                                <div className="flex items-center gap-2 px-4 py-2 bg-muted/30 rounded-lg">
+                                  <span className="text-2xl">{generatedCampaigns[platformId]?.icon}</span>
+                                  <span className="font-medium">{platformNames[platformId]}</span>
+                                </div>
                               </div>
-                            )}
 
-                            {/* Action Buttons */}
-                            <div className="flex gap-3 pt-4">
-                              <Button size="default" variant="outline" className="flex-1 glass border-0 h-12">
-                                <Edit2 className="h-4 w-4 mr-2" />
-                                Edit Text
-                              </Button>
-                              <Button size="default" className="flex-1 bg-primary hover:bg-primary/90 h-12">
-                                <Share2 className="h-4 w-4 mr-2" />
-                                Post Now
-                              </Button>
-                              <Button size="default" variant="outline" className="flex-1 glass border-0 h-12">
-                                <Calendar className="h-4 w-4 mr-2" />
-                                Schedule
-                              </Button>
-                            </div>
-                          </CardContent>
-                        </Card>
+                              {/* Generated Content */}
+                              <div className="space-y-4">
+                                <Textarea
+                                  value={generatedCampaigns[platformId]?.content || ""}
+                                  readOnly
+                                  className="glass border-0 bg-white/50 dark:bg-slate-800/50 min-h-[300px] text-base leading-relaxed resize-none p-6"
+                                />
+                                <p className="text-xs text-muted-foreground text-center">Version 1</p>
+                              </div>
+
+                              {/* Action Buttons - Left Aligned */}
+                              <div className="flex gap-3 justify-start">
+                                <Button size="default" variant="outline" className="glass border-0 h-12">
+                                  <Edit2 className="h-4 w-4 mr-2" />
+                                  Edit Text
+                                </Button>
+                                <Button size="default" className="bg-primary hover:bg-primary/90 h-12">
+                                  <Share2 className="h-4 w-4 mr-2" />
+                                  Post Now
+                                </Button>
+                                <Button size="default" variant="outline" className="glass border-0 h-12">
+                                  <Download className="h-4 w-4 mr-2" />
+                                  Download
+                                </Button>
+                              </div>
+                            </CardContent>
+                          </Card>
+
+                          {/* Image Card (Right) */}
+                          <Card className="glass-card shadow-lg h-fit">
+                            <CardContent className="p-8 space-y-6">
+                              {/* Image Carousel */}
+                              <div className="space-y-4">
+                                <div className="aspect-square bg-muted/20 rounded-lg flex items-center justify-center border-2 border-dashed border-muted-foreground/30">
+                                  {uploadedImage ? (
+                                    <img 
+                                      src={uploadedImage} 
+                                      alt="Campaign image" 
+                                      className="w-full h-full object-cover rounded-lg"
+                                    />
+                                  ) : (
+                                    <div className="text-center">
+                                      <ImageIcon className="h-12 w-12 text-muted-foreground/50 mx-auto mb-2" />
+                                      <p className="text-sm text-muted-foreground">No image selected</p>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Image Action Buttons - Right Aligned */}
+                              <div className="flex gap-3 justify-end">
+                                <Button size="default" variant="outline" className="glass border-0 h-12">
+                                  <Edit2 className="h-4 w-4 mr-2" />
+                                  Edit with AI
+                                </Button>
+                                <Button size="default" variant="outline" className="glass border-0 h-12">
+                                  <Upload className="h-4 w-4 mr-2" />
+                                  Upload Image
+                                </Button>
+                                <Button size="default" variant="outline" className="glass border-0 h-12">
+                                  <Palette className="h-4 w-4 mr-2" />
+                                  Apply Logo
+                                </Button>
+                                {uploadedImage && (
+                                  <Button size="default" variant="outline" className="glass border-0 h-12 w-12 p-0">
+                                    <X className="h-4 w-4" />
+                                  </Button>
+                                )}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </div>
                       </TabsContent>
                     ))}
                   </Tabs>
