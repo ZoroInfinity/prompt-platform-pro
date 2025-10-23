@@ -262,24 +262,36 @@ export function CampaignGenerator() {
                       <div className="p-4 grid grid-cols-2 gap-4">
                         <div>
                           <Label htmlFor="audience" className="text-sm font-medium">Target Audience</Label>
-                          <Input
-                            id="audience"
-                            value={targetAudience}
-                            onChange={(e) => setTargetAudience(e.target.value)}
-                            placeholder="e.g., Small business owners"
-                            className="mt-1 border-0 bg-background/50"
-                          />
+                          <Select value={targetAudience} onValueChange={setTargetAudience}>
+                            <SelectTrigger className="mt-1 border-0 bg-background/50">
+                              <SelectValue placeholder="Select audience" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-background border border-muted z-50">
+                              <SelectItem value="small-business">Small Business Owners</SelectItem>
+                              <SelectItem value="entrepreneurs">Entrepreneurs</SelectItem>
+                              <SelectItem value="enterprise">Enterprise Companies</SelectItem>
+                              <SelectItem value="startups">Startups</SelectItem>
+                              <SelectItem value="marketers">Marketing Professionals</SelectItem>
+                              <SelectItem value="executives">C-Level Executives</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
                         
                         <div>
                           <Label htmlFor="cta" className="text-sm font-medium">Call to Action</Label>
-                          <Input
-                            id="cta"
-                            value={cta}
-                            onChange={(e) => setCta(e.target.value)}
-                            placeholder="e.g., Get started free"
-                            className="mt-1 border-0 bg-background/50"
-                          />
+                          <Select value={cta} onValueChange={setCta}>
+                            <SelectTrigger className="mt-1 border-0 bg-background/50">
+                              <SelectValue placeholder="Select CTA" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-background border border-muted z-50">
+                              <SelectItem value="get-started">Get Started Free</SelectItem>
+                              <SelectItem value="learn-more">Learn More</SelectItem>
+                              <SelectItem value="sign-up">Sign Up Now</SelectItem>
+                              <SelectItem value="try-free">Try Free Trial</SelectItem>
+                              <SelectItem value="book-demo">Book a Demo</SelectItem>
+                              <SelectItem value="contact-us">Contact Us</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
                         
                         <div>
@@ -288,7 +300,7 @@ export function CampaignGenerator() {
                             <SelectTrigger className="mt-1 border-0 bg-background/50">
                               <SelectValue placeholder="Select tone" />
                             </SelectTrigger>
-                            <SelectContent className="bg-background border border-muted">
+                            <SelectContent className="bg-background border border-muted z-50">
                               {tones.map((t) => (
                                 <SelectItem key={t} value={t.toLowerCase()}>{t}</SelectItem>
                               ))}
@@ -302,7 +314,7 @@ export function CampaignGenerator() {
                             <SelectTrigger className="mt-1 border-0 bg-background/50">
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent className="bg-background border border-muted">
+                            <SelectContent className="bg-background border border-muted z-50">
                               {languages.map((lang) => (
                                 <SelectItem key={lang} value={lang.toLowerCase()}>{lang}</SelectItem>
                               ))}
@@ -398,45 +410,35 @@ export function CampaignGenerator() {
                           {/* Content Card (Left) */}
                           <Card className="glass-card shadow-lg">
                             <CardContent className="p-8 space-y-6">
-                              {/* Platform Tabs (Logo Only) */}
-                              <TabsList className="grid grid-cols-3 w-full bg-muted/30">
-                                {selectedPlatforms.slice(0, 3).map((pid) => (
-                                  <TabsTrigger 
-                                    key={pid} 
-                                    value={pid}
-                                    className="data-[state=active]:bg-background"
-                                    onClick={() => setCurrentPlatform(pid)}
+                              {/* Version Controls - Above Content */}
+                              {generatedCampaigns[platformId]?.content.length > 1 && (
+                                <div className="flex items-center justify-between">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 p-0"
+                                    onClick={() => setCurrentVersion(Math.max(0, currentVersion - 1))}
+                                    disabled={currentVersion === 0}
                                   >
-                                    <span className="text-lg">{platformIcons[pid]}</span>
-                                  </TabsTrigger>
-                                ))}
-                              </TabsList>
+                                    <ChevronLeft className="h-4 w-4" />
+                                  </Button>
+                                  <p className="text-xs text-muted-foreground">
+                                    Version {currentVersion + 1} of {generatedCampaigns[platformId]?.content.length}
+                                  </p>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 p-0"
+                                    onClick={() => setCurrentVersion(Math.min((generatedCampaigns[platformId]?.content.length || 1) - 1, currentVersion + 1))}
+                                    disabled={currentVersion >= (generatedCampaigns[platformId]?.content.length || 1) - 1}
+                                  >
+                                    <ChevronRight className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              )}
 
-                              {/* Version Carousel */}
+                              {/* Content Display */}
                               <div className="relative">
-                                {generatedCampaigns[platformId]?.content.length > 1 && (
-                                  <>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 p-0"
-                                      onClick={() => setCurrentVersion(Math.max(0, currentVersion - 1))}
-                                      disabled={currentVersion === 0}
-                                    >
-                                      <ChevronLeft className="h-4 w-4" />
-                                    </Button>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 p-0"
-                                      onClick={() => setCurrentVersion(Math.min((generatedCampaigns[platformId]?.content.length || 1) - 1, currentVersion + 1))}
-                                      disabled={currentVersion >= (generatedCampaigns[platformId]?.content.length || 1) - 1}
-                                    >
-                                      <ChevronRight className="h-4 w-4" />
-                                    </Button>
-                                  </>
-                                )}
-                                
                                 {isEditing ? (
                                   <Textarea
                                     value={editContent}
@@ -451,13 +453,6 @@ export function CampaignGenerator() {
                                   />
                                 )}
                               </div>
-
-                              {/* Version Label */}
-                              {generatedCampaigns[platformId]?.content.length > 1 && (
-                                <p className="text-xs text-muted-foreground text-center">
-                                  Version {currentVersion + 1} of {generatedCampaigns[platformId]?.content.length}
-                                </p>
-                              )}
 
                               {/* Action Buttons - Left Aligned */}
                               <div className="flex gap-3 justify-start">
